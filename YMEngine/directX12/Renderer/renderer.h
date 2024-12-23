@@ -39,6 +39,8 @@ namespace ym
 
 		}
 
+		void SetViewPort();
+
 	private:
 		std::shared_ptr<Device> device_{};//デバイス
 		std::shared_ptr<CommandList> commandList_{};

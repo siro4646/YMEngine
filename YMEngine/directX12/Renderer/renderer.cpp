@@ -51,7 +51,10 @@ namespace ym
 	{
 		device_->WaitForCommandQueue();
 
+		commandList_->Uninit();
+
 		device_->Uninit();
+
 
 
 	}
@@ -67,9 +70,8 @@ namespace ym
 		auto rtv = device_->GetSwapChain().GetDescHandle(bbidx);
 		cmd->GetCommandList()->OMSetRenderTargets(1, &rtv, FALSE, nullptr);
 		cmd->GetCommandList()->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
-		cmd->GetCommandList()->RSSetViewports(1, &m_viewPort);
-		cmd->GetCommandList()->RSSetScissorRects(1, &m_scissorRect);
-
+		
+		SetViewPort();
 
 
 	}
@@ -86,5 +88,11 @@ namespace ym
 		device_->WaitForCommandQueue();
 		cmd->Reset();
 		device_->Present();
+	}
+	void Renderer::SetViewPort()
+	{
+		auto cmd = commandList_;
+		cmd->GetCommandList()->RSSetViewports(1, &m_viewPort);
+		cmd->GetCommandList()->RSSetScissorRects(1, &m_scissorRect);
 	}
 }

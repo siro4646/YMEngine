@@ -152,6 +152,11 @@
     <ClCompile Include="YMEngine\directX12\swapChain\swapChain.cpp" />
     <ClCompile Include="YMEngine\directX12\textureView\textureView.cpp" />
     <ClCompile Include="YMEngine\directX12\texture\texture.cpp" />
+    <ClCompile Include="YMEngine\utility\inputSystem\gamePad\gamePadInput.cpp" />
+    <ClCompile Include="YMEngine\utility\inputSystem\inputSystem.cpp" />
+    <ClCompile Include="YMEngine\utility\inputSystem\keyBoard\keyBoardInput.cpp" />
+    <ClCompile Include="YMEngine\utility\inputSystem\mouse\mouseInput.cpp" />
+    <ClCompile Include="YMEngine\utility\vector\vector.cpp" />
     <ClCompile Include="YMEngine\winAPI\window\window.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -172,9 +177,20 @@
     <ClInclude Include="YMEngine\directX12\texture\texture.h" />
     <ClInclude Include="YMEngine\utility\crc.h" />
     <ClInclude Include="YMEngine\utility\fileStream\fileStream.h" />
+    <ClInclude Include="YMEngine\utility\inputSystem\base\inputDevice.h" />
+    <ClInclude Include="YMEngine\utility\inputSystem\gamePad\gamePadInput.h" />
+    <ClInclude Include="YMEngine\utility\inputSystem\inputManger\inputManger.h" />
+    <ClInclude Include="YMEngine\utility\inputSystem\inputSystem.h" />
+    <ClInclude Include="YMEngine\utility\inputSystem\keyBoard\keyBoardInput.h" />
+    <ClInclude Include="YMEngine\utility\inputSystem\mouse\mouseInput.h" />
     <ClInclude Include="YMEngine\utility\stringUtility.h" />
     <ClInclude Include="YMEngine\utility\timer.h" />
+    <ClInclude Include="YMEngine\utility\transform\transform.h" />
     <ClInclude Include="YMEngine\utility\utility.h" />
+    <ClInclude Include="YMEngine\utility\vector\i_vector.h" />
+    <ClInclude Include="YMEngine\utility\vector\vector2.h" />
+    <ClInclude Include="YMEngine\utility\vector\vector3.h" />
+    <ClInclude Include="YMEngine\utility\vector\vectorbase.h" />
     <ClInclude Include="YMEngine\winAPI\window\window.h" />
   </ItemGroup>
   <ItemGroup>

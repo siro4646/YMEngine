@@ -2,6 +2,7 @@
 #include "winAPI/window/window.h"
 #include "Renderer/renderer.h"
 
+#include "utility/inputSystem/inputManger/inputManger.h"
 
 namespace ym
 {
@@ -33,6 +34,7 @@ namespace ym
 	{
 		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
+
 		ym::CpuTimer::Initialize();
 		deltaTime_.reset();
 
@@ -57,6 +59,7 @@ namespace ym
 		{
 			return false;
 		}
+		ym::InputManager::GetInstance().Initialize(m_window->GetWndHandle());
 
 		
 
