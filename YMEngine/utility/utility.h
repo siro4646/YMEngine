@@ -2,8 +2,6 @@
 
 #define NOMINMAX
 
-//#include "define/type.h"
-
 
 namespace ym
 {

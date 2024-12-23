@@ -4,8 +4,8 @@
 #include "utility/vector/vector3.h"
 
 namespace ym {
-	class Vector2;
-	class Vector3;
+	/*class Vector2;
+	class Vector3;*/
 
 	class Transform2D
 	{

@@ -1,27 +1,31 @@
 #pragma once
 #include "vectorbase.h"
-class Vector3;
 
-class Vector2 : public VectorBase<float> {
-public:
-    Vector2() : VectorBase() {}
-    Vector2(float x, float y) : VectorBase(x, y) {}
+namespace ym {
 
-	// ÉÅÉìÉoïœêî
-	static Vector2 up;
-	static Vector2 down;
-	static Vector2 left;
-	static Vector2 right;
+    class Vector3;
 
-	static Vector2 zero;
-	static Vector2 one;
+    class Vector2 : public VectorBase<float> {
+    public:
+        Vector2() : VectorBase() {}
+        Vector2(float x, float y) : VectorBase(x, y) {}
+
+        // ÉÅÉìÉoïœêî
+        static Vector2 up;
+        static Vector2 down;
+        static Vector2 left;
+        static Vector2 right;
+
+        static Vector2 zero;
+        static Vector2 one;
 
 
-    // DirectXMathå›ä∑
-    DirectX::XMFLOAT2 ToXMFLOAT2() const {
-        return DirectX::XMFLOAT2(x, y);
-    }
+        // DirectXMathå›ä∑
+        DirectX::XMFLOAT2 ToXMFLOAT2() const {
+            return DirectX::XMFLOAT2(x, y);
+        }
 
-    // Vector3Ç…ïœä∑
-    Vector3 ToVector3(float z = 0.0f) const;
-};
+        // Vector3Ç…ïœä∑
+        Vector3 ToVector3(float z = 0.0f) const;
+    };
+}

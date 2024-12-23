@@ -2,7 +2,7 @@
 #include "winAPI/window/window.h"
 #include "Renderer/renderer.h"
 
-#include "utility/inputSystem/inputManger/inputManger.h"
+
 
 namespace ym
 {
@@ -62,6 +62,7 @@ namespace ym
 		ym::InputManager::GetInstance().Initialize(m_window->GetWndHandle());
 
 		
+		
 
 		return true;
 
@@ -71,8 +72,12 @@ namespace ym
 	{
 		auto _renderer = Renderer::Instance();
 
+		auto input = InputManager::GetInstance();
+		auto keybord = KeyboardInput::GetInstance();
+
 		while (1)
 		{
+			input.Update();
 			if (!m_window->ProcessMessage())
 			{
 				break;
@@ -86,7 +91,6 @@ namespace ym
 					_renderer->BeginFrame();
 					_renderer->EndFrame();
 
-					
 				}
 			}
 		}
