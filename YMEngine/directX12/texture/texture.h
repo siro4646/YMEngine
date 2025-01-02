@@ -35,11 +35,23 @@ namespace ym
 		bool					isUav = false;
 	};
 
+	enum TextureState
+	{
+		//èâä˙âªëO
+		Uninitialized = 0,
+		//èâä˙âªçœÇ›
+		Initialized,
+		//ì«Ç›çûÇ›èIóπ
+		Loaded,
+	};
+
 	class Texture
 	{
 		friend class CommandList;
 
 	public:
+		
+
 		Texture(){}
 		~Texture(){
 		
@@ -50,11 +62,44 @@ namespace ym
 		bool Init(Device *pDev, const TextureDesc &desc);
 		bool InitFromSwapChain(Device*pDev,SwapChain *pSwapChain, u32 bufferIndex);
 
+		bool LoadTexture(Device *pDev, CommandList *pCmdList, const std::string filename, bool isForceSRGB = false, bool forceSysRam = false);
+		bool LoadTexture(Device *pDev, CommandList *pCmdList, const std::wstring *filename, bool isForceSRGB = false, bool forceSysRam = false);
+
+
+		bool UpdateImage(Device *pDev, CommandList *pCmdList, const DirectX::ScratchImage &image, ID3D12Resource **ppSrcImage);
+		bool UpdateImage(Device *pDev, CommandList *pCmdList, const void *pImageBin, ID3D12Resource **ppSrcImage);
+
+		static void ResourceRelease()
+		{
+			textureMap_.clear();
+		}
+
 		//Getter
 		ID3D12Resource *GetResourceDep() { return pResource_.Get(); }
 		const TextureDesc &GetTextureDesc() const { return textureDesc_; }
 		const D3D12_RESOURCE_DESC &GetResourceDesc() const { return resourceDesc_; }
+
 	private:
+
+		bool InitFromDXImage(Device *pDev, const DirectX::ScratchImage &image, bool isForceSRGB, bool forceSysRam = false);
+
+		bool InitFromTGA(Device *pDev, CommandList *pCmdList, const void *pTgaBin, size_t size, ym::u32 mipLevels, bool isForceSRGB, bool forceSysRam = false);
+		bool InitFromDDS(Device *pDev, CommandList *pCmdList, const void *pDdsBin, size_t size, ym::u32 mipLevels, bool isForceSRGB, bool forceSysRam = false);
+		bool InitFromPNG(Device *pDev, CommandList *pCmdList, const void *pPngBin, size_t size, ym::u32 mipLevels, bool isForceSRGB, bool forceSysRam = false);
+		bool InitFromJPG(Device *pDev, CommandList *pCmdList, const void *pJpgBin, size_t size, ym::u32 mipLevels, bool isForceSRGB, bool forceSysRam = false);
+
+
+
+
+
+		std::unique_ptr<DirectX::ScratchImage> InitializeFromTGAwoLoad(Device *pDev, const void *pTgaBin, size_t size, ym::u32 mipLevels);
+		std::unique_ptr<DirectX::ScratchImage> InitializeFromDDSwoLoad(Device *pDev, const void *pTgaBin, size_t size, ym::u32 mipLevels);
+		std::unique_ptr<DirectX::ScratchImage> InitializeFromPNGwoLoad(Device *pDev, const void *pPngBin, size_t size, ym::u32 mipLevels);
+		std::unique_ptr<DirectX::ScratchImage> InitializeFromJPGwoLoad(Device *pDev, const void *pJpgBin, size_t size, ym::u32 mipLevels);
+
+	private:
+		static  std::unordered_map<std::string,ym::Texture> textureMap_;
+
 		ComPtr<ID3D12Resource> pResource_{ nullptr };
 		TextureDesc textureDesc_{};
 		D3D12_RESOURCE_DESC resourceDesc_{};

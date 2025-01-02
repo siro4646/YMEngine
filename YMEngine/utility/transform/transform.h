@@ -49,6 +49,7 @@ namespace ym {
 		}
 		XMMATRIX GetMatrix()
 		{
+			//return GetMatrixPosition() * GetMatrixRotation() * GetMatrixScale();
 			return GetMatrixScale() * GetMatrixRotation() * GetMatrixPosition();
 		}
 		Vector3 GetForward()

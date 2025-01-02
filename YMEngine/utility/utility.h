@@ -2,10 +2,14 @@
 
 #define NOMINMAX
 
+#include "transform/transform.h"
 
 namespace ym
 {
-
+	struct Color
+	{
+		float r, g, b, a;
+	};
 
 	enum class ColorSpaceType
 	{
@@ -397,6 +401,103 @@ namespace ym
 		float b = Persp.r[3].m128_f32[2];
 		float c = Persp.r[2].m128_f32[3];
 		return -b / (a - c * DeviceZ);
+	}
+
+	//スケール行列の作成
+	static std::array<std::array<float, 4>, 4> CreateScaleMatrix(float x, float y, float z)
+	{
+		return{ {
+			{x,0,0,0},
+			{0,y,0,0},
+			{0,0,z,0},
+			{0,0,0,1}
+			} };
+	}
+
+	static std::array<std::array<float, 4>, 4> CreateScaleMatrix(Vector3 v)
+	{
+		return CreateScaleMatrix(v.x, v.y, v.z);
+	}
+	//回転行列を作成
+	static std::array<std::array<float, 4>, 4> CreateRotationMatrix(float x, float y, float z)
+	{
+		float radX = XMConvertToRadians(x);
+		float radY = XMConvertToRadians(y);
+		float radZ = XMConvertToRadians(z);
+
+		float cosX = cosf(radX);
+		float sinX = sinf(radX);
+		float cosY = cosf(radY);
+		float sinY = sinf(radY);
+		float cosZ = cosf(radZ);
+		float sinZ = sinf(radZ);
+
+		return{ {
+			{cosY * cosZ,cosY * sinZ,0,0},
+			{sinX * sinY * cosZ - cosX * sinZ, sinX * sinY * sinZ + cosX * cosZ,sinX * cosY,0},
+			{cosX * sinY * cosZ + sinX * sinZ, cosX * sinY * sinZ - sinX * cosZ,cosX * cosY,0},
+			{0,0,0,1}
+		} };
+	}
+	static std::array<std::array<float, 4>, 4> CreateRotationMatrix(Vector3 v)
+	{
+		return CreateRotationMatrix(v.x, v.y, v.z);
+	}
+
+	//平行移動行列を作成
+	static std::array<std::array<float, 4>, 4> CreateTranslationMatrix(float x, float y, float z)
+	{
+		return{ {
+			{1,0,0,x},
+			{0,1,0,y},
+			{0,0,1,z},
+			{0,0,0,1}
+		} };
+	}
+	static std::array<std::array<float, 4>, 4> CreateTranslationMatrix(Vector3 v)
+	{
+		return CreateTranslationMatrix(v.x, v.y, v.z);
+	}
+	//行列の掛け算
+	static std::array<std::array<float, 4>, 4> MultiplyMatrix(const std::array<std::array<float, 4>, 4> &m1, const std::array<std::array<float, 4>, 4> &m2)
+	{
+		std::array<std::array<float, 4>, 4> ans = { 0 };
+		for (int i = 0; i < 4; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				ans[i][j] =
+					m1[i][0] * m2[0][j] +
+					m1[i][1] * m2[1][j] +
+					m1[i][2] * m2[2][j] +
+					m1[i][3] * m2[3][j];
+			}
+		}
+		return ans;
+	}
+	//変換行列を作成
+	static std::array<std::array<float, 4>, 4> CreateTransformMatrix(Vector3 scale, Vector3 rot, Vector3 trans)
+	{
+		auto scaleMatrix = CreateScaleMatrix(scale);
+		auto rotMatrix = CreateRotationMatrix(rot);
+		auto transMatrix = CreateTranslationMatrix(trans);
+
+		auto ans = MultiplyMatrix(MultiplyMatrix(scaleMatrix, rotMatrix), transMatrix);
+
+		return ans;
+	}
+	static std::array<std::array<float, 4>, 4> CreateTransformMatrix(Transform t)
+	{
+		return CreateTransformMatrix(t.Scale, t.Rotation, t.Position);
+	}
+	// 座標を変換するための関数
+	static Vector3 TransformPoint(const std::array<std::array<float, 4>, 4> &matrix, const std::array<float, 3> &point) {
+		std::array<float, 3> ans = {
+			matrix[0][0] * point[0] + matrix[0][1] * point[1] + matrix[0][2] * point[2] + matrix[0][3],
+			matrix[1][0] * point[0] + matrix[1][1] * point[1] + matrix[1][2] * point[2] + matrix[1][3],
+			matrix[2][0] * point[0] + matrix[2][1] * point[1] + matrix[2][2] * point[2] + matrix[2][3]
+		};
+		return Vector3(ans[0], ans[1], ans[2]);
 	}
 
 

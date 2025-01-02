@@ -45,7 +45,28 @@ namespace ym {
 	}
 	void Device::Uninit()
 	{
+		WaitForCommandQueue();
+
+	/*	pGlobalViewDescHeap_->Destroy();
+		delete pGlobalViewDescHeap_;
+		pGlobalViewDescHeap_ = nullptr;
+
+		defaultSamplerDescInfo_.Free();
+		defaultViewDescInfo_.Free();
+
+		pSamplerDescHeap_->Destroy();
+		delete pSamplerDescHeap_;
+		pSamplerDescHeap_ = nullptr;
+
+		pViewDescHeap_->Destroy();
+		delete pViewDescHeap_;
+		pViewDescHeap_ = nullptr;*/
+
+
 		
+		
+
+
 	}
 	void Device::WaitForCommandQueue()
 	{
@@ -65,6 +86,10 @@ namespace ym {
 	void Device::Present(int syncInterval)
 	{
 		pSwapChain_->Present(syncInterval);
+	}
+	void Device::Resize(u32 width, u32 height)
+	{	
+		pSwapChain_->Resize(width, height);
 	}
 	bool Device::CreateFactory()
 	{
@@ -249,6 +274,9 @@ namespace ym {
 					break;//生成可能なバージョンが見つかったらループを打ち切り
 				}
 			}
+
+			pDevice_->QueryInterface(IID_PPV_ARGS(&pLatestDevice_));
+
 			// COPY_DESCRIPTORS_INVALID_RANGESエラーを回避
 			ID3D12InfoQueue *pD3DInfoQueue;
 			if (SUCCEEDED(pDevice_->QueryInterface(__uuidof(ID3D12InfoQueue), reinterpret_cast<void **>(&pD3DInfoQueue))))
@@ -329,13 +357,58 @@ namespace ym {
 	bool Device::CreateDescriptorHeap()
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC desc{};
+		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		desc.NumDescriptors = 500000;
+		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		desc.NodeMask = 1;
+		pGlobalViewDescHeap_ = new GlobalDescriptorHeap();
+		if (!pGlobalViewDescHeap_->Initialize(this, desc))
+		{
+			return false;
+		}
+
+		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+		desc.NumDescriptors = 1000;
+		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		pViewDescHeap_ = new DescriptorAllocator();
+		if (!pViewDescHeap_->Initialize(this, desc))
+		{
+			return false;
+		}
+
+
+		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
+		desc.NumDescriptors = 1000;
+		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		pSamplerDescHeap_ = new DescriptorAllocator();
+		if (!pSamplerDescHeap_->Initialize(this, desc))
+		{
+			return false;
+		}
+
+
+
 		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-		desc.NumDescriptors = 2;
+		desc.NumDescriptors = 1000;
 		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
 		pRtvDescHeap_ = new DescriptorAllocator();
 		if (!pRtvDescHeap_->Initialize(this, desc))
 		{
 			return false;
 		}
+		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_DSV;
+		desc.NumDescriptors = 1000;
+		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		pDsvDescHeap_ = new DescriptorAllocator();
+		if (!pDsvDescHeap_->Initialize(this, desc))
+		{
+			return false;
+		}
+
+		defaultViewDescInfo_ = pViewDescHeap_->Allocate();
+		defaultSamplerDescInfo_ = pSamplerDescHeap_->Allocate();
+
+		ym::ConsoleLog("ディスクリプタヒープ作成成功\n");
+
 	}
 }

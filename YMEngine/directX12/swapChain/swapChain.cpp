@@ -74,7 +74,7 @@ namespace ym
 			frameIndex_ = pSwapChain_->GetCurrentBackBufferIndex();
 			width_ = width;
 			height_ = height;
-
+			pDevice_ = pDev;
 			//swapchainEvent_ = pSwapChain_->GetFrameLatencyWaitableObject();
 
 			pSwap->Release();
@@ -84,17 +84,47 @@ namespace ym
 		{
 			for (u32 i = 0; i < kFrameCount; ++i)
 			{
-				if (!textures_[i].InitFromSwapChain(pDev, this, i))
+				if (!renderTargetTextures_[i].InitFromSwapChain(pDev, this, i))
 				{
 					return false;
 				}
-				if (!views_[i].Init(pDev, &textures_[i]))
+				if (!renderTargetViews_[i].Init(pDev, &renderTargetTextures_[i]))
+				{
+					return false;
+				}
+				if (!renderTargetTexViews_[i].Init(pDev, &renderTargetTextures_[i]))
 				{
 					return false;
 				}
 			}
 
 		}
+		{
+			ym::TextureDesc texDesc;
+			texDesc.dimension = TextureDimension::Texture2D;
+			texDesc.width = width;
+			texDesc.height = height;
+			texDesc.format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+			texDesc.isDepthBuffer = true;
+			texDesc.clearDepth = 1.0f;
+			texDesc.clearStencil = 0;
+			//texDesc.
+
+			if (!depthStencilTexture_.Init(pDev, texDesc))
+			{
+				return false;
+			}
+			if (!depthStencilView_.Init(pDev, &depthStencilTexture_))
+			{
+				return false;
+			}
+			if (!depthStencilTexView_.Init(pDev, &depthStencilTexture_))
+			{
+				return false;
+			}
+
+		}
+
 		return true;
 
 	}
@@ -108,8 +138,15 @@ namespace ym
 		pSwapChain_->Present(syncInterval, 0);
 		frameIndex_ = pSwapChain_->GetCurrentBackBufferIndex();
 	}
+	void SwapChain::Resize(u32 width, u32 height)
+	{
+		pSwapChain_->ResizeBuffers(kFrameCount, width, height, pDevice_->GetSwapChain().GetCurrentRenderTargetView()->GetFormat(), 0);
+		width_ = width;
+		height_ = height;
+
+	}
 	D3D12_CPU_DESCRIPTOR_HANDLE SwapChain::GetDescHandle(int index)
 	{
-		return views_[index].GetDescInfo().cpuHandle;
+		return renderTargetViews_[index].GetDescInfo().cpuHandle;
 	}
 }

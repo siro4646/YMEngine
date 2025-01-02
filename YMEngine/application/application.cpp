@@ -1,7 +1,9 @@
 #include "application.h"
 #include "winAPI/window/window.h"
 #include "Renderer/renderer.h"
+#include "scene/sceneManager.h"
 
+#include "texture/texture.h"
 
 
 namespace ym
@@ -19,6 +21,7 @@ namespace ym
 
 	Application::~Application()
 	{
+		Texture::ResourceRelease();
 		//Terminate();
 //#ifdef _DEBUG
 //		ComPtr<IDXGIDebug1>dxgiDebug;
@@ -32,7 +35,7 @@ namespace ym
 
 	bool Application::Init()
 	{
-		CoInitializeEx(nullptr, COINIT_MULTITHREADED);
+		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 
 		ym::CpuTimer::Initialize();
@@ -55,12 +58,13 @@ namespace ym
 		{
 			return false;
 		}
-		if (!_renderer->Init(m_window->GetWndHandle(), ym::config::kResolutionWidth, ym::config::kResolutionHeight,ym::ColorSpaceType::Rec2020))
+		if (!_renderer->Init(m_window.get(), ym::config::kResolutionWidth, ym::config::kResolutionHeight, ym::ColorSpaceType::Rec2020))
 		{
 			return false;
 		}
 		ym::InputManager::GetInstance().Initialize(m_window->GetWndHandle());
 
+		auto sceneManager = ym::SceneManager::Instance();
 		
 		
 
@@ -74,6 +78,7 @@ namespace ym
 
 		auto input = InputManager::GetInstance();
 		auto keybord = KeyboardInput::GetInstance();
+		auto sceneManager = ym::SceneManager::Instance();
 
 		while (1)
 		{
@@ -87,10 +92,30 @@ namespace ym
 				// フレームレートの同期
 				if (SyncFrameRate())
 				{
-
-					_renderer->BeginFrame();
-					_renderer->EndFrame();
-
+					if (keybord.GetKeyDown("Z"))
+					{
+						ym::ConsoleLog("Z\n");
+						_renderer->Resize(ym::config::kResolutionWidth, ym::config::kResolutionHeight);
+						ym::ConsoleLog("%d %d \n", ym::config::kResolutionWidth, ym::config::kResolutionHeight);
+					}
+					else if (keybord.GetKeyDown("X"))
+					{
+						ym::ConsoleLog("X\n");
+						u32 x = 192;
+						u32 y = 108;
+						_renderer->Resize(x, y);
+						ym::ConsoleLog("%d %d \n",x, y);
+					}
+					else if (keybord.GetKeyDown("C"))
+					{
+						ym::ConsoleLog("C\n");
+						u32 x = 800;
+						u32 y = 600;
+						_renderer->Resize(x, y);
+						ym::ConsoleLog("%d %d \n", x, y);
+					}
+					sceneManager->Update();
+					sceneManager->Draw();
 				}
 			}
 		}

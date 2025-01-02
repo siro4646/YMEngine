@@ -20,6 +20,18 @@ namespace ym
 		std::transform(ret.begin(), ret.end(), ret.begin(), [](unsigned char c) { return std::tolower(c); });
 		return ret;
 	}
+	inline std::wstring GetDirectoryPath(const std::wstring &origin)
+	{
+		namespace fs = std::filesystem;
+		fs::path p = origin.c_str();
+		return p.remove_filename().c_str();
+	}
+	inline std::wstring ReplaceExtension(const std::wstring &origin, const char *ext)
+	{
+		namespace fs = std::filesystem;
+		fs::path p = origin.c_str();
+		return p.replace_extension(ext).c_str();
+	}
 
 	inline std::string ConvertYenToSlash(const std::string &path)
 	{

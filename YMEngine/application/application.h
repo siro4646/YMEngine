@@ -42,6 +42,12 @@ namespace ym
 			}
 			return m_instance;
 		}
+
+		inline Window *GetWindow() const
+		{
+			return m_window.get();
+		}
+
 		/// <summary>
 		/// ‰Šú‰»
 		/// </summary>

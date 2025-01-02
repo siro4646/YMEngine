@@ -69,6 +69,57 @@
     <ClCompile Include="YMEngine\utility\vector\vector.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="YMEngine\directX12\bufferView\bufferView.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\buffer\buffer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\pipelineState\pipelineState.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\rootSignature\rootSignature.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\sampler\sampler.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\shader\shader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\test\polygon.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\scene\sceneManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scene\TestScene\testScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\gameObject\gameObject.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\TestObject.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\components\component.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\components\sprite\sprite.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\components\fbxLoader\fbxLoader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\camera\camera.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\camera\cameraManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\requiredObject\mainCamera.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -167,12 +218,105 @@
     <ClInclude Include="YMEngine\utility\transform\transform.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="YMEngine\directX12\bufferView\bufferView.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\buffer\buffer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\descriptorSet\DescriptorSet.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\pipelineState\pipelineState.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\rootSignature\rootSignature.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\sampler\sampler.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\shader\shader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\test\polygon.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\buffer\constantBuffer\constantBuffer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\utility\resourceRelease\resourceRelease.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\scene\baseScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\scene\sceneManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\TestScene\testScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\gameObject\gameObject.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\TestObject.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\components\component.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\components\sprite\sprite.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\resource\resourceStateTracker.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\components\fbxLoader\fbxLoader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\camera\camera.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\camera\cameraManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\requiredObject\mainCamera.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc143-mt.dll" />
     <None Include="packages.config" />
+    <None Include="asset\shader\test\test.hlsli" />
+    <None Include="asset\shader\2dSprite\2dSprite.hlsli" />
+    <None Include="asset\shader\simpleFBX\simpleFBX.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="assimp-vc143-mt.lib" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="asset\shader\grayScale\grayScalePS.hlsl" />
+    <FxCompile Include="asset\shader\grayScale\grayScaleVS.hlsl" />
+    <FxCompile Include="asset\shader\mosaic\mosaicPS.hlsl" />
+    <FxCompile Include="asset\shader\mosaic\mosaicVS.hlsl" />
+    <FxCompile Include="asset\shader\reverse\reversePS.hlsl" />
+    <FxCompile Include="asset\shader\reverse\reverseVS.hlsl" />
+    <FxCompile Include="asset\shader\test\testPS.hlsl" />
+    <FxCompile Include="asset\shader\test\testVS.hlsl" />
+    <FxCompile Include="asset\shader\blur\blurVS.hlsl" />
+    <FxCompile Include="asset\shader\blur\blurPS.hlsl" />
+    <FxCompile Include="asset\shader\test2\test2VS.hlsl" />
+    <FxCompile Include="asset\shader\test2\test2PS.hlsl" />
+    <FxCompile Include="asset\shader\2dSprite\2dSpriteVS.hlsl" />
+    <FxCompile Include="asset\shader\2dSprite\2dSpritePS.hlsl" />
+    <FxCompile Include="asset\shader\simpleFBX\simpleFBXVS.hlsl" />
+    <FxCompile Include="asset\shader\simpleFBX\simpleFBXPS.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="asset\texture\blue_noise.tga" />
+    <Image Include="asset\texture\test.png">
+      <Filter>リソース ファイル</Filter>
+    </Image>
   </ItemGroup>
 </Project>

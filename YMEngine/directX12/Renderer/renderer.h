@@ -4,10 +4,18 @@
 #include "commandList/commandList.h"
 
 
+//テスト用
+#include "test/polygon.h"
+
+
+//=============================================================================
+
+
 namespace ym
 {
 	class Device;
 	class CommandList;
+	class Window;
 
 	//描画関係全部やってくれるクラスになる予定
 	class Renderer
@@ -23,11 +31,26 @@ namespace ym
 
 
 
-		bool Init(HWND hwnd, u32 width, u32 height, ColorSpaceType csType = ColorSpaceType::Rec709);
+		bool Init(Window *win, u32 width, u32 height, ColorSpaceType csType = ColorSpaceType::Rec709);
 
 		void Uninit();
 
+		void Update();
+
+		void Resize(u32 width, u32 height);
+
+		CommandList *GetCommandList()
+		{
+			return commandList_.get();
+		}
+		Device *GetDevice()
+		{
+			return device_.get();
+		}
+
+
 		void BeginFrame();
+		void Draw();
 		void EndFrame();
 
 	private:
@@ -41,11 +64,18 @@ namespace ym
 
 		void SetViewPort();
 
+		void CreateGraphicsItem();
+
 	private:
-		std::shared_ptr<Device> device_{};//デバイス
-		std::shared_ptr<CommandList> commandList_{};
+		static std::shared_ptr<Device> device_;//デバイス
+		static std::shared_ptr<CommandList> commandList_;
+		ym::Window *window_{};
 		D3D12_VIEWPORT m_viewPort{};
 		D3D12_RECT m_scissorRect{};
+
+		//テスト用
+		ym::Polygon _polygon;
+
 	};
 
 

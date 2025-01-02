@@ -23,6 +23,13 @@ namespace ym
 
 		void Present(int syncInterval);
 
+		void Resize(u32 width, u32 height);
+
+		Vector2 GetSize() const
+		{
+			return Vector2(width_, height_);
+		}
+
 		//Getter
 		IDXGISwapChain4 *GetSwapChainDep()
 		{
@@ -32,19 +39,32 @@ namespace ym
 		{
 			return frameIndex_;
 		}
-		Texture *GetTexture(int index) { return &textures_[index% kFrameCount]; }
-		Texture *GetCurrentTexture(int offset = 0) { return &textures_[(frameIndex_ + offset) % kFrameCount]; }
-		RenderTargetView *GetRenderTargetView(int index) { return &views_[index% kFrameCount]; }
-		RenderTargetView *GetCurrentRenderTargetView(int offset = 0) { return &views_[(frameIndex_ + offset) % kFrameCount]; }
+		Texture *GetTexture(int index) { return &renderTargetTextures_[index% kFrameCount]; }
+		Texture *GetCurrentTexture(int offset = 0) { return &renderTargetTextures_[(frameIndex_ + offset) % kFrameCount]; }
+		RenderTargetView *GetRenderTargetView(int index) { return &renderTargetViews_[index% kFrameCount]; }
+		RenderTargetView *GetCurrentRenderTargetView(int offset = 0) { return &renderTargetViews_[(frameIndex_ + offset) % kFrameCount]; }
+
+		Texture *GetDepthStencilTexture() { return &depthStencilTexture_; }
+		DepthStencilView *GetDepthStencilView() { return &depthStencilView_; }
+		TextureView *GetDepthStencilTexView() { return &depthStencilTexView_; }
+
 		D3D12_CPU_DESCRIPTOR_HANDLE GetDescHandle(int index);
 
 
 
 	private:
+		Device *pDevice_{ nullptr };
 		ComPtr<IDXGISwapChain4> pSwapChain_{ nullptr };
 
-		Texture textures_[kFrameCount];
-		RenderTargetView		views_[kFrameCount];
+		//レンダーターゲット
+		Texture renderTargetTextures_[kFrameCount];
+		RenderTargetView		renderTargetViews_[kFrameCount];
+		TextureView renderTargetTexViews_[kFrameCount];
+		//深度ステンシル
+		Texture depthStencilTexture_;
+		DepthStencilView depthStencilView_;
+		TextureView depthStencilTexView_;
+		
 
 
 		u32 frameIndex_{ 0 };
