@@ -84,15 +84,15 @@ namespace ym
 		{
 			for (u32 i = 0; i < kFrameCount; ++i)
 			{
-				if (!renderTargetTextures_[i].InitFromSwapChain(pDev, this, i))
+				if (!backBufferTextures[i].InitFromSwapChain(pDev, this, i))
 				{
 					return false;
 				}
-				if (!renderTargetViews_[i].Init(pDev, &renderTargetTextures_[i]))
+				if (!renderTargetViews_[i].Init(pDev, &backBufferTextures[i]))
 				{
 					return false;
 				}
-				if (!renderTargetTexViews_[i].Init(pDev, &renderTargetTextures_[i]))
+				if (!sceneRenderTargetTexViews_[i].Init(pDev, &backBufferTextures[i]))
 				{
 					return false;
 				}
@@ -130,6 +130,26 @@ namespace ym
 	}
 	void SwapChain::Uninit()
 	{
+		ym::ConsoleLog("[INFO]SwapChain::Uninit()\n");
+
+		//レンダーターゲット
+		for (auto v : renderTargetViews_)
+		{
+			v.Uninit();
+		}
+		for (auto v : sceneRenderTargetTexViews_)
+		{
+			v.Destroy();
+		}
+		for (auto t : backBufferTextures)
+		{
+			t.Uninit();
+		}
+		//深度ステンシル
+		depthStencilView_.Uninit();
+		depthStencilTexView_.Destroy();
+		depthStencilTexture_.Uninit();
+
 		pSwapChain_.Reset();
 
 	}

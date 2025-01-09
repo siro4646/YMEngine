@@ -25,7 +25,7 @@ namespace ym
 		void Draw() override;
 
 	private:
-		Renderer *_renderer = nullptr;
+	Renderer *_renderer = nullptr;
 
 		std::shared_ptr<Object> _testObject;
 		std::shared_ptr<Object> _mainCamera;

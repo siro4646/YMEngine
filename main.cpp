@@ -6,6 +6,7 @@ int main() {
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #endif
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	// ƒƒ‚ƒŠƒŠ[ƒN‚ğ’m‚ç‚¹‚é
+	//_CrtSetBreakAlloc(292);
 #ifdef _DEBUG
 
 	ym::EnableDebugLayer();

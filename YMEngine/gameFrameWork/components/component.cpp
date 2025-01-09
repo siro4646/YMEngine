@@ -11,7 +11,7 @@ namespace ym
 	{
 		auto renderer = Renderer::Instance();
 		pDevice_ = renderer->GetDevice()->shared_from_this();
-		pCmdList_ = renderer->GetCommandList()->shared_from_this();
+		pCmdList_ = renderer->GetGraphicCommandList()->shared_from_this();
 		this->object = object;
 	}
 }

@@ -8,6 +8,9 @@
 #include "gameFrameWork/gameObject/gameObject.h"
 #include "resource/resourceStateTracker.h"
 
+#include "camera/camera.h"
+#include "camera/cameraManager.h"
+
 namespace ym
 {
 	void Sprite::Init()
@@ -19,6 +22,9 @@ namespace ym
 		CreateSampler();
 		CreatePipelineState();
 		descriptorSet_ = std::make_shared<DescriptorSet>();
+
+		pCamera_ = CameraManager::Instance().GetMainCamera();
+
 
 		/*pCmdList_->Close();
 		pCmdList_->Execute();
@@ -48,6 +54,7 @@ namespace ym
 		cmdList->SetPipelineState(pipelineState_->GetPSO());
 		descriptorSet_->Reset();
 		descriptorSet_->SetVsCbv(0, constBufferView_->GetDescInfo().cpuHandle);
+		descriptorSet_->SetVsCbv(1, pCamera_->GetDescriptorHandle());
 		descriptorSet_->SetPsSrv(0, textureView_->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSampler(0, sampler_->GetDescInfo().cpuHandle);
 
@@ -158,6 +165,7 @@ namespace ym
 		XMMATRIX rot = XMMatrixRotationZ(object->globalTransform.Rotation.z);
 		XMMATRIX mat = scale * rot * windowScale * pos;
 		(*pMatrix_) = XMMatrixTranspose(mat);
+		(*pMatrix_) = object->globalTransform.GetMatrix();
 
 	}
 

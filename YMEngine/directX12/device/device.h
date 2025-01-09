@@ -69,6 +69,10 @@ namespace ym
 		{
 			return *pGraphicsQueue_;
 		}
+		CommandQueue &GetComputeQueue()
+		{
+			return *pComputeQueue_;
+		}
 
 		ColorSpaceType	GetColorSpaceType() const
 		{
@@ -148,6 +152,9 @@ namespace ym
 
 
 		std::unique_ptr<CommandQueue> pGraphicsQueue_{ nullptr };
+		std::unique_ptr<CommandQueue> pComputeQueue_{ nullptr };
+
+
 		std::unique_ptr<SwapChain> pSwapChain_{ nullptr };
 
 		ComPtr<ID3D12Fence> pFence_{ nullptr };
@@ -173,6 +180,8 @@ namespace ym
 		float			minLuminance_ = 0.0f;
 		float			maxLuminance_ = 0.0f;
 		float			maxFullFrameLuminance_ = 0.0f;
+
+		bool isUninited = false;
 
 
 	};

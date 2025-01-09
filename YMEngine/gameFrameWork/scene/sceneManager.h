@@ -38,6 +38,9 @@ namespace ym {
         // 現在のシーンを描画
         void Draw();
 
+		// シーンマネージャーの終了処理
+		void Terminate();
+
     private:
         SceneManager();
         ~SceneManager();

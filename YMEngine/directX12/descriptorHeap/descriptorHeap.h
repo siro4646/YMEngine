@@ -71,6 +71,7 @@ namespace ym
 		DescriptorInfo Allocate();
 		void Free(DescriptorInfo info);
 
+		u32							allocCount_ = 0;
 	private:
 		std::mutex					mutex_;
 		ID3D12DescriptorHeap *pHeap_ = nullptr;
@@ -79,7 +80,6 @@ namespace ym
 		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandleStart_;
 		u8 *pUseFlags_ = nullptr;
 		u32							descSize_ = 0;
-		u32							allocCount_ = 0;
 		u32							currentPosition_ = 0;
 	};	// class DescriptorAllocator
 
@@ -121,6 +121,8 @@ namespace ym
 		void Allocate(u32 count, D3D12_CPU_DESCRIPTOR_HANDLE &cpuHandle, D3D12_GPU_DESCRIPTOR_HANDLE &gpuHandle);
 
 		void Reset();
+
+		void Destroy();
 
 	private:
 		bool AddStack();

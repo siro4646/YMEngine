@@ -21,7 +21,7 @@ namespace ym
 			return;
 		}
 		pDevice_ = _renderer->GetDevice();
-		pCommandList_ = _renderer->GetCommandList();
+		pCommandList_ = _renderer->GetGraphicCommandList();
 		auto swapChain = pDevice_->GetSwapChain();
 		Vector2 windowSize = swapChain.GetSize();
 
@@ -41,6 +41,18 @@ namespace ym
 	}
 	Camera::~Camera()
 	{
+		if (pConstantBuffer_)
+		{
+			pConstantBuffer_->Unmap();
+			pConstantBuffer_.reset();
+		}
+		if (pConstBufferView_)
+		{
+			pConstBufferView_->Destroy();
+			pConstBufferView_.reset();
+		}
+
+
 	}
 	void Camera::UpdateViewMatrix()
 	{

@@ -80,7 +80,7 @@ namespace ym
 	{
 		if (!isInit_) return;
 		auto cmdList = pCmdList_->GetCommandList();
-
+		
 		for (int i = 0; i < meshes.size(); i++)
 		{
 		cmdList->SetPipelineState(pipelineState_->GetPSO());

@@ -1,4 +1,4 @@
-Texture2D g_texture : register(t0);
+Texture2D<float4> g_texture : register(t0);
 SamplerState g_sampler : register(s0);
 
 struct PSInput
@@ -17,7 +17,7 @@ float4 main(PSInput input) : SV_TARGET
     
     float2 g_windowSize;
     float4 g_area = float4(0, 0, 1280, 720);
-    float g_size = 25.0;
+    float g_size = 5.0;
     
     g_windowSize = float2(1280, 720);
      
@@ -32,9 +32,12 @@ float4 main(PSInput input) : SV_TARGET
         uv.x = floor(uv.x * g_windowSize.x / g_size) * g_size / g_windowSize.x;
         uv.y = floor(uv.y * g_windowSize.y / g_size) * g_size / g_windowSize.y;
         return g_texture.Sample(g_sampler,uv);
+        //return float4(1, 0, 0, 1);
     }
     else
     {
-        return g_texture.Sample(g_sampler, input.uv);
+       return g_texture.Sample(g_sampler, input.uv);
+       //return float4(1, 1, 0, 1);
+        
     }
 }

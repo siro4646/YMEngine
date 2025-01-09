@@ -15,6 +15,10 @@ namespace ym {
 		std::shared_ptr<Object>Clone()override;
 	private:
 
+		void UpdateCamera();
+
+		float distance_ = 1000.0f;
+
 		Camera *camera_;
 	};
 }

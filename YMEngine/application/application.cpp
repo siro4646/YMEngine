@@ -52,21 +52,8 @@ namespace ym
 		{
 			return false;
 		}
-		auto _renderer = Renderer::Instance();
-
-		if (!_renderer)
-		{
-			return false;
-		}
-		if (!_renderer->Init(m_window.get(), ym::config::kResolutionWidth, ym::config::kResolutionHeight, ym::ColorSpaceType::Rec2020))
-		{
-			return false;
-		}
-		ym::InputManager::GetInstance().Initialize(m_window->GetWndHandle());
-
-		auto sceneManager = ym::SceneManager::Instance();
 		
-		
+		AllInitilizeManager();
 
 		return true;
 
@@ -95,7 +82,7 @@ namespace ym
 					if (keybord.GetKeyDown("Z"))
 					{
 						ym::ConsoleLog("Z\n");
-						_renderer->Resize(ym::config::kResolutionWidth, ym::config::kResolutionHeight);
+						//_renderer->Resize(ym::config::kResolutionWidth, ym::config::kResolutionHeight);
 						ym::ConsoleLog("%d %d \n", ym::config::kResolutionWidth, ym::config::kResolutionHeight);
 					}
 					else if (keybord.GetKeyDown("X"))
@@ -103,7 +90,7 @@ namespace ym
 						ym::ConsoleLog("X\n");
 						u32 x = 192;
 						u32 y = 108;
-						_renderer->Resize(x, y);
+						//_renderer->Resize(x, y);
 						ym::ConsoleLog("%d %d \n",x, y);
 					}
 					else if (keybord.GetKeyDown("C"))
@@ -111,7 +98,7 @@ namespace ym
 						ym::ConsoleLog("C\n");
 						u32 x = 800;
 						u32 y = 600;
-						_renderer->Resize(x, y);
+						//_renderer->Resize(x, y);
 						ym::ConsoleLog("%d %d \n", x, y);
 					}
 					sceneManager->Update();
@@ -124,11 +111,41 @@ namespace ym
 
 	void Application::Terminate()
 	{
+		ym::ConsoleLog("Application::Terminate()\n");
 		CoUninitialize();
 		Delete();
 	}
+	void Application::AllInitilizeManager()
+	{
+		auto _renderer = Renderer::Instance();
+		if (!_renderer)
+		{
+			return;
+		}
+		if (!_renderer->Init(m_window.get(), ym::config::kResolutionWidth, ym::config::kResolutionHeight, ym::ColorSpaceType::Rec2020))
+		{
+			return;
+		}
+		ym::InputManager::GetInstance().Initialize(m_window->GetWndHandle());
+
+		auto sceneManager = ym::SceneManager::Instance();
+	}
 	void Application::Delete()
 	{
+
+		auto sm = SceneManager::Instance();
+		if (sm)
+		{
+			sm->Terminate();
+		}
+
+		auto _renderer = Renderer::Instance();
+		if (_renderer)
+		{
+			_renderer->Uninit();
+		}
+
+		m_window.reset();
 
 		if (m_instance != nullptr)
 		{
@@ -136,5 +153,7 @@ namespace ym
 			delete m_instance;
 			m_instance = nullptr;
 		}
+
+
 	}
 }	// namespace ym

@@ -5,7 +5,7 @@ namespace ym
     public:
 		static ResourceStateTracker *Instance()
 		{
-			static ResourceStateTracker*instance=nullptr;
+			//=nullptr;
             if (!instance)
                 instance = new ResourceStateTracker();
 
@@ -24,10 +24,13 @@ namespace ym
             return D3D12_RESOURCE_STATE_COMMON; // デフォルトの状態
         }
 
+        void Uninit();
+
     private:
         std::unordered_map<ID3D12Resource *, D3D12_RESOURCE_STATES> resourceStates;
+        static ResourceStateTracker *instance;
     };
-
+	//ResourceStateTracker *ResourceStateTracker::instance = nullptr;
     //// 使用例
     //ResourceStateTracker tracker;
     //tracker.SetState(indexBufferResource, D3D12_RESOURCE_STATE_COPY_DEST);

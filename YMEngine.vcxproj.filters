@@ -120,6 +120,45 @@
     <ClCompile Include="YMEngine\gameFrameWork\requiredObject\mainCamera.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\components\objLoader\objLoader.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\resource\resourceStateTracker.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\resource\resourceManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\components\meshRenderer\meshRenderer.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\material.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\rootSignatureManager\rootSignatureManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\gameObject\gameObjectManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\postProcess\postProcessMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\mosaic\mosaicMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\postProcess\postProcessManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\grayScale\grayScaleMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\fbxMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\objMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -284,6 +323,42 @@
     <ClInclude Include="YMEngine\gameFrameWork\requiredObject\mainCamera.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\components\objLoader\objLoader.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\resource\resourceManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\components\meshRenderer\meshRenderer.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\material.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\rootSignatureManager\rootSignatureManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\gameObject\gameObjectManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\postProcess\postProcessManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\postProcess\postProcessMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\mosaic\mosaicMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\grayScale\grayScaleMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\fbxMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\objMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc143-mt.dll" />
@@ -312,6 +387,12 @@
     <FxCompile Include="asset\shader\2dSprite\2dSpritePS.hlsl" />
     <FxCompile Include="asset\shader\simpleFBX\simpleFBXVS.hlsl" />
     <FxCompile Include="asset\shader\simpleFBX\simpleFBXPS.hlsl" />
+    <FxCompile Include="asset\shader\fullScreen\fullScreenVS.hlsl" />
+    <FxCompile Include="asset\shader\fullScreen\fullScreenPS.hlsl" />
+    <FxCompile Include="asset\shader\unlit\unlitVS.hlsl" />
+    <FxCompile Include="asset\shader\unlit\unlitPS.hlsl" />
+    <FxCompile Include="asset\shader\simpleOBJ\simpleOBJVS.hlsl" />
+    <FxCompile Include="asset\shader\simpleOBJ\simpleOBJPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="asset\texture\blue_noise.tga" />

@@ -25,37 +25,9 @@ namespace ym
 	//struct Mesh;
 
 
-        struct Vertex3D
-        {
-            DirectX::XMFLOAT3 Position; // 位置座標
-            DirectX::XMFLOAT3 Normal; // 法線
-            DirectX::XMFLOAT2 UV; // uv座標
-            DirectX::XMFLOAT3 Tangent; // 接空間
-            DirectX::XMFLOAT4 Color; // 頂点色
-          
-        };
-		struct Mesh
-		{
-			std::vector<Vertex3D> Vertices; // 頂点データの配列
-			std::vector <ym::u32> Indices; // インデックスの配列
-			std::wstring DiffuseMap; // テクスチャのファイルパス
-		};
-	enum ModelSetting
-	{
-		None = 0,
-		InverseU = (int)(1 << 0),   // 0ビット目
-		InverseV = (int)(1 << 1),   // 1ビット目
-		InverseUV = (int)(InverseU | InverseV), // 合成フラグ
-		AdjustScale = (int)(1 << 2),   // 2ビット目
-		AdjustCenter = (int)(1 << 3),   // 3ビット目
-		AdjustScaleAndCenter = (int)(AdjustScale | AdjustCenter) // 合成フラグ
-	};
 
-	struct ImportSettings // インポートするときのパラメータ
-	{
-		const wchar_t *filename = nullptr; // ファイルパス
-		int flags = ModelSetting::None; // フラグ
-	};
+		
+
 
 	class FBXLoader :public Component
 	{

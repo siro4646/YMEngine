@@ -8,6 +8,8 @@
 
 #include "utility/fileStream/fileStream.h"
 
+#include "resource/resourceManager.h"
+
 namespace ym
 {
 	std::unordered_map<string, ym::Texture> Texture::textureMap_{};
@@ -105,13 +107,13 @@ namespace ym
 
 	bool Texture::LoadTexture(Device *pDev, CommandList *pCmdList, const std::string filename, bool isForceSRGB, bool forceSysRam)
 	{
-
-		auto it = textureMap_.find(filename);
-		if (it != textureMap_.end())
+		auto rM = ResourceManager::Instance();
+		//auto textureMap = rM->GetTextureMap();
+		if (rM->FindTexture(filename))
 		{
-			*this = it->second;
+			*this = rM->GetTexture(filename);
 			return true;
-		}
+		}	
 		// ファイルの読み込み
 		ym::File file(filename.c_str());
 
@@ -152,15 +154,17 @@ namespace ym
 			//res = LoadTexture(pDev, pCmdList, path, isForceSRGB, forceSysRam);
 
 		}
+		//拡張子がない場合
 		else
 		{
-			//ym::File file("asset/texture/test.png");
 
 		}
 		if (res)
 		{
 			//textureMap_.get()->emplace(std::make_pair(filename, *this));
-			textureMap_[filename] = *this;
+			rM->SetTexture(filename, *this);
+			//textureMap->insert({ filename,*this});
+			//textureMap[filename] = *this;
 			//バリアを張る
 			auto rST = ResourceStateTracker::Instance();
 			pCmdList->TransitionBarrier(this, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -171,7 +175,8 @@ namespace ym
 		}
 		else
 		{
-			ym::ConsoleLog("failed to load texture\n");
+			ym::ConsoleLog("failed to load texture");
+			ym::ConsoleLog("[%s]\n", filename.c_str());
 			LoadTexture(pDev, pCmdList, "asset/texture/test.png", isForceSRGB, forceSysRam);
 		}
 		return res;
@@ -391,6 +396,7 @@ namespace ym
 			DirectX::GenerateMipMaps(*image->GetImage(0, 0, 0), DirectX::TEX_FILTER_CUBIC | DirectX::TEX_FILTER_FORCE_NON_WIC, 0, *mipped_image);
 			image.swap(mipped_image);
 		}
+
 
 		return std::move(image);
 	}
@@ -617,6 +623,34 @@ namespace ym
 		currentState_ = D3D12_RESOURCE_STATE_PRESENT;
 
 		return true;
+	}
+
+	bool Texture::InitFromBin(Device *pDev, CommandList *pCmdList, const TextureDesc &desc, const void *pImageBin)
+	{
+		if (!pDev)
+		{
+			return false;
+		}
+		if (!pImageBin)
+		{
+			return false;
+		}
+
+		// テクスチャオブジェクト作成
+		if (!Init(pDev, desc))
+		{
+			return false;
+		}
+
+		// リソースにデータをコピー
+		ID3D12Resource *pSrcImage = nullptr;
+		if (!UpdateImage(pDev, pCmdList, pImageBin, &pSrcImage))
+		{
+			return false;
+		}
+		pDev->PendingKill(new ReleaseObjectItem<ID3D12Resource>(pSrcImage));
+		return true;
+
 	}
 
 	//----

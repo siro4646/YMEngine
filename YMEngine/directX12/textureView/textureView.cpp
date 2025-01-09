@@ -3,6 +3,7 @@
 #include "device/device.h"
 #include "texture/texture.h"
 #include "descriptor/descriptor.h"
+#include "buffer/buffer.h"
 
 
 namespace ym
@@ -122,7 +123,11 @@ namespace ym
 	//----
 	void TextureView::Destroy()
 	{
-		descInfo_.Free();
+		if (descInfo_.IsValid())
+		{
+			ym::ConsoleLog("TextureView::Destroy() called\n");
+		}
+			descInfo_.Free();
 	}
 
 	bool RenderTargetView::Init(Device *pDev, Texture *pTex, u32 mipSlice, u32 firstArray, u32 arraySize)
@@ -204,8 +209,9 @@ namespace ym
 	{
 		if (descInfo_.IsValid())
 		{
-			descInfo_.Free();
+			ym::ConsoleLog("RenderTargetView::Uninit() called\n");
 		}
+			descInfo_.Free();
 	}
 
 	bool DepthStencilView::Init(Device *pDev, Texture *pTex, u32 mipSlice, u32 firstArray, u32 arraySize)
@@ -280,8 +286,118 @@ namespace ym
 	{
 		if (descInfo_.IsValid())
 		{
-			descInfo_.Free();
+			ym::ConsoleLog("DepthStencilView::Uninit() called\n");
 		}
+			descInfo_.Free();
+	}
+
+	//----
+	bool UnorderedAccessView::Initialize(Device *pDev, Texture *pTex, u32 mipSlice, u32 firstArray, u32 arraySize)
+	{
+		const D3D12_RESOURCE_DESC &resDesc = pTex->GetResourceDesc();
+		D3D12_UNORDERED_ACCESS_VIEW_DESC viewDesc{};
+		viewDesc.Format = resDesc.Format;
+		if (resDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE1D)
+		{
+			if (resDesc.DepthOrArraySize == 1)
+			{
+				viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE1D;
+				viewDesc.Texture1D.MipSlice = mipSlice;
+			}
+			else
+			{
+				viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE1DARRAY;
+				viewDesc.Texture1DArray.MipSlice = mipSlice;
+				viewDesc.Texture1DArray.FirstArraySlice = firstArray;
+				viewDesc.Texture1DArray.ArraySize = arraySize;
+			}
+		}
+		else if (resDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE2D)
+		{
+			if (resDesc.SampleDesc.Count == 1)
+			{
+				if (resDesc.DepthOrArraySize == 1)
+				{
+					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2D;
+					viewDesc.Texture2D.MipSlice = mipSlice;
+					viewDesc.Texture2D.PlaneSlice = 0;
+				}
+				else
+				{
+					viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE2DARRAY;
+					viewDesc.Texture2DArray.MipSlice = mipSlice;
+					viewDesc.Texture2DArray.FirstArraySlice = firstArray;
+					viewDesc.Texture2DArray.ArraySize = arraySize;
+				}
+			}
+			else
+			{
+				return false;
+			}
+		}
+		else if (resDesc.Dimension == D3D12_RESOURCE_DIMENSION_TEXTURE3D)
+		{
+			viewDesc.ViewDimension = D3D12_UAV_DIMENSION_TEXTURE3D;
+			viewDesc.Texture3D.MipSlice = mipSlice;
+			viewDesc.Texture3D.FirstWSlice = firstArray;
+			viewDesc.Texture3D.WSize = arraySize;
+		}
+		else
+		{
+			return false;
+		}
+
+		descInfo_ = pDev->GetViewDescriptorHeap().Allocate();
+		if (!descInfo_.IsValid())
+		{
+			return false;
+		}
+
+		pDev->GetDeviceDep()->CreateUnorderedAccessView(pTex->GetResourceDep(), nullptr, &viewDesc, descInfo_.cpuHandle);
+
+		return true;
+	}
+
+	//----
+	bool UnorderedAccessView::Initialize(Device *pDev, Buffer *pBuff, u32 firstElement, u32 numElement, u32 stride, u64 offset)
+	{
+		const D3D12_RESOURCE_DESC &resDesc = pBuff->GetResourceDesc();
+		D3D12_UNORDERED_ACCESS_VIEW_DESC viewDesc{};
+		viewDesc.ViewDimension = D3D12_UAV_DIMENSION_BUFFER;
+		if (stride == 0)
+		{
+			viewDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+			viewDesc.Buffer.FirstElement = firstElement;
+			viewDesc.Buffer.NumElements = (numElement == 0) ? (static_cast<u32>(resDesc.Width / 4) - firstElement) : numElement;
+			viewDesc.Buffer.StructureByteStride = 0;
+			viewDesc.Buffer.CounterOffsetInBytes = offset;
+			viewDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_RAW;
+		}
+		else
+		{
+			viewDesc.Format = DXGI_FORMAT_UNKNOWN;
+			viewDesc.Buffer.FirstElement = firstElement;
+			viewDesc.Buffer.NumElements = (numElement == 0) ? (static_cast<u32>((resDesc.Width / static_cast<u64>(stride)) - static_cast<u64>(firstElement))) : numElement;
+			viewDesc.Buffer.StructureByteStride = stride;
+			viewDesc.Buffer.CounterOffsetInBytes = offset;
+			viewDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
+		}
+
+		descInfo_ = pDev->GetViewDescriptorHeap().Allocate();
+		if (!descInfo_.IsValid())
+		{
+			return false;
+		}
+
+		pDev->GetDeviceDep()->CreateUnorderedAccessView(pBuff->GetResourceDep(), nullptr, &viewDesc, descInfo_.cpuHandle);
+
+		return true;
+	}
+
+	//----
+	void UnorderedAccessView::Destroy()
+	{
+		descInfo_.Free();
 	}
 
 }

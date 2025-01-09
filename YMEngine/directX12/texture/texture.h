@@ -54,13 +54,19 @@ namespace ym
 
 		Texture(){}
 		~Texture(){
-		
-		
-				//pResource_->Release();
+			Uninit();
 		}
 
 		bool Init(Device *pDev, const TextureDesc &desc);
+
+		void Uninit()
+		{
+			pResource_.Reset();
+		}
+
 		bool InitFromSwapChain(Device*pDev,SwapChain *pSwapChain, u32 bufferIndex);
+
+		bool InitFromBin(Device *pDev, CommandList *pCmdList, const TextureDesc &desc, const void *pImageBin);
 
 		bool LoadTexture(Device *pDev, CommandList *pCmdList, const std::string filename, bool isForceSRGB = false, bool forceSysRam = false);
 		bool LoadTexture(Device *pDev, CommandList *pCmdList, const std::wstring *filename, bool isForceSRGB = false, bool forceSysRam = false);

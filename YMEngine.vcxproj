@@ -169,7 +169,12 @@
     <ClCompile Include="YMEngine\directX12\descriptor\descriptor.cpp" />
     <ClCompile Include="YMEngine\directX12\device\device.cpp" />
     <ClCompile Include="YMEngine\directX12\pipelineState\pipelineState.cpp" />
+    <ClCompile Include="YMEngine\directX12\postProcess\postProcessManager.cpp" />
+    <ClCompile Include="YMEngine\directX12\postProcess\postProcessMaterial.cpp" />
     <ClCompile Include="YMEngine\directX12\Renderer\renderer.cpp" />
+    <ClCompile Include="YMEngine\directX12\resource\resourceManager.cpp" />
+    <ClCompile Include="YMEngine\directX12\resource\resourceStateTracker.cpp" />
+    <ClCompile Include="YMEngine\directX12\rootSignatureManager\rootSignatureManager.cpp" />
     <ClCompile Include="YMEngine\directX12\rootSignature\rootSignature.cpp" />
     <ClCompile Include="YMEngine\directX12\sampler\sampler.cpp" />
     <ClCompile Include="YMEngine\directX12\shader\shader.cpp" />
@@ -180,8 +185,16 @@
     <ClCompile Include="YMEngine\gameFrameWork\camera\cameraManager.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\components\component.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\components\fbxLoader\fbxLoader.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\components\meshRenderer\meshRenderer.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\components\objLoader\objLoader.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\components\sprite\sprite.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\gameObject\gameObject.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\gameObject\gameObjectManager.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\fbxMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\material.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\objMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\grayScale\grayScaleMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\mosaic\mosaicMaterial.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\requiredObject\mainCamera.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\scene\sceneManager.cpp" />
     <ClCompile Include="YMEngine\test\polygon.cpp" />
@@ -211,8 +224,12 @@
     <ClInclude Include="YMEngine\directX12\descriptor\descriptor.h" />
     <ClInclude Include="YMEngine\directX12\device\device.h" />
     <ClInclude Include="YMEngine\directX12\pipelineState\pipelineState.h" />
+    <ClInclude Include="YMEngine\directX12\postProcess\postProcessManager.h" />
+    <ClInclude Include="YMEngine\directX12\postProcess\postProcessMaterial.h" />
     <ClInclude Include="YMEngine\directX12\Renderer\renderer.h" />
+    <ClInclude Include="YMEngine\directX12\resource\resourceManager.h" />
     <ClInclude Include="YMEngine\directX12\resource\resourceStateTracker.h" />
+    <ClInclude Include="YMEngine\directX12\rootSignatureManager\rootSignatureManager.h" />
     <ClInclude Include="YMEngine\directX12\rootSignature\rootSignature.h" />
     <ClInclude Include="YMEngine\directX12\sampler\sampler.h" />
     <ClInclude Include="YMEngine\directX12\shader\shader.h" />
@@ -223,7 +240,15 @@
     <ClInclude Include="YMEngine\gameFrameWork\camera\cameraManager.h" />
     <ClInclude Include="YMEngine\gameFrameWork\components\component.h" />
     <ClInclude Include="YMEngine\gameFrameWork\components\fbxLoader\fbxLoader.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\components\meshRenderer\meshRenderer.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\components\objLoader\objLoader.h" />
     <ClInclude Include="YMEngine\gameFrameWork\gameObject\gameObject.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\gameObject\gameObjectManager.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\fbxMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\material.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\objMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\grayScale\grayScaleMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\mosaic\mosaicMaterial.h" />
     <ClInclude Include="YMEngine\gameFrameWork\requiredObject\mainCamera.h" />
     <ClInclude Include="YMEngine\gameFrameWork\scene\baseScene.h" />
     <ClInclude Include="YMEngine\gameFrameWork\scene\sceneManager.h" />
@@ -283,6 +308,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="asset\shader\fullScreen\fullScreenPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="asset\shader\fullScreen\fullScreenVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="asset\shader\grayScale\grayScalePS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
@@ -331,6 +368,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
+    <FxCompile Include="asset\shader\simpleOBJ\simpleOBJPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="asset\shader\simpleOBJ\simpleOBJVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
     <FxCompile Include="asset\shader\test2\test2VS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
@@ -358,6 +407,18 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="asset\shader\unlit\unlitPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="asset\shader\unlit\unlitVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

@@ -5,8 +5,10 @@
 namespace ym
 {
 
-	class ObjectManager;
+	class GameObjectManager;
 	class Component;
+
+
 
 	//コピー用テンプレート
 	//class ClassName : public Object
@@ -24,15 +26,22 @@ namespace ym
 	class Object:public std::enable_shared_from_this<Object>
 	{
 	public:
-		ObjectManager *objectManager;
+		enum Type
+		{
+			Delete,
+			None,
+			Max,
+		};
+
+		GameObjectManager *objectManager;//参照だけもつ
 		Transform localTransform;
 		Transform globalTransform;
-
+		Type type =Type::None;
 		std::vector<std::shared_ptr<Component>> components;
 	private:
+	protected:
 		std::string tag;
 		std::string name;
-	protected:
 		std::shared_ptr<Object>_parent = nullptr;
 		std::vector <std::shared_ptr<Object>> _childs;
 	public:

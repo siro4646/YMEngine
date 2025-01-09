@@ -45,28 +45,31 @@ namespace ym {
 	}
 	void Device::Uninit()
 	{
+		if (isUninited)return;
+
 		WaitForCommandQueue();
 
-	/*	pGlobalViewDescHeap_->Destroy();
-		delete pGlobalViewDescHeap_;
-		pGlobalViewDescHeap_ = nullptr;
+		SyncKillObjects(true);
 
+		pSwapChain_.reset();
+
+		ym::ConsoleLog("デフォルトサンプラーデスクリプター解放\n");
 		defaultSamplerDescInfo_.Free();
+		ym::ConsoleLog("デフォルトビューデスクリプター解放\n");
 		defaultViewDescInfo_.Free();
 
-		pSamplerDescHeap_->Destroy();
-		delete pSamplerDescHeap_;
-		pSamplerDescHeap_ = nullptr;
-
-		pViewDescHeap_->Destroy();
-		delete pViewDescHeap_;
-		pViewDescHeap_ = nullptr;*/
-
-
-		
-		
-
-
+		ym::ConsoleLog("ディスクリプタヒープ解放\n");
+		ym::ConsoleLog("DSVデスクリプタヒープ解放\n");
+		SafeDelete(pDsvDescHeap_);
+		ym::ConsoleLog("RTVデスクリプタヒープ解放\n");
+		SafeDelete(pRtvDescHeap_);
+		ym::ConsoleLog("サンプラーデスクリプタヒープ解放\n");
+		SafeDelete(pSamplerDescHeap_);
+		ym::ConsoleLog("ビューデスクリプタヒープ解放\n");
+		SafeDelete(pViewDescHeap_);
+		ym::ConsoleLog("グローバルビューデスクリプタヒープ解放\n");
+		SafeDelete(pGlobalViewDescHeap_);
+		isUninited = true;
 	}
 	void Device::WaitForCommandQueue()
 	{
@@ -317,6 +320,16 @@ namespace ym {
 			return false;
 		}
 		ym::ConsoleLog("グラフィックキュー作成成功\n");
+		pComputeQueue_ = std::make_unique<CommandQueue>();
+		if (!pComputeQueue_)
+		{
+			return false;
+		}
+		if (!pComputeQueue_->Init(this, D3D12_COMMAND_LIST_TYPE_COMPUTE, D3D12_COMMAND_QUEUE_PRIORITY_NORMAL))
+		{
+			return false;
+		}
+		ym::ConsoleLog("コンピュートキュー作成成功\n");
 		return true;
 	}
 	bool Device::CreateFence()
@@ -327,7 +340,7 @@ namespace ym {
 		{
 			return false;
 		}
-		fenceValue_ = 1;
+		fenceValue_ = 0;
 
 		fenceEvent_ = CreateEventEx(nullptr, FALSE, FALSE, EVENT_ALL_ACCESS);
 		if (fenceEvent_ == nullptr)

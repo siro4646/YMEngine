@@ -82,18 +82,32 @@ namespace ym {
     SceneManager::SceneManager()
     {
 		// テストシーンを追加
-		PushScene(std::make_unique<TestScene>());
-		//m_pScene.top()->Init();
+		PushScene(std::make_unique<TestScene>());		
     }
-    SceneManager::~SceneManager()
+    void SceneManager::Terminate()
     {
+        int i = 0;
         while (!m_pScene.empty())
         {
+            i++;
+            ym::ConsoleLog("シーン削除 %d\n", i);
             if (m_pScene.top() != nullptr)
             {
                 m_pScene.top()->UnInit();
                 m_pScene.pop();
             }
         }
+
+        ym::ConsoleLog("シーン削除完了\n");
+        //自身を削除
+        if (m_instance != nullptr)
+        {
+            delete m_instance;
+            m_instance = nullptr;
+        }
+    }
+    SceneManager::~SceneManager()
+    {
+			
     }
 }

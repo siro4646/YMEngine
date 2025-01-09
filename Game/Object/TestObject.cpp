@@ -1,42 +1,60 @@
 #include "TestObject.h"
 #include "gameFrameWork/components/sprite/sprite.h"
 #include "gameFrameWork/components/fbxLoader/fbxLoader.h"
+#include "gameFrameWork/components/objLoader/objLoader.h"
 #include "utility/inputSystem/keyBoard/keyBoardInput.h"
 
 #include "camera/camera.h"
+
+#include "gameFrameWork/material/fbxMaterial.h"
 
 
 namespace ym
 {
 	void TestObject::Init()
 	{
+		name = "TestObject";
 		globalTransform.Scale = { 1.0f,1.0f,1.0f };
-		globalTransform.Scale *= 1;
-		globalTransform.Rotation = { 0.0f,180.0f,0.0f };
+		globalTransform.Scale *= 5;
+		globalTransform.Rotation = { 0.0f,90.0f,0.0f };
 		globalTransform.Position = { 0.0f,0.0f,0.0f };
 
 		const wchar_t *modelFile = L"asset/Alicia/FBX/Alicia_solid_Unity.FBX";
 		const wchar_t *modelFile2 = L"asset/Dragon/Dragon 2.5_fbx.fbx";
 		const wchar_t *modelFile3 = L"asset/a.fbx";
-
-
-		std::vector<Mesh> meshes;
+		const wchar_t *modelFile4 = L"asset/sponza (1)/sponza.obj";		
+		//material->Init();
+		
 		int flag = 0;
 		flag |= ModelSetting::InverseV;
+		//flag |= ModelSetting::InverseU;
 		flag |= ModelSetting::AdjustCenter;
 		flag |= ModelSetting::AdjustScale;
-		auto fbxLoader = AddComponent<FBXLoader>();
 		ImportSettings importSetting = // これ自体は自作の読み込み設定構造体
 		{
-			modelFile,
+			modelFile4,
 			flag
 		};
-		fbxLoader->Load(importSetting);
+
+		objLoader = AddComponent<OBJLoader>().get();
+		meshes = objLoader->Load(importSetting);
+		for (auto &mesh : meshes)
+		{
+			auto fbxMaterial = std::make_shared<FBXMaterial>();
+			//fbxMaterial->SetMesh(mesh);
+			materials.push_back(fbxMaterial);
+		}		
+		//fbxMaterial = std::make_shared<FBXMaterial>();
+
+		//objLoader->SetMaterial(fbxMaterial);
+
+		/*auto fbxLoader = AddComponent<FBXLoader>();
+		fbxLoader->Load(importSetting);*/
 
 		//globalTransform.Position = { 0.0f,0.0f,0.0f };
 
-		auto sprite = AddComponent<ym::Sprite>();
-		sprite->LoadTexture("asset/texture/Jacket_BaseColor.jpg");
+		/*auto sprite = AddComponent<ym::Sprite>();
+		sprite->LoadTexture("asset/texture/Jacket_BaseColor.jpg");*/
 	}
 
 	void TestObject::FixedUpdate()
@@ -47,44 +65,33 @@ namespace ym
 	void TestObject::Update()
 	{
 		auto &input = KeyboardInput::GetInstance();
-		if (input.GetKey("W"))
+		if (input.GetKey("LEFT"))
 		{
-			globalTransform.Position.z += 0.05f;
+			globalTransform.Rotation.y -= 1.0f;
 		}
-		if (input.GetKey("S"))
-		{
-			globalTransform.Position.z -= 0.05f;
-		}
-		if (input.GetKey("A"))
-		{
-			globalTransform.Position.x -= 0.05f;
-		}
-		if (input.GetKey("D"))
-		{
-			globalTransform.Position.x += 0.05f;
-		}
-		if (input.GetKey("Q"))
-		{
-			globalTransform.Position.y += 0.05f;
-		}
-		if (input.GetKey("E"))
-		{
-			globalTransform.Position.y -= 0.05f;
-		}
-		//サイズ変える
-		if (input.GetKey("T"))
+		if (input.GetKey("RIGHT"))
 		{
 			globalTransform.Rotation.y += 1.0f;
 		}
-		if (input.GetKey("Y"))
+		if (input.GetKeyDown("UP"))
+		{		
+			int count = 0;
+			for (auto &mesh : meshes)
+			{
+				objLoader->SetMaterial(materials[count], count);
+				count++;
+			}
+		}
+		if (input.GetKeyDown("DOWN"))
 		{
-			globalTransform.Rotation.y -= 1.0f;
+			int count = 0;
+			for (auto &mesh : meshes)
+			{
+				objLoader->SetMaterial(std::make_shared<Material>(), count);
+				count++;
+			}
+		}
 
-		}
-		if (input.GetKey("0"))
-		{
-			globalTransform.Position = { 0.0f,0.0f,0.0f };
-		}
 
 		Object::Update();
 
@@ -97,6 +104,8 @@ namespace ym
 
 	void TestObject::Uninit()
 	{
+
+
 	}
 
 	std::shared_ptr<Object> TestObject::Clone()

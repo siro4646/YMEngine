@@ -1,6 +1,7 @@
 
 #include "gameObject.h"
 #include "gameFrameWork/components/component.h"
+#include "gameFrameWork/gameObject/gameObjectManager.h"
 
 
 namespace ym
@@ -122,6 +123,9 @@ namespace ym
 
 	Object::~Object()
 	{
+		ym::ConsoleLog("[%s]削除 \n", name.c_str());
+		//参照を持つだけなので削除しない
+		objectManager = nullptr;
 		// 自身がデストラクタで削除されるとき、子オブジェクトも削除
 		for (auto &child : _childs) {
 			child->SetParent(nullptr);

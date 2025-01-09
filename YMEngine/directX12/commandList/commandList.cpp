@@ -258,10 +258,26 @@ namespace ym
 
 	void CommandList::Uninit()
 	{
-		pAllocator_.Reset();
-		pCmdList_.Reset();
 		pDevice_ = nullptr;
 		pQueue_ = nullptr;
+
+
+		pAllocator_.Reset();
+		pCmdList_.Reset();
+
+		if (pViewDescStack_)
+		{
+			pViewDescStack_->Destroy();
+			delete pViewDescStack_;
+			pViewDescStack_ = nullptr;
+		}
+
+		if (pSamplerDescCache_)
+		{
+			pSamplerDescCache_->Destroy();
+			delete pSamplerDescCache_;
+			pSamplerDescCache_ = nullptr;
+		}
 	}
 
 	void CommandList::Reset()
@@ -286,6 +302,7 @@ namespace ym
 
 	void CommandList::Close()
 	{
+
 		auto hr = pCmdList_->Close();
 		assert(SUCCEEDED(hr));
 	}

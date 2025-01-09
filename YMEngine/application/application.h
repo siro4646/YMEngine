@@ -31,6 +31,9 @@ namespace ym
 			return false;
 
 		}
+
+		void AllInitilizeManager();
+
 		void Delete();
 
 	public:

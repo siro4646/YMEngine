@@ -94,10 +94,21 @@ namespace ym
 	//----
 	void DescriptorInfo::Free()
 	{
+
 		if (IsValid())
 		{
-			pAllocator->Free(*this);
-			pAllocator = nullptr;
+			ym::ConsoleLog("[INFO] DescriptorInfo::Free() called\n");
+			ym::ConsoleLog("[INFO] pAllocator = %d\n", pAllocator->allocCount_);
+			if (pAllocator->allocCount_ == 0)
+			{
+				ym::ConsoleLog("[INFO] DescriptorInfo::Free() pAllocator->allocCount_ == 0\n");
+				//pAllocator = nullptr;
+			}
+			else
+			{
+				pAllocator->Free(*this);
+				pAllocator = nullptr;
+			}
 		}
 	}
 	bool DescriptorAllocator::Initialize(Device *pDev, const D3D12_DESCRIPTOR_HEAP_DESC &desc)
@@ -132,7 +143,18 @@ namespace ym
 	//----
 	void DescriptorAllocator::Destroy()
 	{
+
+		ym::ConsoleLog("[INFO] DescriptorAllocator::Destroy() called\n");
+		ym::ConsoleLog("[INFO] allocCount_ = %d\n", allocCount_);
+
+		//0‚¶‚á‚È‚¢‚È‚çŠJ•ú‚µ‚È‚¢
+		if (allocCount_ != 0) return;
+
+
 		assert(allocCount_ == 0);
+
+
+
 
 		SafeRelease(pHeap_);
 		SafeDeleteArray(pUseFlags_);
@@ -174,12 +196,20 @@ namespace ym
 	//----
 	void DescriptorAllocator::Free(DescriptorInfo info)
 	{
-		assert(info.pAllocator == this);
-		assert(pUseFlags_[info.index] != 0);
+		ym::ConsoleLog("[INFO] DescriptorAllocator::Free() called\n");
+		//assert(info.pAllocator == this);
+		//assert(pUseFlags_[info.index] != 0);
+		if (info.pAllocator == this && pUseFlags_[info.index] != 0)
+		{
+			std::lock_guard<std::mutex> lock(mutex_);
+			pUseFlags_[info.index] = 0;
+			allocCount_--;
+		}
 
-		std::lock_guard<std::mutex> lock(mutex_);
+		/*std::lock_guard<std::mutex> lock(mutex_);
 		pUseFlags_[info.index] = 0;
-		allocCount_--;
+		allocCount_--;*/
+
 	}
 
 	bool DescriptorStack::Allocate(u32 count, D3D12_CPU_DESCRIPTOR_HANDLE &cpuHandle, D3D12_GPU_DESCRIPTOR_HANDLE &gpuHandle)
@@ -229,6 +259,12 @@ namespace ym
 	{
 		for (auto &&stack : stacks_) stack.Reset();
 		stackIndex_ = 0;
+	}
+
+	void DescriptorStackList::Destroy()
+	{
+		stacks_.clear();
+		pParentHeap_ = nullptr;
 	}
 
 	//----

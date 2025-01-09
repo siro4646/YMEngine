@@ -19,6 +19,7 @@ namespace ym
 
 	class Buffer;
 	class VertexBufferView;
+	class Camera;
 
 	struct Vertex
 	{
@@ -69,6 +70,8 @@ namespace ym
 		std::shared_ptr <ym::Buffer> constantBuffer_;
 		std::shared_ptr <ym::ConstantBufferView> constBufferView_;
 		XMMATRIX *pMatrix_ = nullptr;
+
+		Camera *pCamera_ = nullptr;
 
 		XMFLOAT4 rect_ = XMFLOAT4(0, 0, 1, 1);
 		XMFLOAT4 *pRect_ = nullptr;

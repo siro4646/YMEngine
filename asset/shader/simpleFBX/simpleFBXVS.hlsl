@@ -42,9 +42,10 @@ PSInput main(VSInput Input)
     //output.pos = mul(output.pos, view); // ビュー行列適用
     //output.pos = mul(output.pos, proj); // プロジェクション行列適用
     
-    
-   
+    //Input.normal.
+    output.normal = mul(mat, Input.normal); //float4(Input.normal, 1.0f); 
     output.color = Input.color;
     output.uv = Input.uv;	
+    output.ray = normalize(Input.pos.xyz - mul(view, eye));
     return output;
 }

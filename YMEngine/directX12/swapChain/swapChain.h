@@ -39,10 +39,12 @@ namespace ym
 		{
 			return frameIndex_;
 		}
-		Texture *GetTexture(int index) { return &renderTargetTextures_[index% kFrameCount]; }
-		Texture *GetCurrentTexture(int offset = 0) { return &renderTargetTextures_[(frameIndex_ + offset) % kFrameCount]; }
+		Texture *GetTexture(int index) { return &backBufferTextures[index% kFrameCount]; }
+		Texture *GetCurrentTexture(int offset = 0) { return &backBufferTextures[(frameIndex_ + offset) % kFrameCount]; }
 		RenderTargetView *GetRenderTargetView(int index) { return &renderTargetViews_[index% kFrameCount]; }
 		RenderTargetView *GetCurrentRenderTargetView(int offset = 0) { return &renderTargetViews_[(frameIndex_ + offset) % kFrameCount]; }
+		TextureView *GetTextureView(int index) { return &sceneRenderTargetTexViews_[index % kFrameCount]; }
+		TextureView *GetCurrentTextureView(int offset = 0) { return &sceneRenderTargetTexViews_[(frameIndex_ + offset) % kFrameCount]; }
 
 		Texture *GetDepthStencilTexture() { return &depthStencilTexture_; }
 		DepthStencilView *GetDepthStencilView() { return &depthStencilView_; }
@@ -57,9 +59,9 @@ namespace ym
 		ComPtr<IDXGISwapChain4> pSwapChain_{ nullptr };
 
 		//レンダーターゲット
-		Texture renderTargetTextures_[kFrameCount];
+		Texture backBufferTextures[kFrameCount];
 		RenderTargetView		renderTargetViews_[kFrameCount];
-		TextureView renderTargetTexViews_[kFrameCount];
+		TextureView sceneRenderTargetTexViews_[kFrameCount];
 		//深度ステンシル
 		Texture depthStencilTexture_;
 		DepthStencilView depthStencilView_;
