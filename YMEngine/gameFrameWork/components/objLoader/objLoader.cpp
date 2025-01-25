@@ -29,6 +29,8 @@
 #include "material/material.h"
 #include "material/objMaterial.h"
 
+#include "resource/resourceManager.h"
+
 
 namespace ym
 {
@@ -48,12 +50,19 @@ namespace ym
 	}
 	void OBJLoader::Update()
 	{
+		if (!isInit_) return;
+
+		for (auto material : material_)
+		{
+			material->Update();
+		}
 		UpdateMatrix();
 	}
 	void OBJLoader::Draw()
 	{
 		if (!isInit_) return;
 		auto cmdList = pCmdList_->GetCommandList();
+		pCamera_ = CameraManager::Instance().GetMainCamera();
 
 		for (int i = 0; i < meshes.size(); i++)
 		{
@@ -65,44 +74,12 @@ namespace ym
 	}
 	void OBJLoader::Uninit()
 	{
-		/*vertexBuffers_.clear();
-		vertexBufferViews_.clear();
-		indexBuffers_.clear();
-		indexBufferViews_.clear();*/
+	
 		constantBuffer_.reset();
 		constBufferView_.reset();
-		/*vsShader_.reset();
-		psShader_.reset();
-		rootSignature_.reset();
-		pipelineState_.reset();
-		descriptorSet_.reset();
-		sampler_.reset();
-		for (auto &texture : textures_)
-		{
-			texture.reset();
-		}
-		for (auto &textureView : textureViews_)
-		{
-			textureView.reset();
-		}
-		for (auto &specTexture : specTextures_)
-		{
-			specTexture.reset();
-		}
-		for (auto &specTextureView : specTextureViews_)
-		{
-			specTextureView.reset();
-		}
-		for (auto &maskTexture : maskTextures_)
-		{
-			maskTexture.reset();
-		}
-		for (auto &maskTextureView : maskTextureViews_)
-		{
-			maskTextureView.reset();
-		}*/
-
-
+		isInit_ = false;
+		meshes.clear();
+		material_.clear();
 	}
 	void OBJLoader::SetMaterial(std::shared_ptr<Material>material, u32 index)
 	{
@@ -116,64 +93,78 @@ namespace ym
 		{
 			return std::vector<Mesh>();
 		}
-		//auto &meshes = settings.meshes;
-		// フラグを取得
-		flags_ = settings.flags;
-		bool inverseU = false;
-		bool inverseV = false;
-		if (flags_ & ModelSetting::InverseU)
+		auto resourceManager = ResourceManager::Instance();
+		string sFileName = ym::Utf16ToUtf8(settings.filename);
+		if (resourceManager->FindMesh(sFileName))
 		{
-			inverseU = true;
-
+			auto buffers = resourceManager->GetMesh(sFileName);
+			meshes.resize(buffers.size());
+			meshes = resourceManager->GetMesh(sFileName);
+			buffers.clear();
+			//return meshes;
 		}
-		if (flags_ & ModelSetting::InverseV)
+		else
 		{
-			inverseV = true;
+
+			//auto &meshes = settings.meshes;
+			// フラグを取得
+			flags_ = settings.flags;
+			bool inverseU = false;
+			bool inverseV = false;
+			if (flags_ & ModelSetting::InverseU)
+			{
+				inverseU = true;
+
+			}
+			if (flags_ & ModelSetting::InverseV)
+			{
+				inverseV = true;
+			}
+			auto path = ym::Utf16ToUtf8(settings.filename);
+			Assimp::Importer importer;
+			int flag = 0;
+			flag |= aiProcess_Triangulate;
+			flag |= aiProcess_PreTransformVertices;
+			flag |= aiProcess_CalcTangentSpace;
+			flag |= aiProcess_GenSmoothNormals;
+			flag |= aiProcess_GenUVCoords;
+			flag |= aiProcess_RemoveRedundantMaterials;
+			flag |= aiProcess_OptimizeMeshes;
+
+			auto scene = importer.ReadFile(path, flag);
+
+			if (scene == nullptr)
+			{
+				// もし読み込みエラーがでたら表示する
+				printf(importer.GetErrorString());
+				printf("\n");
+				return std::vector<Mesh>();
+			}
+
+			// 読み込んだデータを自分で定義したMesh構造体に変換する
+			meshes.clear();
+			meshes.resize(scene->mNumMeshes);
+			/*texturePaths_.resize(scene->mNumMeshes);
+			textures_.resize(scene->mNumMeshes);
+			textureViews_.resize(scene->mNumMeshes);
+			specTexturePaths_.resize(scene->mNumMeshes);
+			specTextures_.resize(scene->mNumMeshes);
+			specTextureViews_.resize(scene->mNumMeshes);
+			maskexturePaths_.resize(scene->mNumMeshes);
+			maskTextures_.resize(scene->mNumMeshes);
+			maskTextureViews_.resize(scene->mNumMeshes);*/
+			//======================================
+			//======================================
+			for (size_t i = 0; i < meshes.size(); ++i)
+			{
+				const auto pMesh = scene->mMeshes[i];
+				LoadMesh(meshes[i], pMesh, inverseU, inverseV);
+				const auto pMaterial = scene->mMaterials[i];
+				LoadTexture(settings.filename, meshes[i], pMaterial);
+			}
+			scene = nullptr;
 		}
-		auto path = ym::Utf16ToUtf8(settings.filename);
-		Assimp::Importer importer;
-		int flag = 0;
-		flag |= aiProcess_Triangulate;
-		flag |= aiProcess_PreTransformVertices;
-		flag |= aiProcess_CalcTangentSpace;
-		flag |= aiProcess_GenSmoothNormals;
-		flag |= aiProcess_GenUVCoords;
-		flag |= aiProcess_RemoveRedundantMaterials;
-		flag |= aiProcess_OptimizeMeshes;
-
-		auto scene = importer.ReadFile(path, flag);
-
-		if (scene == nullptr)
-		{
-			// もし読み込みエラーがでたら表示する
-			printf(importer.GetErrorString());
-			printf("\n");
-			return std::vector<Mesh>();
-		}
-
-		// 読み込んだデータを自分で定義したMesh構造体に変換する
-		meshes.clear();
-		meshes.resize(scene->mNumMeshes);
-		/*texturePaths_.resize(scene->mNumMeshes);
-		textures_.resize(scene->mNumMeshes);
-		textureViews_.resize(scene->mNumMeshes);
-		specTexturePaths_.resize(scene->mNumMeshes);
-		specTextures_.resize(scene->mNumMeshes);
-		specTextureViews_.resize(scene->mNumMeshes);
-		maskexturePaths_.resize(scene->mNumMeshes);
-		maskTextures_.resize(scene->mNumMeshes);
-		maskTextureViews_.resize(scene->mNumMeshes);*/
-		//======================================
-		material_.resize(scene->mNumMeshes);
-		//======================================
-		for (size_t i = 0; i < meshes.size(); ++i)
-		{
-			const auto pMesh = scene->mMeshes[i];
-			LoadMesh(meshes[i], pMesh, inverseU, inverseV);
-			const auto pMaterial = scene->mMaterials[i];
-			LoadTexture(settings.filename, meshes[i], pMaterial);			
-		}
-
+		material_.resize(meshes.size());
 		NormalizeScale();
 
 		for (size_t i = 0; i < meshes.size(); ++i)
@@ -185,17 +176,18 @@ namespace ym
 
 		}
 
-		scene = nullptr;
 
 		
 		isInit_ = true;
 
 
-		/*pCmdList_->Close();
+		pCmdList_->Close();
 		pCmdList_->Execute();
-		pDevice_->WaitForCommandQueue();
-		pCmdList_->Reset();	*/
+		pDevice_->WaitForGraphicsCommandQueue();
+		
+		pCmdList_->Reset();	
 
+		resourceManager->SetMesh(sFileName, meshes);
 		return meshes;
 
 	}
@@ -373,7 +365,7 @@ namespace ym
 	}
 	void OBJLoader::UpdateMatrix()
 	{
-		(*pMatrix_) = object->globalTransform.GetMatrix();
+		(*pMatrix_) = object->worldTransform.GetMatrix();
 	}
 	
 }

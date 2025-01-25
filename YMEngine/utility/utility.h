@@ -3,6 +3,8 @@
 #define NOMINMAX
 
 #include "transform/transform.h"
+#include "quaternion/quaternion.h"
+#include "stringUtility.h"
 
 namespace ym
 {
@@ -48,6 +50,20 @@ namespace ym
 	}
 
 	inline void ConsoleLog(const char *format, ...)
+	{
+#ifdef _DEBUG
+		va_list arg;
+
+		char tsv[4096];
+		va_start(arg, format);
+		vsprintf_s(tsv, format, arg);
+		va_end(arg);
+
+		OutputDebugStringA(tsv);
+#endif // _DEBUG
+
+	}
+	inline void ConsoleLogRelease(const char *format, ...)
 	{
 		va_list arg;
 
@@ -488,6 +504,7 @@ namespace ym
 	}
 	static std::array<std::array<float, 4>, 4> CreateTransformMatrix(Transform t)
 	{
+		
 		return CreateTransformMatrix(t.Scale, t.Rotation, t.Position);
 	}
 	// ç¿ïWÇïœä∑Ç∑ÇÈÇΩÇﬂÇÃä÷êî
@@ -501,6 +518,8 @@ namespace ym
 	}
 
 
+
+	
 	extern Random GlobalRandom;
 
 

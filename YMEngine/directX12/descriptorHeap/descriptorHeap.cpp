@@ -97,10 +97,14 @@ namespace ym
 
 		if (IsValid())
 		{
-			ym::ConsoleLog("[INFO] DescriptorInfo::Free() called\n");
-			ym::ConsoleLog("[INFO] pAllocator = %d\n", pAllocator->allocCount_);
+			if (DEBUG_DESCRIPTOR_HEAP)
+			{
+				ym::ConsoleLog("[INFO] DescriptorInfo::Free() called\n");
+				ym::ConsoleLog("[INFO] pAllocator = %d\n", pAllocator->allocCount_);
+			}
 			if (pAllocator->allocCount_ == 0)
 			{
+				if (DEBUG_DESCRIPTOR_HEAP)
 				ym::ConsoleLog("[INFO] DescriptorInfo::Free() pAllocator->allocCount_ == 0\n");
 				//pAllocator = nullptr;
 			}
@@ -143,10 +147,11 @@ namespace ym
 	//----
 	void DescriptorAllocator::Destroy()
 	{
-
-		ym::ConsoleLog("[INFO] DescriptorAllocator::Destroy() called\n");
-		ym::ConsoleLog("[INFO] allocCount_ = %d\n", allocCount_);
-
+		if (DEBUG_DESCRIPTOR_HEAP)
+		{
+			ym::ConsoleLog("[INFO] DescriptorAllocator::Destroy() called\n");
+			ym::ConsoleLog("[INFO] allocCount_ = %d\n", allocCount_);
+		}
 		//0‚¶‚á‚È‚¢‚È‚çŠJ•ú‚µ‚È‚¢
 		if (allocCount_ != 0) return;
 
@@ -196,7 +201,9 @@ namespace ym
 	//----
 	void DescriptorAllocator::Free(DescriptorInfo info)
 	{
-		ym::ConsoleLog("[INFO] DescriptorAllocator::Free() called\n");
+		if (DEBUG_DESCRIPTOR_HEAP) {
+			ym::ConsoleLog("[INFO] DescriptorAllocator::Free() called\n");
+		}
 		//assert(info.pAllocator == this);
 		//assert(pUseFlags_[info.index] != 0);
 		if (info.pAllocator == this && pUseFlags_[info.index] != 0)

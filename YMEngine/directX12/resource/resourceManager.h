@@ -5,6 +5,7 @@ namespace ym
 {
 
 	class Texture;
+	struct Mesh;
 
 	class ResourceManager
 	{
@@ -31,6 +32,19 @@ namespace ym
 			return textureMap_.find(fileName) != textureMap_.end();
 		}
 
+		inline void SetMesh(std::string fileName, std::vector<ym::Mesh> data)
+		{
+			meshMap_[fileName] = data;
+		}
+		inline std::vector<ym::Mesh> GetMesh(std::string fileName)
+		{
+			return meshMap_[fileName];
+		}
+		inline bool FindMesh(std::string fileName)
+		{
+			return meshMap_.find(fileName) != meshMap_.end();
+		}
+
 
 
 		
@@ -39,5 +53,7 @@ namespace ym
 		static ResourceManager *instance;
 
 		unordered_map<std::string, ym::Texture> textureMap_;
+
+		unordered_map<std::string, std::vector<ym::Mesh>> meshMap_;
 	};
 }

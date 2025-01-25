@@ -59,6 +59,11 @@ namespace ym
 
 		void CreateMaterial(Mesh mesh);
 
+		void SetMainTex(string diffuse)
+		{
+			diffuseMap_ = diffuse;
+		}
+
 	private:
 		void CreateVertexBuffer();
 		void CreateIndexBuffer();

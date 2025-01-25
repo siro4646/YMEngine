@@ -72,6 +72,17 @@ namespace ym {
 		}
 
 		void Update() {
+			/*auto th1 = std::thread([]
+				{
+
+					KeyboardInput::GetInstance().Update();
+				});
+			auto th2 = std::thread([]
+				{
+					MouseInput::GetInstance().Update();
+				});
+			th1.join();
+			th2.join();*/
 			KeyboardInput::GetInstance().Update();
 			MouseInput::GetInstance().Update();
 

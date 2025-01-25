@@ -44,46 +44,12 @@ namespace ym
 		auto bbidx = device_->GetSwapChain().GetFrameIndex();
 		auto &swapChain = device_->GetSwapChain();
 
-		D3D12_INPUT_ELEMENT_DESC elementDescs[] = {
-	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float3‚ÌPOSITION
-	{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float3‚ÌNORMAL
-	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float2‚ÌTEXCOORD
-	{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float3‚ÌTANGENT
-	{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float4‚ÌCOLOR
-		};
-
 		ym::GraphicsPipelineStateDesc desc;
-		desc.rasterizer.fillMode = D3D12_FILL_MODE_SOLID;
+		desc = GraphicsPipelineState::GetDefaultDesc();
 		desc.rasterizer.cullMode = D3D12_CULL_MODE_NONE;
-		desc.rasterizer.isFrontCCW = false;
-		desc.rasterizer.isDepthClipEnable = false;
-		desc.multisampleCount = 1;
-
-		desc.blend.sampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-		desc.blend.rtDesc[0].isBlendEnable = false;
-		desc.blend.rtDesc[0].srcBlendColor = D3D12_BLEND_ZERO;
-		desc.blend.rtDesc[0].dstBlendColor = D3D12_BLEND_ZERO;
-		desc.blend.rtDesc[0].blendOpColor = D3D12_BLEND_OP_ADD;
-		desc.blend.rtDesc[0].srcBlendAlpha = D3D12_BLEND_ZERO;
-		desc.blend.rtDesc[0].dstBlendAlpha = D3D12_BLEND_ZERO;
-		desc.blend.rtDesc[0].blendOpAlpha = D3D12_BLEND_OP_ADD;
-		desc.blend.rtDesc[0].writeMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-		desc.depthStencil.depthFunc = D3D12_COMPARISON_FUNC_LESS;
-		desc.depthStencil.isDepthEnable = true;
-		desc.depthStencil.isDepthWriteEnable = true;
-
 		desc.pRootSignature = rootSignature_.get();
 		desc.pVS = vs_.get();
 		desc.pPS = ps_.get();
-		desc.primTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-		//auto inputLayout = Vertex::InputLayout;
-		desc.inputLayout.numElements = _countof(elementDescs);
-		desc.inputLayout.pElements = elementDescs;
-		desc.numRTVs = 0;
-		desc.rtvFormats[desc.numRTVs++] = device_->GetSwapChain().GetRenderTargetView(bbidx)->GetFormat();
-		desc.dsvFormat = device_->GetSwapChain().GetDepthStencilTexture()->GetTextureDesc().format;
 		pipelineState_ = std::make_shared<GraphicsPipelineState>();
 		pipelineState_->Init(device_, desc);
 
@@ -118,6 +84,8 @@ namespace ym
 		rootSignature_.reset();
 		pipelineState_.reset();
 		sampler_.reset();
+		diffuseMapTex_.reset();
+		diffuseMapTexView_.reset();			
 	}
 	void Material::Update()
 	{

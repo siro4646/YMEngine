@@ -2,6 +2,15 @@
 
 namespace ym
 {
+
+	enum  class  PostProcessType :u32
+	{
+		Blur,
+		Mosaic,
+		GrayScale,
+		Max,
+	};
+
 	class PostProcessMaterial;
 
 	class Device;
@@ -64,6 +73,7 @@ namespace ym
 
 		void CreateVertexBuffer();
 		void CreateIndexBuffer();
+
 
 		PostProcessManager() {}
 		Device *device_;

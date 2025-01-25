@@ -19,7 +19,7 @@ namespace ym
 	//	void Update()override;
 	//	void Draw()override;
 	//	void Uninit()override;
-	//  Object*Clone()override;
+	//  std::shared_ptr<Object>Clone()override;
 	//};
 
 
@@ -35,13 +35,14 @@ namespace ym
 
 		GameObjectManager *objectManager;//参照だけもつ
 		Transform localTransform;
-		Transform globalTransform;
+		Transform worldTransform;
 		Type type =Type::None;
 		std::vector<std::shared_ptr<Component>> components;
+		std::string name;
 	private:
+		bool isUninit = false;
 	protected:
 		std::string tag;
-		std::string name;
 		std::shared_ptr<Object>_parent = nullptr;
 		std::vector <std::shared_ptr<Object>> _childs;
 	public:
@@ -76,10 +77,8 @@ namespace ym
 		//子供の削除
 		bool DeleteChild(const std::shared_ptr<Object> &child);
 
-		//親子関係の更新
-		void NotifyUpdate();
-		//親子関係の更新
-		void NotifyGlobalUpdate();
+		void UpdateHierarchy();
+
 
 	
 
@@ -97,9 +96,10 @@ namespace ym
 		{
 			for (auto &component : components)
 			{
-				if (typeid(*component) == typeid(T))
+				// dynamic_cast を使用して、T 型にキャスト可能か判定
+				if (auto castedComponent = std::dynamic_pointer_cast<T>(component))
 				{
-					return std::dynamic_pointer_cast<T>(component);
+					return castedComponent;
 				}
 			}
 			return nullptr;

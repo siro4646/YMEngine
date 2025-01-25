@@ -3,6 +3,10 @@
 #include <iostream> // デバッグ用
 
 #include "../Game/Scene/TestScene/testScene.h"
+#include "../Game/Scene/TestScene2/testScene2.h"
+
+#include "Renderer/renderer.h"
+#include "device/device.h"
 
 namespace ym {
 
@@ -86,6 +90,14 @@ namespace ym {
     }
     void SceneManager::Terminate()
     {
+        auto device = Renderer::Instance()->GetDevice();
+		if (device)
+		{
+			device->WaitForComputeCommandQueue();
+			device->WaitForGraphicsCommandQueue();
+		}
+
+		//シーン削除
         int i = 0;
         while (!m_pScene.empty())
         {

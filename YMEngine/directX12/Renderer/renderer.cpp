@@ -29,15 +29,27 @@
 
 #include "material/postProcess/mosaic/mosaicMaterial.h"
 #include "material/postProcess/grayScale/grayScaleMaterial.h"
+#include "material/postProcess/blur/blurMaterial.h"
+#include "material/postProcess/lightPass/lightPassMaterial.h"
+#include "material/postProcess/lumPass/lumPassMaterial.h"
+
 
 #include "utility/inputSystem/keyBoard/keyBoardInput.h"
+
+#include "imgui/imguiRender.h"
+
+#include "gameFrameWork/light/lightManager.h"
+
+#include "renderTargetManager/renderTargetManager.h"
 
 
 namespace ym
 {
 	std::shared_ptr<Device> Renderer::device_{};
 	std::shared_ptr<CommandList> Renderer::pGraphicCommandList_{};
+	std::shared_ptr<CommandList> Renderer::pRenderTextureCommandList_{};
 	std::shared_ptr<CommandList> Renderer::pComputeCommandList_{};
+	std::shared_ptr<CommandList> Renderer::pCopyCommandList_{};
 
 	bool Renderer::Init(Window*win, u32 width, u32 height, ColorSpaceType csType)
 	{
@@ -70,6 +82,24 @@ namespace ym
 		{
 			return false;
 		}
+		pRenderTextureCommandList_ = std::make_shared<CommandList>();
+		if (!pRenderTextureCommandList_)
+		{
+			return false;
+		}
+		if (!pRenderTextureCommandList_->Init(device_.get(), &device_->GetGraphicsQueue()))
+		{
+			return false;
+		}
+		pCopyCommandList_ = std::make_shared<CommandList>();
+		if (!pCopyCommandList_)
+		{
+			return false;
+		}
+		if (!pCopyCommandList_->Init(device_.get(), &device_->GetCopyQueue()))
+		{
+			return false;
+		}
 
 		CreateRenderTargets(width, height);
 
@@ -99,6 +129,22 @@ namespace ym
 		grayScaleMaterial_ = std::make_shared<GrayScaleMaterial>();
 		grayScaleMaterial_->Init();
 
+		blurMaterial_ = std::make_shared<BlurMaterial>();
+		blurMaterial_->Init();
+
+		lightPassMaterial_ = std::make_shared<LightPassMaterial>();
+		lightPassMaterial_->Init();
+
+		lumPassMaterial_ = std::make_shared<LumPassMaterial>();
+		lumPassMaterial_->Init();
+
+		pPM->AddPostProcessMaterial(lightPassMaterial_.get());
+		pPM->AddPostProcessMaterial(lumPassMaterial_.get());
+
+		//usePostProcess_[0] = true;
+
+
+		//pPM->AddPostProcessMaterial(blurMaterial_.get());
 		//pPM->AddPostProcessMaterial(mosaicMaterial_.get());
 		//pPM->AddPostProcessMaterial(grayScaleMaterial_.get());
 		window_ = win;
@@ -124,7 +170,9 @@ namespace ym
 	{
 		if (isUninited)return;
 
-		device_->WaitForCommandQueue();
+		device_->WaitForGraphicsCommandQueue();
+		device_->WaitForComputeCommandQueue();
+		device_->WaitForCopyCommandQueue();
 
 		//シーンバッファの開放
 		sceneVertexBuffer_.reset();
@@ -172,6 +220,9 @@ namespace ym
 
 		mosaicMaterial_.reset();
 		grayScaleMaterial_.reset();
+		blurMaterial_.reset();
+		lightPassMaterial_.reset();
+		lumPassMaterial_.reset();
 
 
 
@@ -192,6 +243,7 @@ namespace ym
 			window_ = nullptr;
 		}
 
+		pCopyCommandList_->Uninit();
 		pComputeCommandList_->Uninit();
 		pGraphicCommandList_->Uninit();
 		device_->Uninit();
@@ -213,32 +265,95 @@ namespace ym
 	}
 	void Renderer::Update()
 	{
+		auto pPM = PostProcessManager::Instance();
+		pPM->Update();
+		auto lightManager = LightManager::Instance();
+		lightManager->Update();
 		auto &input = KeyboardInput::GetInstance();
-		if (input.GetKeyDown("1"))
+		//if (input.GetKeyDown("1"))
+		//{
+		//	auto pPM = PostProcessManager::Instance();
+		//	pPM->AddPostProcessMaterial(mosaicMaterial_.get());
+		//}
+		//if (input.GetKeyDown("2"))
+		//{
+		//	auto pPM = PostProcessManager::Instance();
+		//	pPM->AddPostProcessMaterial(grayScaleMaterial_.get());
+		//}
+		//if (input.GetKeyDown("3"))
+		//{
+		//	auto pPM = PostProcessManager::Instance();
+		//	pPM->AddPostProcessMaterial(blurMaterial_.get());
+		//}
+		//if (input.GetKeyDown("4"))
+		//{
+		//	auto pPM = PostProcessManager::Instance();
+		//	pPM->RemovePostProcessMaterial(mosaicMaterial_.get());
+		//}
+		//if (input.GetKeyDown("5"))
+		//{
+		//	auto pPM = PostProcessManager::Instance();
+		//	pPM->RemovePostProcessMaterial(grayScaleMaterial_.get());
+		//}
+		//if (input.GetKeyDown("6"))
+		//{
+		//	auto pPM = PostProcessManager::Instance();
+		//	pPM->RemovePostProcessMaterial(blurMaterial_.get());
+		//}
+
+		/*for (int i = 0; i < (int)PostProcessType::Max; ++i)
 		{
-			auto pPM = PostProcessManager::Instance();
-			pPM->AddPostProcessMaterial(mosaicMaterial_.get());
-		}
-		if (input.GetKeyDown("2"))
-		{
-			auto pPM = PostProcessManager::Instance();
-			pPM->AddPostProcessMaterial(grayScaleMaterial_.get());
-		}
-		if (input.GetKeyDown("3"))
-		{
-			auto pPM = PostProcessManager::Instance();
-			pPM->RemovePostProcessMaterial(mosaicMaterial_.get());
-		}
-		if (input.GetKeyDown("4"))
-		{
-			auto pPM = PostProcessManager::Instance();
-			pPM->RemovePostProcessMaterial(grayScaleMaterial_.get());
-		}
+			if (usePostProcess_[i])
+			{
+				if (i == (int)PostProcessType::Mosaic)
+				{
+					auto pPM = PostProcessManager::Instance();
+					pPM->AddPostProcessMaterial(mosaicMaterial_.get());
+				}
+				if (i == (int)PostProcessType::GrayScale)
+				{
+					auto pPM = PostProcessManager::Instance();
+					pPM->AddPostProcessMaterial(grayScaleMaterial_.get());
+				}
+				if (i == (int)PostProcessType::Blur)
+				{
+					auto pPM = PostProcessManager::Instance();
+					pPM->AddPostProcessMaterial(blurMaterial_.get());
+				}
+			}
+			else
+			{
+				if (i == (int)PostProcessType::Mosaic)
+				{
+					auto pPM = PostProcessManager::Instance();
+					pPM->RemovePostProcessMaterial(mosaicMaterial_.get());
+				}
+				if (i == (int)PostProcessType::GrayScale)
+				{
+					auto pPM = PostProcessManager::Instance();
+					pPM->RemovePostProcessMaterial(grayScaleMaterial_.get());
+				}
+				if (i == (int)PostProcessType::Blur)
+				{
+					auto pPM = PostProcessManager::Instance();
+					pPM->RemovePostProcessMaterial(blurMaterial_.get());
+				}
+				
+			}
+		}*/
+
+		//if (input.GetKeyDown("8"))
+		//{
+		//	blurValue_ -= 0.1f;
+		//}
+
+
+
 
 	}
 	void Renderer::Resize(u32 width, u32 height)
 	{
-		device_->WaitForCommandQueue();
+		device_->WaitForGraphicsCommandQueue();
 		device_->Resize(width, height);
 		m_viewPort.Width = static_cast<float>(width);
 		m_viewPort.Height = static_cast<float>(height);
@@ -251,55 +366,71 @@ namespace ym
 		auto nextbbidx = (bbidx + 1) % ym::SwapChain::kFrameCount;
 		auto cmd = pGraphicCommandList_;
 
-		//===========================================================
-
-		/*auto scTex = device_->GetSwapChain().GetCurrentTexture();
-		auto rtv = device_->GetSwapChain().GetDescHandle(bbidx);
-		auto dsv = device_->GetSwapChain().GetDepthStencilView()->GetDescInfo().cpuHandle;
-		auto dsvTex = device_->GetSwapChain().GetDepthStencilTexture();
-
-		cmd->TransitionBarrier(scTex,D3D12_RESOURCE_STATE_RENDER_TARGET);
-		cmd->TransitionBarrier(dsvTex,D3D12_RESOURCE_STATE_DEPTH_WRITE);
-		float clearColor[] = { 0.5,1,1,1 };
-
-		cmd->GetCommandList()->OMSetRenderTargets(1, &rtv, true, &dsv);
-		cmd->GetCommandList()->ClearRenderTargetView(rtv, clearColor, 0, nullptr);
-		cmd->GetCommandList()->ClearDepthStencilView(dsv, D3D12_CLEAR_FLAG_DEPTH,dsvTex->GetTextureDesc().clearDepth,dsvTex->GetTextureDesc().clearStencil, 0, nullptr);*/
-
-		//===========================================================
-
-		//===========================================================
+		
 
 
-		auto sceneTex = sceneRenderTextures[bbidx].get();
-		auto sceneRtv = sceneRenderTargetViews[bbidx].get();
-		auto sceneDsvTex = depthStencilTexture_.get();
-		auto sceneDsv = depthStencilView_.get();
+		auto sceneTex = GetSceneRenderTexture(bbidx, MultiRenderTargets::Color);
+		auto sceneTex1 = GetSceneRenderTexture(bbidx, MultiRenderTargets::Normal);
+		auto sceneTex2 = GetSceneRenderTexture(bbidx, MultiRenderTargets::HighLuminance);
+		auto sceneTex3 = GetSceneRenderTexture(bbidx, MultiRenderTargets::WorldPos);
+
+		auto sceneRtv = GetSceneRenderTargetView(bbidx, MultiRenderTargets::Color);
+		auto sceneRtv1 = GetSceneRenderTargetView(bbidx, MultiRenderTargets::Normal);
+		auto sceneRtv2 = GetSceneRenderTargetView(bbidx, MultiRenderTargets::HighLuminance);
+		auto sceneRtv3 = GetSceneRenderTargetView(bbidx, MultiRenderTargets::WorldPos);
+
+		D3D12_CPU_DESCRIPTOR_HANDLE  sceneRtvs[] = {
+			sceneRtv->GetDescInfo().cpuHandle,
+			sceneRtv1->GetDescInfo().cpuHandle,
+			sceneRtv2->GetDescInfo().cpuHandle,
+			sceneRtv3->GetDescInfo().cpuHandle
+		};
+
+
 
 		cmd->TransitionBarrier(sceneTex, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		cmd->TransitionBarrier(sceneTex1, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		cmd->TransitionBarrier(sceneTex2, D3D12_RESOURCE_STATE_RENDER_TARGET);
+		cmd->TransitionBarrier(sceneTex3, D3D12_RESOURCE_STATE_RENDER_TARGET);
+
+
+			//sceneRenderTargetViews[bbidx].get();
+		auto sceneDsvTex = depthStencilTexture_.get();
+		auto sceneDsv = depthStencilView_.get();
 		cmd->TransitionBarrier(sceneDsvTex, D3D12_RESOURCE_STATE_DEPTH_WRITE);
 		float clearColor[] = { 0.5,1,1,1 };
 
-		cmd->GetCommandList()->OMSetRenderTargets(1, &sceneRtv->GetDescInfo().cpuHandle, true, &sceneDsv->GetDescInfo().cpuHandle);
-		cmd->GetCommandList()->ClearRenderTargetView(sceneRtv->GetDescInfo().cpuHandle,sceneTex->GetTextureDesc().clearColor, 0, nullptr);
-		cmd->GetCommandList()->ClearDepthStencilView(sceneDsv->GetDescInfo().cpuHandle, D3D12_CLEAR_FLAG_DEPTH, sceneDsvTex->GetTextureDesc().clearDepth, sceneDsvTex->GetTextureDesc().clearStencil, 0, nullptr);
-		
-		//===========================================================
-
+		auto rtManager = RenderTargetManager::Instance();
+		rtManager->BeginRenderTarget({ *sceneRtv,*sceneRtv1,*sceneRtv2,*sceneRtv3 }, { *sceneTex,*sceneTex1,*sceneTex2,*sceneTex3 }, sceneDsv, sceneDsvTex, true);
 
 		SetViewPort();
 
+		//ImGuiのフレーム開始
+		auto pImGui = ImGuiRender::Instance();
+		pImGui->NewFrame();
 	}
 	void Renderer::Draw()
 	{
-		
+		/*ImGui::Begin("PostProcess");
+		for (int i = 0; i < (int)PostProcessType::Max; ++i)
+		{
+			ImGui::PushID(i);
+			ImGui::Checkbox("aaaa", &usePostProcess_[i]);
+			ImGui::PopID();
+		}
+		ImGui::End();*/
+
 	}
 	void Renderer::EndFrame()
 	{
+
+
+
 		auto bbidx = device_->GetSwapChain().GetFrameIndex();
 		auto cmd = pGraphicCommandList_;
 		auto pCmdList = cmd->GetCommandList();
 
+		
 		//===========================================================
 
 		/*auto rtv = device_->GetSwapChain().GetDescHandle(bbidx);
@@ -313,12 +444,18 @@ namespace ym
 
 
 
-		auto sceneTex = sceneRenderTextures[bbidx].get();
-		auto sceneRtv = sceneRenderTargetViews[bbidx].get();
+		auto sceneTex = GetSceneRenderTexture(bbidx, MultiRenderTargets::Color);
+		auto sceneTex1 = GetSceneRenderTexture(bbidx, MultiRenderTargets::Normal);
+		auto sceneTex2 = GetSceneRenderTexture(bbidx, MultiRenderTargets::HighLuminance);
+		auto sceneTex3 = GetSceneRenderTexture(bbidx, MultiRenderTargets::WorldPos);
+		auto sceneRtv = GetSceneRenderTargetView(bbidx, MultiRenderTargets::Color);
 		auto sceneDsvTex = depthStencilTexture_.get();
 
 		//シーンテクスチャをシェーダーに描画するために遷移
 		cmd->TransitionBarrier(sceneTex, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		cmd->TransitionBarrier(sceneTex1, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		cmd->TransitionBarrier(sceneTex2, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		cmd->TransitionBarrier(sceneTex3, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 		cmd->TransitionBarrier(sceneDsvTex, D3D12_RESOURCE_STATE_GENERIC_READ);
 
 		auto ds = sceneDescriptorSet_.get();
@@ -337,9 +474,9 @@ namespace ym
 		cmd->TransitionBarrier(swapChainTex,D3D12_RESOURCE_STATE_RENDER_TARGET);
 		auto clearColor = swapChainTex->GetTextureDesc().clearColor ;
 
-		cmd->GetCommandList()->OMSetRenderTargets(1, &rtv, false, nullptr);
-		cmd->GetCommandList()->ClearRenderTargetView(rtv, clearColor, 0, nullptr);		
-
+		auto rtManager = RenderTargetManager::Instance();
+		rtManager->BeginRenderTarget({ *device_->GetSwapChain().GetRenderTargetView(bbidx) }, { *swapChainTex }, nullptr, nullptr, true);
+	
 		//ポストプロセスのリザルトをバックバッファに描画
 
 
@@ -357,17 +494,30 @@ namespace ym
 		cmd->GetCommandList()->IASetIndexBuffer(&sceneIndexBufferView_->GetView());
 		cmd->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
+		auto imgui = ImGuiRender::Instance();
+		imgui->EndFrame();
+		imgui->Render(cmd.get());
 		//バックバッファをプレゼント
 
 		cmd->TransitionBarrier(swapChainTex, D3D12_RESOURCE_STATE_PRESENT);
 		//cmd->TransitionBarrier(sceneTex, D3D12_RESOURCE_STATE_GENERIC_READ);
 
-
 		pGraphicCommandList_->Close();
+		pRenderTextureCommandList_->Close();
+		pComputeCommandList_->Close();
+		pCopyCommandList_->Close();
 		pGraphicCommandList_->Execute();
-		device_->WaitForCommandQueue();
+		pRenderTextureCommandList_->Execute();
+		pComputeCommandList_->Execute();
+		pCopyCommandList_->Execute();
+		device_->WaitForGraphicsCommandQueue();
+		device_->WaitForComputeCommandQueue();
+		device_->WaitForCopyCommandQueue();
 		device_->Present();
 		cmd->Reset();
+		pRenderTextureCommandList_->Reset();
+		pComputeCommandList_->Reset();
+		pCopyCommandList_->Reset();
 	}
 	void Renderer::CreateDummyTextures()
 	{
@@ -440,6 +590,31 @@ namespace ym
 			rM->SetTexture("white", *dummyTextures_[DummyTex::White].get());
 		}
 
+		//Purple
+		{
+			TextureDesc desc{};
+			desc.initialState = D3D12_RESOURCE_STATE_COPY_DEST;
+			desc.width = desc.height = 4;
+			desc.depth = 1;
+			desc.dimension = TextureDimension::Texture2D;
+			desc.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.mipLevels = 1;
+
+			std::vector<ym::u32> bin;
+			bin.resize(64 * 4);
+			for (auto &&pix : bin)
+			{
+				pix = 0xFF880088;
+			}
+
+			dummyTextures_[DummyTex::Purple] = std::make_unique<Texture>();
+			if (!dummyTextures_[DummyTex::Purple]->InitFromBin(device_.get(), pGraphicCommandList_.get(), desc, bin.data()))
+			{
+				return;
+			}
+			rM->SetTexture("purple", *dummyTextures_[DummyTex::Purple].get());
+		}
+
 		// FlatNormal
 		{
 			TextureDesc desc{};
@@ -478,7 +653,7 @@ namespace ym
 	}
 	void Renderer::CreateRenderTargets(u32 width, u32 height)
 	{
-		int frameCount = ym::SwapChain::kFrameCount;
+		int frameCount = ym::SwapChain::kFrameCount*MultiRenderTargets::Max;
 
 		sceneRenderTextures.resize(frameCount);
 		sceneRenderTargetTexViews.resize(frameCount);
@@ -488,7 +663,7 @@ namespace ym
 		texDesc.dimension = TextureDimension::Texture2D;
 		texDesc.width = width;
 		texDesc.height = height;
-		texDesc.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+		texDesc.format = DXGI_FORMAT_R16G16B16A16_FLOAT;
 		texDesc.clearColor[0] = 0.5f;
 		texDesc.clearColor[1] = 1.f;
 		texDesc.clearColor[2] = 1.f;
@@ -497,6 +672,22 @@ namespace ym
 		for (int i = 0; i < frameCount; ++i)
 		{
 			sceneRenderTextures[i] = std::make_shared<Texture>();
+			//作成している物がColorの場合はtexDescのクリアカラーを水色にする
+			if (i % MultiRenderTargets::Max == MultiRenderTargets::Color)
+			{
+				texDesc.clearColor[0] = 0.5f;
+				texDesc.clearColor[1] = 1.f;
+				texDesc.clearColor[2] = 1.f;
+				texDesc.clearColor[3] = 1.0f;
+			}
+			else
+			{
+				texDesc.clearColor[0] = 0.0f;
+				texDesc.clearColor[1] = 0.0f;
+				texDesc.clearColor[2] = 0.0f;
+				texDesc.clearColor[3] = 1.0f;
+			}
+
 			if (!sceneRenderTextures[i]->Init(device_.get(), texDesc))
 			{
 				return;

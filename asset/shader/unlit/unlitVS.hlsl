@@ -50,9 +50,10 @@ PSInput main(VSInput Input)
     //output.pos = mul(output.pos, proj); // プロジェクション行列適用
     
     //Input.normal.
-    output.normal = mul(mat, Input.normal); //float4(Input.normal, 1.0f); 
+    float3x3 normalMatrix = (float3x3) mat; // 上3x3を取り出す
+    output.normal = float4(normalize(mul(normalMatrix, Input.normal)), 1);
     output.color = Input.color;
     output.uv = Input.uv;
-    output.ray = normalize(Input.pos.xyz - mul(view, eye));
+    output.ray = normalize(worldPos.xyz - eye); // カメラ位置からワールド座標への方向
     return output;
 }

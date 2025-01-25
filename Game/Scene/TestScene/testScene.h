@@ -8,6 +8,7 @@ namespace ym
 	class Object;
 
 	class MainCamera;
+	class SphereMap;
 
 	class TestScene : public BaseScene
 	{
@@ -28,6 +29,8 @@ namespace ym
 	Renderer *_renderer = nullptr;
 
 		std::shared_ptr<Object> _testObject;
+		std::shared_ptr<Object> _testObject2;
+		std::shared_ptr<Object> pointLight;
 		std::shared_ptr<Object> _mainCamera;
 
 	};

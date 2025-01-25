@@ -16,16 +16,19 @@ namespace ym
 
 		std::shared_ptr<Window> m_window;
 
+		
+
 		//Renderer *m_renderer = nullptr;
 
 		Timer deltaTime_;
+		Timer fixedDeltaTime_;
+
 
 		inline bool SyncFrameRate()
 		{
-			if (deltaTime_.elapsedMiliTime() > 1.0f / (ym::config::kFrameRate))
+			if (fixedDeltaTime_.elapsedTime() > 1.0f / (ym::config::kFrameRate))
 			{
-				//ym::ConsoleLog("FPS: %f\n", 1.0f / deltaTime_.elapsedMiliTime());
-				deltaTime_.reset();
+				fixedDeltaTime_.reset();
 				return true;
 			}
 			return false;
@@ -50,7 +53,11 @@ namespace ym
 		{
 			return m_window.get();
 		}
-
+		inline float GetDeltaTime()
+		{
+			return ym::config::kDeltaTime;
+			return deltaTime_.elapsedTime();			
+		}
 		/// <summary>
 		/// ‰Šú‰»
 		/// </summary>

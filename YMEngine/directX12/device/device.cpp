@@ -47,11 +47,19 @@ namespace ym {
 	{
 		if (isUninited)return;
 
-		WaitForCommandQueue();
+		WaitForGraphicsCommandQueue();
+
+		WaitForComputeCommandQueue();
+
+		WaitForCopyCommandQueue();
 
 		SyncKillObjects(true);
 
 		pSwapChain_.reset();
+
+		pGraphicsQueue_.reset();
+		pComputeQueue_.reset();
+		pCopyQueue_.reset();
 
 		ym::ConsoleLog("デフォルトサンプラーデスクリプター解放\n");
 		defaultSamplerDescInfo_.Free();
@@ -71,17 +79,47 @@ namespace ym {
 		SafeDelete(pGlobalViewDescHeap_);
 		isUninited = true;
 	}
-	void Device::WaitForCommandQueue()
+	void Device::WaitForGraphicsCommandQueue()
 	{
-		pGraphicsQueue_->GetQueueDep()->Signal(pFence_.Get(), ++fenceValue_);
-		if (pFence_->GetCompletedValue() != fenceValue_)
+		pGraphicsQueue_->GetQueueDep()->Signal(pGraphicsFence_.Get(), ++graphicsFenceValue_);
+		if (pGraphicsFence_->GetCompletedValue() != graphicsFenceValue_)
 		{
 			auto event = CreateEvent(nullptr, FALSE, FALSE, nullptr);
 			if(!event)
 			{
 				assert(0, &&"イベントエラー、アプリケーション終了\n");
 			}
-			pFence_->SetEventOnCompletion(fenceValue_, event);
+			pGraphicsFence_->SetEventOnCompletion(graphicsFenceValue_, event);
+			WaitForSingleObject(event, INFINITE);
+			CloseHandle(event);
+		}
+	}
+	void Device::WaitForComputeCommandQueue()
+	{
+		pComputeQueue_->GetQueueDep()->Signal(pComputeFence_.Get(), ++computeFenceValue_);
+		if (pComputeFence_->GetCompletedValue() != computeFenceValue_)
+		{
+			auto event = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+			if (!event)
+			{
+				assert(0, &&"イベントエラー、アプリケーション終了\n");
+			}
+			pComputeFence_->SetEventOnCompletion(computeFenceValue_, event);
+			WaitForSingleObject(event, INFINITE);
+			CloseHandle(event);
+		}
+	}
+	void Device::WaitForCopyCommandQueue()
+	{
+		pCopyQueue_->GetQueueDep()->Signal(pCopyFence_.Get(), ++copyFenceValue_);
+		if (pCopyFence_->GetCompletedValue() != copyFenceValue_)
+		{
+			auto event = CreateEvent(nullptr, FALSE, FALSE, nullptr);
+			if (!event)
+			{
+				assert(0, &&"イベントエラー、アプリケーション終了\n");
+			}
+			pCopyFence_->SetEventOnCompletion(copyFenceValue_, event);
 			WaitForSingleObject(event, INFINITE);
 			CloseHandle(event);
 		}
@@ -123,6 +161,7 @@ namespace ym {
 	}
 	bool Device::CreateDevice(ColorSpaceType csType)
 	{
+
 		{
 			//=====================================================
 			//アダプター作成
@@ -330,23 +369,55 @@ namespace ym {
 			return false;
 		}
 		ym::ConsoleLog("コンピュートキュー作成成功\n");
+		pCopyQueue_ = std::make_unique<CommandQueue>();
+		if (!pCopyQueue_)
+		{
+			return false;
+		}
+		if (!pCopyQueue_->Init(this, D3D12_COMMAND_LIST_TYPE_COPY, D3D12_COMMAND_QUEUE_PRIORITY_NORMAL))
+		{
+			return false;
+		}
+
 		return true;
 	}
 	bool Device::CreateFence()
 	{
 		//フェンス作成
-		auto hr = pDevice_->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pFence_));
+		auto hr = pDevice_->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pGraphicsFence_));
 		if (FAILED(hr))
 		{
 			return false;
 		}
-		fenceValue_ = 0;
+		graphicsFenceValue_ = 0;
 
-		fenceEvent_ = CreateEventEx(nullptr, FALSE, FALSE, EVENT_ALL_ACCESS);
-		if (fenceEvent_ == nullptr)
+		graphicsFenceEvent_ = CreateEventEx(nullptr, FALSE, FALSE, EVENT_ALL_ACCESS);
+		if (graphicsFenceEvent_ == nullptr)
 		{
 			return false;
 		}
+
+		hr = pDevice_->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pComputeFence_));
+		if (FAILED(hr))
+		{
+			return false;
+		}
+		computeFenceValue_ = 0;
+
+		computeFenceEvent_ = CreateEventEx(nullptr, FALSE, FALSE, EVENT_ALL_ACCESS);
+		if (computeFenceEvent_ == nullptr)
+		{
+			return false;
+		}
+
+		hr = pDevice_->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pCopyFence_));
+		if (FAILED(hr))
+		{
+			return false;
+		}
+		copyFenceValue_ = 0;
+
+
 		ym::ConsoleLog("フェンス作成成功\n");
 		return true;
 	}

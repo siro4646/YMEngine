@@ -61,8 +61,7 @@ namespace ym
 		specularMapTexView_->Init(device_, specularMapTex_.get());
 	}
 	void FBXMaterial::CreateShader()
-	{
-		//何も設定しない場合はunlitシェーダーを使用
+	{		
 		vs_ = std::make_shared<Shader>();
 		vs_->Init(device_, ShaderType::Vertex, "simpleFBX");
 		ps_ = std::make_shared<Shader>();

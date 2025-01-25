@@ -15,6 +15,7 @@
 #include "texture/texture.h"
 #include "textureView/textureView.h"
 
+#include "renderTargetManager/renderTargetManager.h"
 
 namespace ym
 {
@@ -31,7 +32,7 @@ namespace ym
 		sampler_ = std::make_shared<Sampler>();
 
 		texture_ = std::make_shared<Texture>();
-		ym::TextureDesc texDesc;
+		ym::TextureDesc texDesc; 
 		texDesc = Renderer::Instance()->GetDevice()->GetSwapChain().GetCurrentTexture()->GetTextureDesc();
 		texture_->Init(device_, texDesc);
 		rtv_ = std::make_shared<RenderTargetView>();
@@ -73,11 +74,17 @@ namespace ym
 	{
 		auto cmdList = graphicsCmdList_;
 		auto bbidx = device_->GetSwapChain().GetFrameIndex();
+		auto rtm = RenderTargetManager::Instance();
 
 		//テクスチャをRTVとして設定
 		cmdList->TransitionBarrier(texture_.get(), D3D12_RESOURCE_STATE_RENDER_TARGET);
-		cmdList->GetCommandList()->OMSetRenderTargets(1, &rtv_->GetDescInfo().cpuHandle, false, nullptr);
-		cmdList->GetCommandList()->ClearRenderTargetView(rtv_->GetDescInfo().cpuHandle, texture_->GetTextureDesc().clearColor, 0, nullptr);
+		rtm->BeginRenderTarget(
+			{ *rtv_ },
+			{ *texture_ },
+			nullptr,
+			nullptr,
+			true
+		);
 	}
 
 	void PostProcessMaterial::BaseRootSignature()
@@ -98,6 +105,8 @@ namespace ym
 
 	void PostProcessMaterial::BasePipelineState()
 	{
+
+
 		auto bbidx = device_->GetSwapChain().GetFrameIndex();
 		D3D12_INPUT_ELEMENT_DESC elementDescs[] = {
 { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },

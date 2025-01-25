@@ -10,78 +10,95 @@ namespace ym
 	{
 		name = "MainCamera";
 		camera_ = CameraManager::Instance().CreateCamera("mainCamera");
-
+		
 	}
 
 	void MainCamera::FixedUpdate()
 	{
+		Object::FixedUpdate();
 	}
 
 	void MainCamera::Update()
 	{		
 		auto &input = KeyboardInput::GetInstance();
-		if (input.GetKey("W"))
-		{
-			auto forward = globalTransform.GetForward();
-			globalTransform.Position += 0.05f*forward;
-		}
-		if (input.GetKey("S"))
-		{
-			//globalTransform.Position.z -= 0.05f;
-			auto forward = globalTransform.GetForward();
-			globalTransform.Position -= 0.05f * forward;
 
-		}
-		if (input.GetKey("A"))
+		//親がいないなら
+		if (!_parent)
 		{
-			auto right = globalTransform.GetRight();
+			if (input.GetKey("W"))
+			{
+				auto forward = localTransform.GetForward();
+				localTransform.Position += 0.05f * forward;
+			}
+			if (input.GetKey("S"))
+			{
+				//localTransform.Position.z -= 0.05f;
+				auto forward = localTransform.GetForward();
+				localTransform.Position -= 0.05f * forward;
 
-			globalTransform.Position-= 0.05f*right;
-		}
-		if (input.GetKey("D"))
-		{
-			auto right = globalTransform.GetRight();
+			}
+			if (input.GetKey("A"))
+			{
+				auto right = localTransform.GetRight();
 
-			globalTransform.Position += 0.05f * right;
-		}
-		if (input.GetKey("Q"))
-		{
-			globalTransform.Position.y += 0.05f;
-		}
-		if (input.GetKey("E"))
-		{
-			globalTransform.Position.y -= 0.05f;
-		}
-		//サイズ変える
-		if (input.GetKey("T"))
-		{
-			globalTransform.Rotation.y -= 1.0f;
-		}
-		if (input.GetKey("Y"))
-		{
-			globalTransform.Rotation.y += 1.0f;
+				localTransform.Position -= 0.05f * right;
+			}
+			if (input.GetKey("D"))
+			{
+				auto right = localTransform.GetRight();
 
-		}
-		if (input.GetKey("0"))
-		{
-			globalTransform.Position = Vector3::zero;
-			globalTransform.Rotation = Vector3::zero;
+				localTransform.Position += 0.05f * right;
+			}
+			if (input.GetKey("Q"))
+			{
+				localTransform.Position.y += 0.05f;
+			}
+			if (input.GetKey("E"))
+			{
+				localTransform.Position.y -= 0.05f;
+			}
+			//サイズ変える
+			if (input.GetKey("T"))
+			{
+				localTransform.Rotation.y -= 1.0f;
+			}
+			if (input.GetKey("Y"))
+			{
+				localTransform.Rotation.y += 1.0f;
+
+			}
+			if (input.GetKey("0"))
+			{
+				localTransform.Position = Vector3::zero;
+				//localTransform.Rotation = Vector3::zero;
+			}
 		}
 
+		Object::Update();
 		UpdateCamera();
 		camera_->UpdateViewMatrix();
 		camera_->UpdateProjectionMatrix();
 		camera_->UpdateShaderBuffer();
 
-		Object::Update();
+		if (input.GetKeyDown("F"))
+		{
+			ym::ConsoleLog("Position:%f %f %f\n", worldTransform.Position.x, worldTransform.Position.y, worldTransform.Position.z);
+			ym::ConsoleLog("Rotation:%f %f %f\n", worldTransform.Rotation.x, worldTransform.Rotation.y, worldTransform.Rotation.z);
+			ym::ConsoleLog("Scale:%f %f %f\n", worldTransform.Scale.x, worldTransform.Scale.y, worldTransform.Scale.z);
+
+			//camera_->SetProjectionType(ProjectionType::Perspective);
+		}
+
 	}
 
 	void MainCamera::Draw()
 	{
+		Object::Draw();
 	}
 
 	void MainCamera::Uninit()
 	{
+		Object::Uninit();
 		//camera_->Uninit();
 		//camera_ = nullptr;
 	}
@@ -96,10 +113,10 @@ namespace ym
 	}
 	void MainCamera::UpdateCamera()
 	{
-		camera_->SetEye(globalTransform.Position);
-		camera_->SetTarget(globalTransform.Position + globalTransform.GetForward()* distance_);
+		camera_->SetEye(worldTransform.Position);
+		camera_->SetTarget(worldTransform.Position + worldTransform.GetForward()* distance_);
 		camera_->SetDistance(distance_);
-		camera_->SetUp(globalTransform.GetUp());
+		camera_->SetUp(worldTransform.GetUp());
 
 	}
 }

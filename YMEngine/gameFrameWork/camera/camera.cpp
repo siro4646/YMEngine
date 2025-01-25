@@ -22,7 +22,7 @@ namespace ym
 		}
 		pDevice_ = _renderer->GetDevice();
 		pCommandList_ = _renderer->GetGraphicCommandList();
-		auto swapChain = pDevice_->GetSwapChain();
+		auto &swapChain = pDevice_->GetSwapChain();
 		Vector2 windowSize = swapChain.GetSize();
 
 		eye_ = Vector3(0.0f, 0.0f, -1.0f);

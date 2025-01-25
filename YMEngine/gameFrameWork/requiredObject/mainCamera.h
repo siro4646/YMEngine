@@ -17,7 +17,7 @@ namespace ym {
 
 		void UpdateCamera();
 
-		float distance_ = 1000.0f;
+		float distance_ = 100.0f;
 
 		Camera *camera_;
 	};

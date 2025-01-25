@@ -42,19 +42,25 @@ namespace ym
 	void OBJMaterial::LoadTexture()
 	{
 		//テクスチャの読み込み
-		diffuseMap_ = ym::Utf16ToUtf8(mesh_.DiffuseMap);
+		if (diffuseMap_ == "") {
+			diffuseMap_ = ym::Utf16ToUtf8(mesh_.DiffuseMap);
+		}
 		diffuseMapTex_ = std::make_shared<Texture>();
 		diffuseMapTex_->LoadTexture(device_, commandList_, diffuseMap_.c_str());
 		diffuseMapTexView_ = std::make_shared<TextureView>();
 		diffuseMapTexView_->Init(device_, diffuseMapTex_.get());
 
-		maskMap_ = ym::Utf16ToUtf8(mesh_.MaskMap);
+		if (maskMap_ == "") {
+			maskMap_ = ym::Utf16ToUtf8(mesh_.MaskMap);
+		}
 		maskMapTex_ = std::make_shared<Texture>();
 		maskMapTex_->LoadTexture(device_, commandList_, maskMap_.c_str());
 		maskMapTexView_ = std::make_shared<TextureView>();
 		maskMapTexView_->Init(device_, maskMapTex_.get());
 
-		specularMap_ = ym::Utf16ToUtf8(mesh_.SpecularMap);
+		if (specularMap_ == "") {
+			specularMap_ = ym::Utf16ToUtf8(mesh_.SpecularMap);
+		}
 		specularMapTex_ = std::make_shared<Texture>();
 		specularMapTex_->LoadTexture(device_, commandList_, specularMap_.c_str());
 		specularMapTexView_ = std::make_shared<TextureView>();

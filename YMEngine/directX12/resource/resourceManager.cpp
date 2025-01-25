@@ -13,6 +13,10 @@ namespace ym
 
 		if (!textureMap_.empty())
 			textureMap_.clear();
+
+		ym::ConsoleLog("MeshMap Size : %d\n", meshMap_.size());
+		if (!meshMap_.empty())
+			meshMap_.clear();
 		
 		delete instance;
 		instance = nullptr;

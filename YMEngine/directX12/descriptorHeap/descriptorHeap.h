@@ -2,7 +2,7 @@
 
 namespace ym
 {
-
+#define DEBUG_DESCRIPTOR_HEAP 0
 
 	class Device;
 	class Descriptor;

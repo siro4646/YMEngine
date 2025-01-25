@@ -148,13 +148,13 @@ namespace ym
 
 	void Sprite::UpdateMatrix()
 	{
-		Vector2 size = object->globalTransform.Scale.ToVector2();
+		Vector2 size = object->worldTransform.Scale.ToVector2();
 
 		auto &sc = pDevice_->GetSwapChain();
 
 		Vector2 windowSize = Vector2(sc.GetSize().x, sc.GetSize().y);
 
-		Vector2 pos_ = object->globalTransform.Position.ToVector2();
+		Vector2 pos_ = object->worldTransform.Position.ToVector2();
 
 		float x = pos_.x / windowSize.x * 0.5f;
 		float y = pos_.y / windowSize.y * 0.5f;
@@ -162,10 +162,10 @@ namespace ym
 		XMMATRIX pos = XMMatrixTranslation(x, y, 0.0f);
 		XMMATRIX scale = XMMatrixScaling(size.x, size.y, 1.0f);
 		XMMATRIX windowScale = XMMatrixScaling(1.0f / windowSize.x, 1.0f / windowSize.y, 1.0f);
-		XMMATRIX rot = XMMatrixRotationZ(object->globalTransform.Rotation.z);
+		XMMATRIX rot = XMMatrixRotationZ(object->worldTransform.Rotation.z);
 		XMMATRIX mat = scale * rot * windowScale * pos;
 		(*pMatrix_) = XMMatrixTranspose(mat);
-		(*pMatrix_) = object->globalTransform.GetMatrix();
+		(*pMatrix_) = object->worldTransform.GetMatrix();
 
 	}
 

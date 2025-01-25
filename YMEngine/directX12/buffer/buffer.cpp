@@ -14,10 +14,15 @@ namespace ym
 		//{
 		//	initialState = D3D12_RESOURCE_STATE_COPY_DEST;
 		//}
-		//if (type == BufferUsage::ReadBack)
-		//{
-		//	initialState = D3D12_RESOURCE_STATE_COPY_DEST;
-		//}
+		if (type == BufferUsage::ReadBack)
+		{
+			initialState = D3D12_RESOURCE_STATE_COPY_DEST;
+		}
+		if (type == BufferUsage::ShaderResource)
+		{
+			//initialState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE;
+			//initialState = D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE;
+		}
 		auto rST = ResourceStateTracker::Instance();
 
 		// ÉäÉ\Å[ÉXÇÃèâä˙âª
@@ -109,8 +114,11 @@ namespace ym
 
 		if (heapProp_.Type == D3D12_HEAP_TYPE_UPLOAD)
 		{
-			u8 *p = reinterpret_cast<u8 *>(Map(pCmdList));
-			memcpy(p + offset, pData, size);
+			u8 *p = reinterpret_cast<u8 *>(Map());
+			if (p) {
+				memcpy(p + offset, pData, size);
+				//std::cout << "Data copied to upload buffer" << std::endl;
+			}
 			Unmap();
 		}
 		else
@@ -120,10 +128,7 @@ namespace ym
 			{
 				return;
 			}
-			src->UpdateBuffer(pDev, pCmdList, pData, size, 0);
-
-
-
+			src->UpdateBuffer(pDev, pCmdList, pData, size, 0);			
 
 			pCmdList->GetCommandList()->CopyBufferRegion(pResource_, offset, src->pResource_, 0, size);
 			auto rST = ResourceStateTracker::Instance();
@@ -135,6 +140,23 @@ namespace ym
 			{
 				pCmdList->TransitionBarrier(this, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
 			}
+			/*else if (bufferUsage_ == BufferUsage::ConstantBuffer)
+			{
+				pCmdList->TransitionBarrier(this, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
+			}
+			else if (bufferUsage_ == BufferUsage::ReadBack)
+			{
+				pCmdList->TransitionBarrier(this, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COPY_DEST);
+			}*/
+			else if (bufferUsage_ == BufferUsage::ShaderResource)
+			{
+
+				//pCmdList->TransitionBarrier(this, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE);
+			}
+/*			else
+			{
+				pCmdList->TransitionBarrier(this, D3D12_RESOURCE_STATE_COPY_DEST, D3D12_RESOURCE_STATE_COMMON);
+			}*/	
 			//pCmdList->TransitionBarrier(this,)
 
 

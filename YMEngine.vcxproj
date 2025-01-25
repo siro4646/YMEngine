@@ -153,7 +153,13 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Game\Object\player\player.cpp" />
     <ClCompile Include="Game\Object\TestObject.cpp" />
+    <ClCompile Include="Game\Object\TestObject2.cpp" />
+    <ClCompile Include="Game\Object\TestObject3.cpp" />
+    <ClCompile Include="Game\Object\warpGateManager\warpGateManager.cpp" />
+    <ClCompile Include="Game\Object\warpGate\warpGate.cpp" />
+    <ClCompile Include="Game\Scene\TestScene2\testScene2.cpp" />
     <ClCompile Include="Game\Scene\TestScene\testScene.cpp" />
     <ClCompile Include="YMEngine\application\application.cpp" />
     <ClCompile Include="pch.cpp">
@@ -168,10 +174,13 @@
     <ClCompile Include="YMEngine\directX12\descriptorHeap\descriptorHeap.cpp" />
     <ClCompile Include="YMEngine\directX12\descriptor\descriptor.cpp" />
     <ClCompile Include="YMEngine\directX12\device\device.cpp" />
+    <ClCompile Include="YMEngine\directX12\imgui\imguiRender.cpp" />
     <ClCompile Include="YMEngine\directX12\pipelineState\pipelineState.cpp" />
     <ClCompile Include="YMEngine\directX12\postProcess\postProcessManager.cpp" />
     <ClCompile Include="YMEngine\directX12\postProcess\postProcessMaterial.cpp" />
     <ClCompile Include="YMEngine\directX12\Renderer\renderer.cpp" />
+    <ClCompile Include="YMEngine\directX12\renderTargetManager\renderTargetManager.cpp" />
+    <ClCompile Include="YMEngine\directX12\renderTexture\renderTexture.cpp" />
     <ClCompile Include="YMEngine\directX12\resource\resourceManager.cpp" />
     <ClCompile Include="YMEngine\directX12\resource\resourceStateTracker.cpp" />
     <ClCompile Include="YMEngine\directX12\rootSignatureManager\rootSignatureManager.cpp" />
@@ -183,31 +192,66 @@
     <ClCompile Include="YMEngine\directX12\texture\texture.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\camera\camera.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\camera\cameraManager.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\collider\boxCollider.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\collider\collider.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\collider\sphereCollider.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\components\component.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\components\fbxLoader\fbxLoader.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\components\meshRenderer\meshRenderer.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\components\objLoader\objLoader.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\components\rigidBody\rigidBody.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\components\rigidBody\rigidbodyMath.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\components\sprite\sprite.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\gameObject\gameObject.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\gameObject\gameObjectManager.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\light\light.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\light\lightManager.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\light\pointLight.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\debugMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\dissolveMaterial.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\material\fbxMaterial.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\material\material.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\material\objMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\pbrMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\blur\blurMaterial.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\grayScale\grayScaleMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\lightPass\lightPassMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\lumPass\lumPassMaterial.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\mosaic\mosaicMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\tornadoMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\material\warpGateMaterial.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\requiredObject\directionalLight.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\requiredObject\mainCamera.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\requiredObject\sceneOcTree\sceneOcTree.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\requiredObject\sphereMap\sphereMap.cpp" />
+    <ClCompile Include="YMEngine\gameFrameWork\sceneRenderRegistrar\sceneRenderRegistrar.cpp" />
     <ClCompile Include="YMEngine\gameFrameWork\scene\sceneManager.cpp" />
+    <ClCompile Include="YMEngine\ocTree\ocTree.cpp" />
     <ClCompile Include="YMEngine\test\polygon.cpp" />
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui.cpp" />
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_demo.cpp" />
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_draw.cpp" />
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_impl_dx12.cpp" />
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_impl_win32.cpp" />
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_tables.cpp" />
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_widgets.cpp" />
     <ClCompile Include="YMEngine\utility\inputSystem\gamePad\gamePadInput.cpp" />
     <ClCompile Include="YMEngine\utility\inputSystem\inputSystem.cpp" />
     <ClCompile Include="YMEngine\utility\inputSystem\keyBoard\keyBoardInput.cpp" />
     <ClCompile Include="YMEngine\utility\inputSystem\mouse\mouseInput.cpp" />
+    <ClCompile Include="YMEngine\utility\transform\transform.cpp" />
     <ClCompile Include="YMEngine\utility\vector\vector.cpp" />
     <ClCompile Include="YMEngine\winAPI\window\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="d3dx12.h" />
+    <ClInclude Include="Game\Object\player\player.h" />
     <ClInclude Include="Game\Object\TestObject.h" />
+    <ClInclude Include="Game\Object\TestObject2.h" />
+    <ClInclude Include="Game\Object\TestObject3.h" />
+    <ClInclude Include="Game\Object\warpGateManager\warpGateManager.h" />
+    <ClInclude Include="Game\Object\warpGate\warpGate.h" />
+    <ClInclude Include="Game\Scene\TestScene2\testScene2.h" />
     <ClInclude Include="Game\Scene\TestScene\testScene.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="YMEngine\config\system.h" />
@@ -223,10 +267,14 @@
     <ClInclude Include="YMEngine\directX12\descriptorSet\DescriptorSet.h" />
     <ClInclude Include="YMEngine\directX12\descriptor\descriptor.h" />
     <ClInclude Include="YMEngine\directX12\device\device.h" />
+    <ClInclude Include="YMEngine\directX12\imgui\imguiRender.h" />
     <ClInclude Include="YMEngine\directX12\pipelineState\pipelineState.h" />
     <ClInclude Include="YMEngine\directX12\postProcess\postProcessManager.h" />
     <ClInclude Include="YMEngine\directX12\postProcess\postProcessMaterial.h" />
     <ClInclude Include="YMEngine\directX12\Renderer\renderer.h" />
+    <ClInclude Include="YMEngine\directX12\renderTargetManager\renderTargetManager.h" />
+    <ClInclude Include="YMEngine\directX12\renderTexture\renderTexture.h" />
+    <ClInclude Include="YMEngine\directX12\renderTexture\renderTextureManager.h" />
     <ClInclude Include="YMEngine\directX12\resource\resourceManager.h" />
     <ClInclude Include="YMEngine\directX12\resource\resourceStateTracker.h" />
     <ClInclude Include="YMEngine\directX12\rootSignatureManager\rootSignatureManager.h" />
@@ -238,22 +286,48 @@
     <ClInclude Include="YMEngine\directX12\texture\texture.h" />
     <ClInclude Include="YMEngine\gameFrameWork\camera\camera.h" />
     <ClInclude Include="YMEngine\gameFrameWork\camera\cameraManager.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\collider\collider.h" />
     <ClInclude Include="YMEngine\gameFrameWork\components\component.h" />
     <ClInclude Include="YMEngine\gameFrameWork\components\fbxLoader\fbxLoader.h" />
     <ClInclude Include="YMEngine\gameFrameWork\components\meshRenderer\meshRenderer.h" />
     <ClInclude Include="YMEngine\gameFrameWork\components\objLoader\objLoader.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\components\rigidBody\rigidBody.h" />
     <ClInclude Include="YMEngine\gameFrameWork\gameObject\gameObject.h" />
     <ClInclude Include="YMEngine\gameFrameWork\gameObject\gameObjectManager.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\light\light.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\light\lightManager.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\light\pointLight.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\debugMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\dissolveMaterial.h" />
     <ClInclude Include="YMEngine\gameFrameWork\material\fbxMaterial.h" />
     <ClInclude Include="YMEngine\gameFrameWork\material\material.h" />
     <ClInclude Include="YMEngine\gameFrameWork\material\objMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\pbrMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\blur\blurMaterial.h" />
     <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\grayScale\grayScaleMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\lightPass\lightPassMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\lumPass\lumPassMaterial.h" />
     <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\mosaic\mosaicMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\tornadoMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\material\warpGateMaterial.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\requiredObject\directionalLight.h" />
     <ClInclude Include="YMEngine\gameFrameWork\requiredObject\mainCamera.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\requiredObject\sceneOcTree\sceneOcTree.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\requiredObject\sphereMap\sphereMap.h" />
+    <ClInclude Include="YMEngine\gameFrameWork\sceneRenderRegistrar\sceneRenderRegistrar.h" />
     <ClInclude Include="YMEngine\gameFrameWork\scene\baseScene.h" />
     <ClInclude Include="YMEngine\gameFrameWork\scene\sceneManager.h" />
     <ClInclude Include="YMEngine\gameFrameWork\components\sprite\sprite.h" />
+    <ClInclude Include="YMEngine\ocTree\ocTree.h" />
     <ClInclude Include="YMEngine\test\polygon.h" />
+    <ClInclude Include="YMEngine\thirdParty\imgui\imconfig.h" />
+    <ClInclude Include="YMEngine\thirdParty\imgui\imgui.h" />
+    <ClInclude Include="YMEngine\thirdParty\imgui\imgui_impl_dx12.h" />
+    <ClInclude Include="YMEngine\thirdParty\imgui\imgui_impl_win32.h" />
+    <ClInclude Include="YMEngine\thirdParty\imgui\imgui_internal.h" />
+    <ClInclude Include="YMEngine\thirdParty\imgui\imstb_rectpack.h" />
+    <ClInclude Include="YMEngine\thirdParty\imgui\imstb_textedit.h" />
+    <ClInclude Include="YMEngine\thirdParty\imgui\imstb_truetype.h" />
     <ClInclude Include="YMEngine\utility\crc.h" />
     <ClInclude Include="YMEngine\utility\fileStream\fileStream.h" />
     <ClInclude Include="YMEngine\utility\inputSystem\base\inputDevice.h" />
@@ -274,6 +348,7 @@
     <ClInclude Include="YMEngine\winAPI\window\window.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include=".gitignore" />
     <None Include="asset\shader\2dSprite\2dSprite.hlsli" />
     <None Include="asset\shader\simpleFBX\simpleFBX.hlsli" />
     <None Include="asset\shader\test\test.hlsli" />
@@ -306,6 +381,14 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="asset\shader\copy\copyPS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="asset\shader\copy\copyVS.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
     <FxCompile Include="asset\shader\fullScreen\fullScreenPS.hlsl">

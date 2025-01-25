@@ -39,7 +39,12 @@ namespace ym
 		void SetTarget(const Vector3 &target) { target_ = target; }
 		void SetUp(const Vector3 &up) { up_ = up; }
 		void SetEye(const Vector3 &eye) { eye_ = eye; }
-		void SetDistance(float distance) { distance_ = distance; }
+		void SetDistance(float distance) { 
+			distance_ = distance; 
+			farZ_ = distance_;
+		}
+		
+		std::string name_;
 
 		//const DirectX::XMMATRIX &GetEye() const { return eye_; }
 

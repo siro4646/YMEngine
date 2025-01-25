@@ -15,8 +15,10 @@ namespace ym
 	{
 		enum Type
 		{
+
 			Black,
 			White,
+			Purple,
 			FlatNormal,
 
 			Max

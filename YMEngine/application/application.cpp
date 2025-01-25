@@ -5,6 +5,13 @@
 
 #include "texture/texture.h"
 
+#include "imgui/imguiRender.h"
+
+#include "gameFrameWork/light/lightManager.h"
+
+#include "renderTargetManager/renderTargetManager.h"
+
+#include "gameFrameWork/sceneRenderRegistrar/sceneRenderRegistrar.h"
 
 namespace ym
 {
@@ -38,9 +45,12 @@ namespace ym
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 
+
+		//pixの初期化
+		//PIXLoadLatestWinPixGpuCapturerLibrary();
+
 		ym::CpuTimer::Initialize();
 		deltaTime_.reset();
-
 		m_window = std::make_shared<Window>();
 		//newに失敗した場合
 		if (!m_window)
@@ -66,9 +76,9 @@ namespace ym
 		auto input = InputManager::GetInstance();
 		auto keybord = KeyboardInput::GetInstance();
 		auto sceneManager = ym::SceneManager::Instance();
-
 		while (1)
 		{
+			deltaTime_.reset();
 			input.Update();
 			if (!m_window->ProcessMessage())
 			{
@@ -76,35 +86,15 @@ namespace ym
 			}
 			else
 			{
+				sceneManager->Update();
 				// フレームレートの同期
 				if (SyncFrameRate())
 				{
-					if (keybord.GetKeyDown("Z"))
-					{
-						ym::ConsoleLog("Z\n");
-						//_renderer->Resize(ym::config::kResolutionWidth, ym::config::kResolutionHeight);
-						ym::ConsoleLog("%d %d \n", ym::config::kResolutionWidth, ym::config::kResolutionHeight);
-					}
-					else if (keybord.GetKeyDown("X"))
-					{
-						ym::ConsoleLog("X\n");
-						u32 x = 192;
-						u32 y = 108;
-						//_renderer->Resize(x, y);
-						ym::ConsoleLog("%d %d \n",x, y);
-					}
-					else if (keybord.GetKeyDown("C"))
-					{
-						ym::ConsoleLog("C\n");
-						u32 x = 800;
-						u32 y = 600;
-						//_renderer->Resize(x, y);
-						ym::ConsoleLog("%d %d \n", x, y);
-					}
-					sceneManager->Update();
+					sceneManager->FixedUpdate();
 					sceneManager->Draw();
 				}
 			}
+			//ym::ConsoleLogRelease("%f秒\n",deltaTime_.elapsedTime());
 		}
 
 	}
@@ -112,8 +102,8 @@ namespace ym
 	void Application::Terminate()
 	{
 		ym::ConsoleLog("Application::Terminate()\n");
-		CoUninitialize();
 		Delete();
+		CoUninitialize();
 	}
 	void Application::AllInitilizeManager()
 	{
@@ -126,6 +116,21 @@ namespace ym
 		{
 			return;
 		}
+		auto imgui = ImGuiRender::Instance();
+		if (imgui)
+		{
+			imgui->Init();
+		}
+		auto lightManager = LightManager::Instance();
+		lightManager->Init();
+
+		auto renderTargetManager = RenderTargetManager::Instance();
+		renderTargetManager->Init();
+
+		auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();
+		sceneRenderRegistrar->Init();
+
+
 		ym::InputManager::GetInstance().Initialize(m_window->GetWndHandle());
 
 		auto sceneManager = ym::SceneManager::Instance();
@@ -138,7 +143,29 @@ namespace ym
 		{
 			sm->Terminate();
 		}
+		auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();
+		if (sceneRenderRegistrar)
+		{
+			sceneRenderRegistrar->Uninit();
+		}
 
+		auto renderTargetManager = RenderTargetManager::Instance();
+		if (renderTargetManager)
+		{
+			renderTargetManager->Uninit();
+		}
+
+		auto lightManager = LightManager::Instance();
+		if (lightManager)
+		{
+			lightManager->Uninit();
+		}
+
+		auto imgui = ImGuiRender::Instance();
+		if (imgui)
+		{
+			imgui->Uninit();
+		}
 		auto _renderer = Renderer::Instance();
 		if (_renderer)
 		{

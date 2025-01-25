@@ -124,6 +124,7 @@ namespace ym
 			}
 
 		}
+		//pSwapChain_.Get()->SetFullscreenState(true, NULL);
 
 		return true;
 
@@ -149,6 +150,9 @@ namespace ym
 		depthStencilView_.Uninit();
 		depthStencilTexView_.Destroy();
 		depthStencilTexture_.Uninit();
+
+		//pSwapChain_.Get()->SetFullscreenState(false, NULL);
+
 
 		pSwapChain_.Reset();
 

@@ -105,6 +105,8 @@ namespace ym
 		bool Init(Device *pDev, const GraphicsPipelineStateDesc &desc);
 		void Destroy();
 
+		static GraphicsPipelineStateDesc GetDefaultDesc();
+
 		// getter
 		ID3D12PipelineState *GetPSO() { return pPipelineState_; }
 

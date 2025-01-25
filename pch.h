@@ -91,7 +91,10 @@
 #include <C:/assimp/include/assimp/matrix4x4.h>
 #pragma comment (lib, "assimp-vc143-mt.lib")
 
-
+#define IMGUI_DEFINE_MATH_OPERATORS
+#include "thirdParty/imgui/imgui.h"
+#include "thirdParty/imgui/imgui_impl_dx12.h"
+#include "thirdParty/imgui/imgui_impl_win32.h"
 
 //Direct2D
 #include <d2d1.h>

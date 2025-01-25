@@ -1,17 +1,19 @@
 #include "application/application.h"
 #ifdef _DEBUG
 int main() {
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	// メモリリークを知らせる
+	ym::EnableDebugLayer();
 #else
 #include<Windows.h>
 int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 #endif
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	// メモリリークを知らせる
 	//_CrtSetBreakAlloc(292);
 #ifdef _DEBUG
 
-	ym::EnableDebugLayer();
-#endif // _DEBUG
+#endif _DEBUG
+
 	using namespace ym;
+
 
 	Application::Instance()->Init();
 	Application::Instance()->Run();

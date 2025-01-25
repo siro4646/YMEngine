@@ -4,6 +4,8 @@
 #include "rootSignature/rootSignature.h"
 #include "shader/shader.h"
 #include "textureView/textureView.h"
+#include "Renderer/renderer.h"
+
 namespace ym
 {
 	template <D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type, typename Data>
@@ -208,6 +210,64 @@ namespace ym
 	void GraphicsPipelineState::Destroy()
 	{
 		SafeRelease(pPipelineState_);
+	}
+
+	GraphicsPipelineStateDesc GraphicsPipelineState::GetDefaultDesc()
+	{
+		static GraphicsPipelineStateDesc desc{};
+		static bool isInit = false;
+		if (!isInit)
+		{
+			auto renderer_ = Renderer::Instance();
+			auto device_ = Renderer::Instance()->GetDevice();
+			auto bbidx = device_->GetSwapChain().GetFrameIndex();
+			auto &swapChain = device_->GetSwapChain();
+			static D3D12_INPUT_ELEMENT_DESC elementDescs[] = {
+	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float3‚ÌPOSITION
+	{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float3‚ÌNORMAL
+	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float2‚ÌTEXCOORD
+	{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float3‚ÌTANGENT
+	{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float4‚ÌCOLOR
+			};
+
+			desc.rasterizer.fillMode = D3D12_FILL_MODE_SOLID;
+			desc.rasterizer.cullMode = D3D12_CULL_MODE_BACK;
+			desc.rasterizer.isFrontCCW = false;
+			desc.rasterizer.isDepthClipEnable = true;
+			desc.multisampleCount = 1;
+
+			desc.blend.sampleMask = D3D12_DEFAULT_SAMPLE_MASK;
+			desc.blend.rtDesc[0].isBlendEnable = false;
+			desc.blend.rtDesc[0].srcBlendColor = D3D12_BLEND_ZERO;
+			desc.blend.rtDesc[0].dstBlendColor = D3D12_BLEND_ZERO;
+			desc.blend.rtDesc[0].blendOpColor = D3D12_BLEND_OP_ADD;
+			desc.blend.rtDesc[0].srcBlendAlpha = D3D12_BLEND_ZERO;
+			desc.blend.rtDesc[0].dstBlendAlpha = D3D12_BLEND_ZERO;
+			desc.blend.rtDesc[0].blendOpAlpha = D3D12_BLEND_OP_ADD;
+			desc.blend.rtDesc[0].writeMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+			desc.depthStencil.depthFunc = D3D12_COMPARISON_FUNC_LESS;
+			desc.depthStencil.isDepthEnable = true;
+			desc.depthStencil.isDepthWriteEnable = true;
+	
+			desc.primTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+			//auto inputLayout = Vertex::InputLayout;
+			desc.inputLayout.numElements = _countof(elementDescs);
+			desc.inputLayout.pElements = elementDescs;
+			desc.numRTVs = 0;
+			desc.rtvFormats[desc.numRTVs++] = renderer_->GetSceneRenderTargetView(bbidx,MultiRenderTargets::Color)->GetFormat();
+			desc.rtvFormats[desc.numRTVs++] = renderer_->GetSceneRenderTargetView(bbidx, MultiRenderTargets::Normal)->GetFormat();
+			desc.rtvFormats[desc.numRTVs++] = renderer_->GetSceneRenderTargetView(bbidx, MultiRenderTargets::HighLuminance)->GetFormat();
+			desc.rtvFormats[desc.numRTVs++] = renderer_->GetSceneRenderTargetView(bbidx, MultiRenderTargets::WorldPos)->GetFormat();
+			desc.dsvFormat = device_->GetSwapChain().GetDepthStencilTexture()->GetTextureDesc().format;
+
+			isInit = true;
+		}
+
+
+
+		return desc;
 	}
 
 

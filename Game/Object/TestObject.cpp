@@ -7,22 +7,40 @@
 #include "camera/camera.h"
 
 #include "gameFrameWork/material/fbxMaterial.h"
+#include "gameFrameWork/material/dissolveMaterial.h"
+#include "gameFrameWork/material/pbrMaterial.h"
+#include "gameFrameWork/material/tornadoMaterial.h"
 
+#include "gameFrameWork/sceneRenderRegistrar/sceneRenderRegistrar.h"
+
+#include "gameFrameWork/collider/collider.h"
 
 namespace ym
 {
 	void TestObject::Init()
 	{
 		name = "TestObject";
-		globalTransform.Scale = { 1.0f,1.0f,1.0f };
-		globalTransform.Scale *= 5;
-		globalTransform.Rotation = { 0.0f,90.0f,0.0f };
-		globalTransform.Position = { 0.0f,0.0f,0.0f };
+		localTransform.Scale = { 3.0f,0.01f,3.0f };
+		//localTransform.Scale *= 10;
+
+		localTransform.Scale *= 100;
+		//localTransform.Rotation = { 0.0f,0.0f,0.0f };
+		//localTransform.Position = { 0.0f,-0.5f,1.2f };
+
+		localTransform.Position = { 0.0f,-1.0f,2.0f };
 
 		const wchar_t *modelFile = L"asset/Alicia/FBX/Alicia_solid_Unity.FBX";
 		const wchar_t *modelFile2 = L"asset/Dragon/Dragon 2.5_fbx.fbx";
 		const wchar_t *modelFile3 = L"asset/a.fbx";
-		const wchar_t *modelFile4 = L"asset/sponza (1)/sponza.obj";		
+		const wchar_t *modelFile4 = L"asset/sponza (1)/sponza.obj";	
+		const wchar_t *modelFile5 = L"asset/model/sphere_smooth.obj";
+		const wchar_t *modelFile6 = L"asset/model/cylinder.obj";
+		const wchar_t *modelFile7 = L"asset/model/cube.obj";
+		const wchar_t *modelFile8 = L"asset/model/tornado.fbx";
+
+
+
+
 		//material->Init();
 		
 		int flag = 0;
@@ -32,65 +50,108 @@ namespace ym
 		flag |= ModelSetting::AdjustScale;
 		ImportSettings importSetting = // これ自体は自作の読み込み設定構造体
 		{
-			modelFile4,
+			modelFile7,
 			flag
 		};
 
-		objLoader = AddComponent<OBJLoader>().get();
-		meshes = objLoader->Load(importSetting);
-		for (auto &mesh : meshes)
-		{
-			auto fbxMaterial = std::make_shared<FBXMaterial>();
-			//fbxMaterial->SetMesh(mesh);
-			materials.push_back(fbxMaterial);
-		}		
+		/*objLoader = AddComponent<OBJLoader>().get();
+		meshes = objLoader->Load(importSetting);*/
 		//fbxMaterial = std::make_shared<FBXMaterial>();
 
 		//objLoader->SetMaterial(fbxMaterial);
 
-		/*auto fbxLoader = AddComponent<FBXLoader>();
-		fbxLoader->Load(importSetting);*/
+		fbxLoader = AddComponent<FBXLoader>().get();
+		meshes= fbxLoader->Load(importSetting);
 
-		//globalTransform.Position = { 0.0f,0.0f,0.0f };
+		for (auto &mesh : meshes)
+		{
+			auto fbxMaterial = std::make_shared<FBXMaterial>();		
+			materials.push_back(fbxMaterial);
+			auto dissolveMaterial = std::make_shared<DissolveMaterial>();
+			materials2.push_back(dissolveMaterial);
+			auto pbrMaterial = std::make_shared<PBRMaterial>();
+			materials3.push_back(pbrMaterial);
+			auto tornadoMaterial = std::make_shared<TornadoMaterial>();
+			materials4.push_back(tornadoMaterial);
+		}	
+		int count = 0;
+		for (auto &mesh : meshes)
+		{
+			fbxLoader->SetMaterial(materials3[count], count);
+			count++;
+		}
+
+		//localTransform.Position = { 0.0f,0.0f,0.0f };
 
 		/*auto sprite = AddComponent<ym::Sprite>();
 		sprite->LoadTexture("asset/texture/Jacket_BaseColor.jpg");*/
+		auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();
+		sceneRenderRegistrar->AddRenderObject(this);
+
+		auto boxCollider = AddComponent<BoxCollider>().get();
+		//auto boxCollider = AddComponent<SphereCollider>().get();
+
 	}
 
 	void TestObject::FixedUpdate()
 	{
+		Object::FixedUpdate();
+
 		
 	}
 
 	void TestObject::Update()
 	{
 		auto &input = KeyboardInput::GetInstance();
-		if (input.GetKey("LEFT"))
+		static float speed = 0.0f;
+		static bool flag = false;
+		//if (!flag)
+		//{
+		//	speed += 0.01f;			
+		//	//materials2[0]->SetTime(sin(speed));
+			for (auto &material : materials2)
+			{
+				material->SetTime(sin(dissolve));
+			}
+			//dissolve += 0.01f;
+
+		//}
+
+
+
+
+		/*if (input.GetKey("LEFT"))
 		{
-			globalTransform.Rotation.y -= 1.0f;
+			localTransform.Rotation.y -= 1.0f;
 		}
 		if (input.GetKey("RIGHT"))
 		{
-			globalTransform.Rotation.y += 1.0f;
-		}
+			localTransform.Rotation.y += 1.0f;
+		}*/
 		if (input.GetKeyDown("UP"))
 		{		
 			int count = 0;
+			ym::ConsoleLog("PBRマテリアル\n");
 			for (auto &mesh : meshes)
 			{
-				objLoader->SetMaterial(materials[count], count);
+				fbxLoader->SetMaterial(materials3[count], count);
 				count++;
 			}
+			flag = true;
 		}
 		if (input.GetKeyDown("DOWN"))
 		{
 			int count = 0;
+			ym::ConsoleLog("Dissolve\n");
 			for (auto &mesh : meshes)
 			{
-				objLoader->SetMaterial(std::make_shared<Material>(), count);
+				fbxLoader->SetMaterial(materials2[count], count);
 				count++;
 			}
+			flag = false;
 		}
+
+	
 
 
 		Object::Update();
@@ -100,11 +161,18 @@ namespace ym
 	void TestObject::Draw()
 	{
 		Object::Draw();
+
 	}
 
 	void TestObject::Uninit()
 	{
 
+		materials.clear();
+		materials2.clear();
+		materials3.clear();
+		meshes.clear();
+
+		Object::Uninit();
 
 	}
 

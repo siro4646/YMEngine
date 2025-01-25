@@ -28,8 +28,15 @@ namespace ym
 		void TransitionBarrier(Buffer *p, D3D12_RESOURCE_STATES nextState);
 		void TransitionBarrier(Buffer *p, D3D12_RESOURCE_STATES prevState, D3D12_RESOURCE_STATES nextState);
 
+		// UAVの処理完了バリア
+		void UAVBarrier(Texture *p);
+		void UAVBarrier(Buffer *p);
+
 		// RootSignatureとDescriptorをコマンドリストに積み込む
 		void SetGraphicsRootSignatureAndDescriptorSet(RootSignature *pRS, DescriptorSet *pDSet, const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> **ppBindlessArrays = nullptr);
+
+		// RootSignatureとDescriptorをコマンドリストに積み込む
+		void SetComputeRootSignatureAndDescriptorSet(RootSignature *pRS, DescriptorSet *pDSet, const std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> **ppBindlessArrays = nullptr);
 		// Descriptorだけをコマンドリストに積み込む
 		void SetDescriptorSet(DescriptorSet *pDSet);
 

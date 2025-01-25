@@ -10,6 +10,8 @@
 
 #include "resource/resourceManager.h"
 
+#include "Renderer/renderer.h"
+
 namespace ym
 {
 	std::unordered_map<string, ym::Texture> Texture::textureMap_{};
@@ -170,14 +172,16 @@ namespace ym
 			pCmdList->TransitionBarrier(this, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 			pCmdList->Close();
 			pCmdList->Execute();
-			pDev->WaitForCommandQueue();
+			pDev->WaitForGraphicsCommandQueue();
 			pCmdList->Reset();
 		}
 		else
 		{
 			ym::ConsoleLog("failed to load texture");
 			ym::ConsoleLog("[%s]\n", filename.c_str());
-			LoadTexture(pDev, pCmdList, "asset/texture/test.png", isForceSRGB, forceSysRam);
+			//LoadTexture(pDev, pCmdList, "asset/texture/test.png", isForceSRGB, forceSysRam);
+			auto renderer = Renderer::Instance();
+			*this = *renderer->GetDummyTexture(DummyTex::Purple);
 		}
 		return res;
 

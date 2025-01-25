@@ -47,64 +47,20 @@ namespace ym
 		}
 		return false;
 	}
-
-	void Object::NotifyUpdate()
-	{
-		//ローカル、親の変更からグローバル座標の更新
+	void Object::UpdateHierarchy() {
+		//親がいるか
 		if (_parent != nullptr)
 		{
-			//座標
-			const auto m = CreateTransformMatrix(Transform(
-				_parent->globalTransform.Position,
-				_parent->globalTransform.Scale,
-				_parent->globalTransform.Rotation
-			));
-			std::array<float, 3> p = { localTransform.Position.x,localTransform.Position.y,localTransform.Position.z };
-			globalTransform.Position = TransformPoint(m, p);
-			globalTransform.Position = _parent->globalTransform.Position + localTransform.Position;
-			globalTransform.Rotation = _parent->globalTransform.Rotation + localTransform.Rotation;
-			globalTransform.Scale = _parent->globalTransform.Scale * localTransform.Scale;
+			worldTransform = localTransform.GetWorldTransform(_parent->worldTransform);
 		}
 		else
 		{
-			globalTransform = localTransform;
+			worldTransform = localTransform;
 		}
-
-		//子供の更新
-		for (auto &child : _childs)
-		{
-			if (child != nullptr)
-				child->NotifyUpdate();
-		}
-		NotifyGlobalUpdate();
+		
 	}
 
-	void Object::NotifyGlobalUpdate()
-	{
-		//グローバル座標を変更したときにローカルも調整
-		if (_parent != nullptr)
-		{
-			const auto inverse = CreateTransformMatrix(Transform(
-				Vector3(-_parent->globalTransform.Position.x,
-					-_parent->globalTransform.Position.y,
-					-_parent->globalTransform.Position.z
-				),
-				1.f / _parent->globalTransform.Scale,
-				Vector3(-_parent->globalTransform.Rotation.x,
-					-_parent->globalTransform.Rotation.y,
-					-_parent->globalTransform.Rotation.z
-				)
-			));
-			std::array<float, 3> relative = {
-				globalTransform.Position.x - _parent->globalTransform.Position.x,
-				globalTransform.Position.y - _parent->globalTransform.Position.y,
-				globalTransform.Position.z - _parent->globalTransform.Position.z
-			};
-			localTransform.Position = TransformPoint(inverse, relative);
-			localTransform.Rotation = globalTransform.Rotation - _parent->globalTransform.Rotation;
-			localTransform.Scale = globalTransform.Scale / _parent->globalTransform.Scale;
-		}
-	}
+
 	std::shared_ptr<Object> Object::GetParent() const {
 		return _parent;
 	}
@@ -112,7 +68,8 @@ namespace ym
 	void Object::SetParent(std::shared_ptr<Object> newParent) {
 		if (_parent != newParent) {
 			_parent = newParent;
-			NotifyUpdate(); // 親変更時に更新通知
+			//NotifyUpdate(); // 親変更時に更新通知
+			UpdateHierarchy();
 		}
 	}
 
@@ -135,6 +92,7 @@ namespace ym
 
 	void Object::FixedUpdate()
 	{
+		//UpdateHierarchy();
 		//子供の固定更新
 		for (auto &child : _childs)
 		{
@@ -149,6 +107,7 @@ namespace ym
 
 	void Object::Update()
 	{
+		UpdateHierarchy();
 		//子供の更新
 		for (auto &child : _childs)
 		{
@@ -159,6 +118,10 @@ namespace ym
 		{
 			component->Update();
 		}
+		//NotifyUpdate();
+		//NotifyGlobalUpdate();
+		//NotifyGlobalUpdate();
+
 	}
 
 	void Object::Draw()
@@ -178,16 +141,26 @@ namespace ym
 
 	void Object::Uninit()
 	{
+		if (!isUninit)
+		{
+			isUninit = true;
+		}
+		else
+		{
+			return;
+		}
 		//子供の解放
 		for (auto &child : _childs)
 		{
 			child->Uninit();
 		}
+		_childs.clear();
 		//コンポーネントの解放
 		for (auto &component : components)
 		{
 			component->Uninit();
 		}
+		components.clear();
 	}
 
 } // namespace ym

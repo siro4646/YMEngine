@@ -27,7 +27,11 @@ namespace ym
 		bool Init(HWND hwnd, u32 width, u32 height, ColorSpaceType csType = ColorSpaceType::Rec709);
 		void Uninit();
 
-		void WaitForCommandQueue();
+		void WaitForGraphicsCommandQueue();
+
+		void WaitForComputeCommandQueue();
+
+		void WaitForCopyCommandQueue();
 
 		void SyncKillObjects(bool bForce = false)
 		{
@@ -72,6 +76,10 @@ namespace ym
 		CommandQueue &GetComputeQueue()
 		{
 			return *pComputeQueue_;
+		}
+		CommandQueue &GetCopyQueue()
+		{
+			return *pCopyQueue_;
 		}
 
 		ColorSpaceType	GetColorSpaceType() const
@@ -153,13 +161,22 @@ namespace ym
 
 		std::unique_ptr<CommandQueue> pGraphicsQueue_{ nullptr };
 		std::unique_ptr<CommandQueue> pComputeQueue_{ nullptr };
+		std::unique_ptr<CommandQueue> pCopyQueue_{ nullptr };
 
 
 		std::unique_ptr<SwapChain> pSwapChain_{ nullptr };
 
-		ComPtr<ID3D12Fence> pFence_{ nullptr };
-		u32				fenceValue_{ 0 };
-		HANDLE			fenceEvent_{ nullptr };
+		ComPtr<ID3D12Fence> pGraphicsFence_{ nullptr };
+		u32				graphicsFenceValue_{ 0 };
+		HANDLE			graphicsFenceEvent_{ nullptr };
+
+		ComPtr<ID3D12Fence> pComputeFence_{ nullptr };
+		u32				computeFenceValue_{ 0 };
+		HANDLE			computeFenceEvent_{ nullptr };
+
+		ComPtr<ID3D12Fence> pCopyFence_{ nullptr };
+		u32				copyFenceValue_{ 0 };
+		HANDLE			copyFenceEvent_{ nullptr };
 
 		//DescriptorHeap
 		GlobalDescriptorHeap *pGlobalViewDescHeap_ = nullptr;

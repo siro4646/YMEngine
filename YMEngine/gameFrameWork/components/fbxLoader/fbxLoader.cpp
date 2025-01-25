@@ -28,7 +28,10 @@
 
 #include "utility/inputSystem/keyBoard/keyBoardInput.h"
 
+#include "material/material.h"
+#include "material/fbxMaterial.h"
 
+#include "resource/resourceManager.h"
 
 
 
@@ -49,12 +52,8 @@ namespace ym
 	//};
 
 	void FBXLoader::Init()
-	{
-		CreatePipelineState();
-		CreateSampler();
-		CreateConstantBuffer();
-		descriptorSet_ = std::make_shared<DescriptorSet>();
-
+	{		
+		CreateConstantBuffer();		
 		pCamera_ = CameraManager::Instance().GetMainCamera();
 		if (!pCamera_)
 		{
@@ -64,122 +63,147 @@ namespace ym
 	}
 	void FBXLoader::FixedUpdate()
 	{
+		UpdateMatrix();
 	}
 	void FBXLoader::Update()
 	{
-		auto &input = KeyboardInput::GetInstance();
-		if (input.GetKeyDown("G"))
+		for (auto material : material_)
 		{
-			//座標を表示
-			ym::ConsoleLog("x:%f y:%f z:%f\n", object->globalTransform.Position.x, object->globalTransform.Position.y, object->globalTransform.Position.z);
+			material->Update();
 		}
 
-		UpdateMatrix();
 	}
 	void FBXLoader::Draw()
 	{
 		if (!isInit_) return;
 		auto cmdList = pCmdList_->GetCommandList();
 		
+		pCamera_ = CameraManager::Instance().GetMainCamera();
 		for (int i = 0; i < meshes.size(); i++)
 		{
-		cmdList->SetPipelineState(pipelineState_->GetPSO());
-		descriptorSet_->Reset();
-		descriptorSet_->SetVsCbv(0, constBufferView_->GetDescInfo().cpuHandle);
-		descriptorSet_->SetVsCbv(1, pCamera_->GetDescriptorHandle());
-		descriptorSet_->SetPsSrv(0, textureViews_[i]->GetDescInfo().cpuHandle);
-		descriptorSet_->SetPsSampler(0, sampler_->GetDescInfo().cpuHandle);
-		pCmdList_->SetGraphicsRootSignatureAndDescriptorSet(rootSignature_.get(), descriptorSet_.get());
-			cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			cmdList->IASetVertexBuffers(0, 1, &vertexBufferViews_[i]->GetView());
-			cmdList->IASetIndexBuffer(&indexBufferViews_[i]->GetView());
-			cmdList->DrawIndexedInstanced(meshes[i].Indices.size(), 1, 0, 0, 0);
+			material_[i]->SetMaterial();
+			material_[i]->SetVsCbv(0, constBufferView_->GetDescInfo().cpuHandle);
+			material_[i]->SetVsCbv(1, pCamera_->GetDescriptorHandle());
+			material_[i]->Draw();
 		}
 
 	}
 	void FBXLoader::Uninit()
 	{
+		constantBuffer_.reset();
+		constBufferView_.reset();
+		isInit_ = false;
+		meshes.clear();
+		material_.clear();
 	}
-	bool FBXLoader::Load(ImportSettings settings)
+	void FBXLoader::SetMaterial(std::shared_ptr<Material> material, u32 index)
+	{
+		material_[index] = material;
+		material_[index]->CreateMaterial(meshes[index]);
+	}
+	std::vector<Mesh> FBXLoader::Load(ImportSettings settings)
 	{
 		//
 		if (settings.filename == nullptr)
 		{
-			return false;
+			return std::vector<Mesh>();
 		}
-		//auto &meshes = settings.meshes;
-		// フラグを取得
-		flags_ = settings.flags;
-		bool inverseU = false;
-		bool inverseV = false;
-		if (flags_ & ModelSetting::InverseU)
+		auto resourceManager = ResourceManager::Instance();
+		string sFileName = ym::Utf16ToUtf8(settings.filename);
+		if (resourceManager->FindMesh(sFileName))
 		{
-			inverseU = true;
-			
+			auto buffers = resourceManager->GetMesh(sFileName);
+			meshes.resize(buffers.size());
+			meshes = resourceManager->GetMesh(sFileName);
+			buffers.clear();
+			//return meshes;
 		}
-		if (flags_ & ModelSetting::InverseV)
+		else
 		{
-			inverseV = true;
-		}
-		auto path = ym::Utf16ToUtf8(settings.filename);
-		Assimp::Importer importer;
-		int flag = 0;
-		flag |= aiProcess_Triangulate;
-		flag |= aiProcess_PreTransformVertices;
-		flag |= aiProcess_CalcTangentSpace;
-		flag |= aiProcess_GenSmoothNormals;
-		flag |= aiProcess_GenUVCoords;
-		flag |= aiProcess_RemoveRedundantMaterials;
-		flag |= aiProcess_OptimizeMeshes;
 
-		auto scene = importer.ReadFile(path, flag);
+			//auto &meshes = settings.meshes;
+			// フラグを取得
+			flags_ = settings.flags;
+			bool inverseU = false;
+			bool inverseV = false;
+			if (flags_ & ModelSetting::InverseU)
+			{
+				inverseU = true;
 
-		if (scene == nullptr)
-		{
-			// もし読み込みエラーがでたら表示する
-			printf(importer.GetErrorString());
-			printf("\n");
-			return false;
-		}
+			}
+			if (flags_ & ModelSetting::InverseV)
+			{
+				inverseV = true;
+			}
+			auto path = ym::Utf16ToUtf8(settings.filename);
+			Assimp::Importer importer;
+			int flag = 0;
+			flag |= aiProcess_Triangulate;
+			flag |= aiProcess_PreTransformVertices;
+			flag |= aiProcess_CalcTangentSpace;
+			flag |= aiProcess_GenSmoothNormals;
+			flag |= aiProcess_GenUVCoords;
+			flag |= aiProcess_RemoveRedundantMaterials;
+			flag |= aiProcess_OptimizeMeshes;
 
-		// 読み込んだデータを自分で定義したMesh構造体に変換する
-		meshes.clear();
-		meshes.resize(scene->mNumMeshes);
-		texturePaths_.resize(scene->mNumMeshes);
-		textures_.resize(scene->mNumMeshes);
-		textureViews_.resize(scene->mNumMeshes);
-		for (size_t i = 0; i < meshes.size(); ++i)
-		{
-			const auto pMesh = scene->mMeshes[i];
-			LoadMesh(meshes[i], pMesh, inverseU, inverseV);
-			const auto pMaterial = scene->mMaterials[i];
-			LoadTexture(settings.filename, meshes[i], pMaterial);
-			texturePaths_[i] = ym::Utf16ToUtf8(meshes[i].DiffuseMap);
-			ym::ConsoleLog("texturePath:%s\n", texturePaths_[i].c_str());
-			textures_[i] = std::make_shared<Texture>();
-			textures_[i]->LoadTexture(pDevice_.get(), pCmdList_.get(), texturePaths_[i]);
-			textureViews_[i] = std::make_shared<TextureView>();
-			textureViews_[i]->Init(pDevice_.get(), textures_[i].get());
+			auto scene = importer.ReadFile(path, flag);
+
+			if (scene == nullptr)
+			{
+				// もし読み込みエラーがでたら表示する
+				printf(importer.GetErrorString());
+				printf("\n");
+				return std::vector<Mesh>();
+			}
+
+			// 読み込んだデータを自分で定義したMesh構造体に変換する
+			meshes.clear();
+			meshes.resize(scene->mNumMeshes);
+			/*texturePaths_.resize(scene->mNumMeshes);
+			textures_.resize(scene->mNumMeshes);
+			textureViews_.resize(scene->mNumMeshes);
+			specTexturePaths_.resize(scene->mNumMeshes);
+			specTextures_.resize(scene->mNumMeshes);
+			specTextureViews_.resize(scene->mNumMeshes);
+			maskexturePaths_.resize(scene->mNumMeshes);
+			maskTextures_.resize(scene->mNumMeshes);
+			maskTextureViews_.resize(scene->mNumMeshes);*/
+			//======================================
+			//======================================
+			for (size_t i = 0; i < meshes.size(); ++i)
+			{
+				const auto pMesh = scene->mMeshes[i];
+				LoadMesh(meshes[i], pMesh, inverseU, inverseV);
+				const auto pMaterial = scene->mMaterials[i];
+				LoadTexture(settings.filename, meshes[i], pMaterial);
+			}
+			scene = nullptr;
 		}
+		material_.resize(meshes.size());
 
 		NormalizeScale();
 
-		scene = nullptr;
 
-		CreateVertexBuffer();
-		CreateIndexBuffer();
+		for (size_t i = 0; i < meshes.size(); ++i)
+		{
+			//======================================
+			material_[i] = std::make_shared<FBXMaterial>();
+			material_[i]->CreateMaterial(meshes[i]);
+			//======================================
+
+		}
 
 		isInit_ = true;
 
 
-		/*pCmdList_->Close();
+		pCmdList_->Close();
 		pCmdList_->Execute();
-		pDevice_->WaitForCommandQueue();
-		pCmdList_->Reset();	*/	
+		pDevice_->WaitForGraphicsCommandQueue();
+		pCmdList_->Reset();	
 
-		return true;
+		resourceManager->SetMesh(sFileName, meshes);
 
-
+		return meshes;
 	}
 	void FBXLoader::LoadMesh(Mesh &dst, const aiMesh *src, bool inverseU, bool inverseV)
 	{
@@ -315,48 +339,31 @@ namespace ym
 		{
 			dst.DiffuseMap.clear();
 		}
-	}
-	void FBXLoader::CreateVertexBuffer()
-	{
-		int count = 0;
-		vertexBuffers_.resize(meshes.size());
-		vertexBufferViews_.resize(meshes.size());
-		//頂点サイズ
-		auto vertexSize = sizeof(Vertex3D);
-		for (auto mesh : meshes)
+		if (src->Get(AI_MATKEY_TEXTURE_SPECULAR(0), path) == AI_SUCCESS)
 		{
-			auto vertex_ = mesh.Vertices;
-			vertexBuffers_[count] = std::make_shared<Buffer>();
-			vertexBuffers_[count]->Init(pDevice_.get(),vertex_.size()* vertexSize, vertexSize, BufferUsage::VertexBuffer, false, false);
-			vertexBufferViews_[count] = std::make_shared<VertexBufferView>();
-			vertexBufferViews_[count]->Init(pDevice_.get(), vertexBuffers_[count].get());
-			vertexBuffers_[count]->UpdateBuffer(pDevice_.get(), pCmdList_.get(),vertex_.data(), vertex_.size() * vertexSize);
-			count++;
+			auto dir = GetDirectoryPath(filename);
+			auto file = std::string(path.C_Str());
+			dst.SpecularMap = dir + ym::Utf8ToUtf16(file);
 		}
-
-	}
-	void FBXLoader::CreateIndexBuffer()
-	{
-		int count = 0;
-		indexBuffers_.resize(meshes.size());
-		indexBufferViews_.resize(meshes.size());
-		auto rST = ResourceStateTracker::Instance();
-		//頂点サイズ
-		auto indexSize = sizeof(u32);
-		for (auto mesh : meshes)
+		else
 		{
-			auto index_ = mesh.Indices;
-			indexBuffers_[count] = std::make_shared<Buffer>();
-			indexBuffers_[count]->Init(pDevice_.get(), index_.size() * indexSize, indexSize, BufferUsage::IndexBuffer, false, false);
-			indexBufferViews_[count] = std::make_shared<IndexBufferView>();
-			indexBufferViews_[count]->Init(pDevice_.get(), indexBuffers_[count].get());
-			indexBuffers_[count]->UpdateBuffer(pDevice_.get(), pCmdList_.get(), index_.data(), index_.size() * indexSize);
-
-			
-
-			count++;
+			dst.SpecularMap.clear();
+			dst.SpecularMap = L"black";
+		}
+		//マスクテクスチャがある場合
+		if (src->Get(AI_MATKEY_TEXTURE_OPACITY(0), path) == AI_SUCCESS)
+		{
+			auto dir = GetDirectoryPath(filename);
+			auto file = std::string(path.C_Str());
+			dst.MaskMap = dir + ym::Utf8ToUtf16(file);
+		}
+		else
+		{
+			dst.MaskMap.clear();
+			dst.MaskMap = L"white";
 		}
 	}
+
 	void FBXLoader::CreateConstantBuffer()
 	{
 		constantBuffer_ = std::make_shared<Buffer>();
@@ -369,78 +376,13 @@ namespace ym
 		{
 			assert(0 && "定数バッファのマップに失敗");
 		}
-		*pMatrix_ = XMMatrixIdentity();		
+		//*pMatrix_ = XMMatrixIdentity();		
 		UpdateMatrix();
 	}
 	void FBXLoader::UpdateMatrix()
 	{	
-		(*pMatrix_) = object->globalTransform.GetMatrix();
+		(*pMatrix_) = object->worldTransform.GetMatrix();
 			//XMMatrixTranspose(mat);
 	}
-	void FBXLoader::CreatePipelineState()
-	{
-		
-		vsShader_ = std::make_shared<Shader>();
-		vsShader_->Init(pDevice_.get(), ShaderType::Vertex, "simpleFBX");
-		psShader_ = std::make_shared<Shader>();
-		psShader_->Init(pDevice_.get(), ShaderType::Pixel, "simpleFBX");
-		rootSignature_ = std::make_shared<RootSignature>();
-		rootSignature_->Init(pDevice_.get(), vsShader_.get(), psShader_.get(), nullptr, nullptr, nullptr);
-
-		auto bbidx = pDevice_->GetSwapChain().GetFrameIndex();
-		auto &swapChain = pDevice_->GetSwapChain();
-
-		D3D12_INPUT_ELEMENT_DESC elementDescs[] = { 
-	{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float3のPOSITION
-	{ "NORMAL",   0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float3のNORMAL
-	{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float2のTEXCOORD
-	{ "TANGENT",  0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float3のTANGENT
-	{ "COLOR",    0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }, // float4のCOLOR
-		};
-
-		ym::GraphicsPipelineStateDesc desc;
-		desc.rasterizer.fillMode = D3D12_FILL_MODE_SOLID;
-		desc.rasterizer.cullMode = D3D12_CULL_MODE_NONE;
-		desc.rasterizer.isFrontCCW = false;
-		desc.rasterizer.isDepthClipEnable = false;
-		desc.multisampleCount = 1;
-
-		desc.blend.sampleMask = D3D12_DEFAULT_SAMPLE_MASK;
-		desc.blend.rtDesc[0].isBlendEnable = false;
-		desc.blend.rtDesc[0].srcBlendColor = D3D12_BLEND_ZERO;
-		desc.blend.rtDesc[0].dstBlendColor = D3D12_BLEND_ZERO;
-		desc.blend.rtDesc[0].blendOpColor = D3D12_BLEND_OP_ADD;
-		desc.blend.rtDesc[0].srcBlendAlpha = D3D12_BLEND_ZERO;
-		desc.blend.rtDesc[0].dstBlendAlpha = D3D12_BLEND_ZERO;
-		desc.blend.rtDesc[0].blendOpAlpha = D3D12_BLEND_OP_ADD;
-		desc.blend.rtDesc[0].writeMask = D3D12_COLOR_WRITE_ENABLE_ALL;
-
-		desc.depthStencil.depthFunc = D3D12_COMPARISON_FUNC_LESS;
-		desc.depthStencil.isDepthEnable = true;
-		desc.depthStencil.isDepthWriteEnable = true;
-
-		desc.pRootSignature = rootSignature_.get();
-		desc.pVS = vsShader_.get();
-		desc.pPS = psShader_.get();
-		desc.primTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-		
-		//auto inputLayout = Vertex::InputLayout;
-		desc.inputLayout.numElements = _countof(elementDescs);
-		desc.inputLayout.pElements = elementDescs; 
-		desc.numRTVs = 0;
-		desc.rtvFormats[desc.numRTVs++] = pDevice_->GetSwapChain().GetRenderTargetView(bbidx)->GetFormat();
-		desc.dsvFormat = pDevice_->GetSwapChain().GetDepthStencilTexture()->GetTextureDesc().format;
-		pipelineState_ = std::make_shared<GraphicsPipelineState>();
-		pipelineState_->Init(pDevice_.get(), desc);
-	}
-	void FBXLoader::CreateSampler()
-	{
-		D3D12_SAMPLER_DESC desc{};
-		desc.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-		desc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-		desc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-		desc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
-		sampler_ = std::make_shared<Sampler>();
-		sampler_->Initialize(pDevice_.get(), desc);
-	}
+	
 }

@@ -1,13 +1,20 @@
 //pch.h is included in window.h
 #include "window.h"
 
+	extern LRESULT ImGui_ImplWin32_WndProcHandler(
+		HWND, UINT, WPARAM, LPARAM);
 namespace ym {
+
 
 	LRESULT WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
+
+		ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam);
 		// メッセージ毎に処理を選択
 		switch (message)
 		{
+
+
 		case WM_DESTROY:
 
 			PostQuitMessage(0);		// OSに対して終了を伝える
@@ -20,8 +27,14 @@ namespace ym {
 				DestroyWindow(hWnd);		// ウィンドウを破棄するよう指示する
 
 				break;
+			case VK_SPACE:
+				//PIXGpuCaptureNextFrames(L"TestGPUCapture.wpix", 1);
+				break;
 			}
 			break;
+			
+
+
 		default:
 			return DefWindowProc(hWnd, message, wParam, lParam);		// メッセージのデフォルト処理
 			break;
@@ -62,7 +75,7 @@ namespace ym {
 		m_hWnd = CreateWindowA(
 			windowClassName.c_str(),							// ウィンドウクラス名
 			titleName.c_str(),									// ウィンドウのタイトル
-			WS_OVERLAPPEDWINDOW,				// ウィンドウタイプを標準タイプに	
+			WS_OVERLAPPEDWINDOW| WS_MAXIMIZE,				// ウィンドウタイプを標準タイプに	
 			0,													// ウィンドウの位置（Ｘ座標）
 			0,													// ウィンドウの位置（Ｙ座標）						
 			clientWidth,										// ウィンドウの幅

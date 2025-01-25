@@ -24,6 +24,7 @@ namespace ym
 	class Camera;
 	//struct Mesh;
 
+	class Material;
 
 
 		
@@ -43,8 +44,9 @@ namespace ym
 		void Update() override;
 		void Draw() override;
 		void Uninit() override;
+		void SetMaterial(std::shared_ptr<Material>material, u32 index);
 
-		bool Load(ImportSettings settings); // FBXファイルを読み込む
+		std::vector<Mesh> Load(ImportSettings settings); // FBXファイルを読み込む
 
 		//void LoadFBX(const std::string &path);
     private:
@@ -52,27 +54,21 @@ namespace ym
 
 		void NormalizeScale();
 
-		void LoadTexture(const wchar_t *filename,Mesh &dst, const aiMaterial *src);
-
-		void CreateVertexBuffer();
-		void CreateIndexBuffer();
+		void LoadTexture(const wchar_t *filename,Mesh &dst, const aiMaterial *src);	
 
 		void CreateConstantBuffer();
 
 		void UpdateMatrix();
-
-		void CreatePipelineState();
-
-		void CreateSampler();
+	
 
     private:
 		std::vector<Mesh> meshes; // 出力先のメッシュ配列
 
-		//std::vector<Vertex3D> vertices; // 頂点データの配列
-		std::vector<std::shared_ptr<ym::Buffer>> vertexBuffers_;
-		std::vector<std::shared_ptr<ym::VertexBufferView>> vertexBufferViews_;
-		std::vector<std::shared_ptr<ym::Buffer>> indexBuffers_;
-		std::vector<std::shared_ptr<ym::IndexBufferView>> indexBufferViews_;
+		////std::vector<Vertex3D> vertices; // 頂点データの配列
+		//std::vector<std::shared_ptr<ym::Buffer>> vertexBuffers_;
+		//std::vector<std::shared_ptr<ym::VertexBufferView>> vertexBufferViews_;
+		//std::vector<std::shared_ptr<ym::Buffer>> indexBuffers_;
+		//std::vector<std::shared_ptr<ym::IndexBufferView>> indexBufferViews_;
 
 		float minX = FLT_MAX, minY = FLT_MAX, minZ = FLT_MAX;
 		float maxX = -FLT_MAX, maxY = -FLT_MAX, maxZ = -FLT_MAX;
@@ -87,7 +83,11 @@ namespace ym
 		int flags_ = 0;
 
 		bool isInit_ = false;
-		std::vector<std::string> texturePaths_;
+
+		std::vector<std::shared_ptr<Material>>material_;
+
+
+	/*	std::vector<std::string> texturePaths_;
 		std::vector<std::shared_ptr<ym::Texture>> textures_;
 		std::vector<std::shared_ptr<ym::TextureView>> textureViews_;
 
@@ -96,7 +96,7 @@ namespace ym
 		std::shared_ptr<RootSignature> rootSignature_{};
 		std::shared_ptr<GraphicsPipelineState> pipelineState_{};
 		std::shared_ptr<ym::DescriptorSet> descriptorSet_;
-		std::shared_ptr<ym::Sampler> sampler_;
+		std::shared_ptr<ym::Sampler> sampler_;*/
 
 	};
 }

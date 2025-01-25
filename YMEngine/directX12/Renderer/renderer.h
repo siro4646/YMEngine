@@ -12,6 +12,7 @@
 //テスト用
 #include "test/polygon.h"
 
+#include "postProcess/postProcessManager.h"
 
 //=============================================================================
 
@@ -39,7 +40,19 @@ namespace ym
 	class PostProcessMaterial;
 	class MosaicMaterial;
 	class GrayScaleMaterial;
+	class BlurMaterial;
+	class LightPassMaterial;
+	class LumPassMaterial;
 
+	enum MultiRenderTargets
+	{
+		Color,//カラー
+		Normal,//法線
+		HighLuminance,//輝度
+		WorldPos,//ワールド座標
+		Max,//最大数
+		//ダブルバッファの場合 0,1,2と3,4,5のペアで使う
+	};
 
 
 	//描画関係全部やってくれるクラスになる予定
@@ -68,9 +81,17 @@ namespace ym
 		{
 			return pGraphicCommandList_.get();
 		}
+		CommandList *GetRenderTextureCommandList()
+		{
+			return pRenderTextureCommandList_.get();
+		}
 		CommandList *GetComputeCommandList()
 		{
 			return pComputeCommandList_.get();
+		}
+		CommandList *GetCopyCommandList()
+		{
+			return pCopyCommandList_.get();
 		}
 
 		Device *GetDevice()
@@ -87,21 +108,22 @@ namespace ym
 			return dummyTextureViews_[type].get();
 		}
 
-		Texture *GetSceneRenderTexture(int index)
+		Texture *GetSceneRenderTexture(int index,MultiRenderTargets type)
 		{
-			return sceneRenderTextures[index].get();
+
+			return sceneRenderTextures[index * MultiRenderTargets::Max + type].get();
 		}
-		RenderTargetView *GetSceneRenderTargetView(int index)
+		RenderTargetView *GetSceneRenderTargetView(int index, MultiRenderTargets type)
 		{
-			return sceneRenderTargetViews[index].get();
+			return sceneRenderTargetViews[index * MultiRenderTargets::Max + type].get();
 		}
-		TextureView *GetSceneRenderTargetTexView(int index)
+		TextureView *GetSceneRenderTargetTexView(int index, MultiRenderTargets type)
 		{
-			return sceneRenderTargetTexViews[index].get();
+			return sceneRenderTargetTexViews[index * MultiRenderTargets::Max + type].get();
 		}
-		D3D12_CPU_DESCRIPTOR_HANDLE GetDescHandle(int index)
+		D3D12_CPU_DESCRIPTOR_HANDLE GetDescHandle(int index, MultiRenderTargets type)
 		{
-			return sceneRenderTargetViews[index]->GetDescInfo().cpuHandle;
+			return sceneRenderTargetViews[index * MultiRenderTargets::Max + type]->GetDescInfo().cpuHandle;
 		}
 
 
@@ -122,6 +144,9 @@ namespace ym
 		void BeginFrame();
 		void Draw();
 		void EndFrame();
+
+		void SetViewPort();
+
 
 	private:
 		Renderer() = default;
@@ -150,13 +175,16 @@ namespace ym
 
 		void CreateSceneSampler();
 
-		void SetViewPort();
 
 
 	private:
 		static std::shared_ptr<Device> device_;//デバイス
 		static std::shared_ptr<CommandList> pGraphicCommandList_;
+		static std::shared_ptr<CommandList> pRenderTextureCommandList_;
+
 		static std::shared_ptr<CommandList> pComputeCommandList_;
+		static std::shared_ptr<CommandList> pCopyCommandList_;
+
 		ym::Window *window_{};
 		D3D12_VIEWPORT m_viewPort{};
 		D3D12_RECT m_scissorRect{};
@@ -193,6 +221,12 @@ namespace ym
 
 		std::shared_ptr<MosaicMaterial> mosaicMaterial_;
 		std::shared_ptr<GrayScaleMaterial> grayScaleMaterial_;
+		std::shared_ptr<BlurMaterial> blurMaterial_;
+		float blurValue_ = 0.0f;
+		std::shared_ptr<LightPassMaterial> lightPassMaterial_;
+		std::shared_ptr<LumPassMaterial> lumPassMaterial_;
+
+		bool usePostProcess_[(int)PostProcessType::Max]{ false };
 
 		std::shared_ptr<RootSignature> sceneRootSignature_;
 		std::shared_ptr<DescriptorSet> sceneDescriptorSet_;

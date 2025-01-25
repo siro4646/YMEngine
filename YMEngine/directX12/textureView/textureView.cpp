@@ -209,7 +209,7 @@ namespace ym
 	{
 		if (descInfo_.IsValid())
 		{
-			ym::ConsoleLog("RenderTargetView::Uninit() called\n");
+			//ym::ConsoleLog("RenderTargetView::Uninit() called\n");
 		}
 			descInfo_.Free();
 	}

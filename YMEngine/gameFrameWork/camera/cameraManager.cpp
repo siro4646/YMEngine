@@ -12,6 +12,7 @@ namespace ym
 			return cameras_[name].get();
 		}
 		auto pCamera = std::make_shared<Camera>();
+		pCamera->name_ = name;
 		cameras_[name] = pCamera;
 		// ƒƒCƒ“ƒJƒƒ‰‚ªİ’è‚³‚ê‚Ä‚¢‚È‚¢ê‡‚Íİ’è
 		if (pMainCamera_ == nullptr)

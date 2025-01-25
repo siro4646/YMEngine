@@ -67,6 +67,12 @@ namespace ym
 	}
 	void PostProcessManager::Update()
 	{
+		
+
+		for (auto material : materials_)
+		{
+			material->Update();
+		}
 	}
 	void PostProcessManager::Draw()
 	{
@@ -74,14 +80,16 @@ namespace ym
 		auto bbidx = device_->GetSwapChain().GetFrameIndex();
 		auto cmdList = graphicsCmdList_;
 
+		auto type = MultiRenderTargets::Color;
 
-		resultRTVs_[bbidx] = Renderer::Instance()->GetSceneRenderTargetView(bbidx);
-		resultTextures_[bbidx] = Renderer::Instance()->GetSceneRenderTexture(bbidx);
-		resultTextureViews_[bbidx] = Renderer::Instance()->GetSceneRenderTargetTexView(bbidx);
+		resultRTVs_[bbidx] = Renderer::Instance()->GetSceneRenderTargetView(bbidx ,type);
+		resultTextures_[bbidx] = Renderer::Instance()->GetSceneRenderTexture(bbidx, type);
+		resultTextureViews_[bbidx] = Renderer::Instance()->GetSceneRenderTargetTexView(bbidx,type);
 		for (auto material : materials_)
 		{
 			//ルートシグネチャなどシェーダーに渡す情報をセット
 			material->SetMaterial();
+			material->Draw();
 			//描画
 			cmdList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			cmdList->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_->GetView());
@@ -91,10 +99,11 @@ namespace ym
 			//描画したマテリアルのバリアを遷移
 			cmdList->TransitionBarrier(material->GetTexture(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
-			//描画したものをリザルトにコピー
+			//描画したものをリザルトにコピーyyy
 			resultRTVs_[bbidx] = material->GetRTV();
 			resultTextures_[bbidx] = material->GetTexture();
 			resultTextureViews_[bbidx] = material->GetTextureView();
+
 		}
 	}
 	void PostProcessManager::AddPostProcessMaterial(PostProcessMaterial *material)
