@@ -26,42 +26,54 @@ namespace ym
 
 	void GameObjectManager::FixedUpdate() {
 
+		//std::vector<std::shared_ptr<Object>> objectsToDelete;
+		//std::mutex deleteMutex;
+		//std::mutex fixedUpdateMutex;
+
+		//// 並列に FixedUpdate を実行
+		//std::for_each(std::execution::par, gameObjects_.begin(), gameObjects_.end(), [&](auto &gameObject) {
+		//	if (gameObject->type == Object::Type::Delete) {
+		//		std::lock_guard<std::mutex> lock(deleteMutex); // 削除リストへのアクセスを保護
+		//		objectsToDelete.push_back(gameObject);
+		//	}
+		//	else {
+		//		std::lock_guard<std::mutex> lock(fixedUpdateMutex);// FixedUpdateのアクセスを保護
+		//		gameObject->FixedUpdate();
+		//	}
+		//	});
+
+		//// 削除処理はシングルスレッドで実行
+		//for (auto &gameObject : objectsToDelete) {
+		//	gameObject->Uninit();
+		//	std::lock_guard<std::mutex> lock(deleteMutex);
+		//	gameObjects_.erase(std::remove(gameObjects_.begin(), gameObjects_.end(), gameObject), gameObjects_.end());
+		//}
+
 		std::vector<std::shared_ptr<Object>> objectsToDelete;
-		std::mutex deleteMutex;
-		std::mutex fixedUpdateMutex;
+		
+		for (auto obj : gameObjects_)
+		{
+			if (!obj)continue;
 
-		// 並列に FixedUpdate を実行
-		std::for_each(std::execution::par, gameObjects_.begin(), gameObjects_.end(), [&](auto &gameObject) {
-			if (gameObject->type == Object::Type::Delete) {
-				std::lock_guard<std::mutex> lock(deleteMutex); // 削除リストへのアクセスを保護
-				objectsToDelete.push_back(gameObject);
+			if (obj->type == Object::Type::Delete)
+			{
+				objectsToDelete.push_back(obj);
 			}
-			else {
-				std::lock_guard<std::mutex> lock(fixedUpdateMutex);// FixedUpdateのアクセスを保護
-				gameObject->FixedUpdate();
+			else
+			{
+				obj->FixedUpdate();
 			}
-			});
-
-		// 削除処理はシングルスレッドで実行
-		for (auto &gameObject : objectsToDelete) {
-			gameObject->Uninit();
-			std::lock_guard<std::mutex> lock(deleteMutex);
-			gameObjects_.erase(std::remove(gameObjects_.begin(), gameObjects_.end(), gameObject), gameObjects_.end());
 		}
 
-		//std::vector<std::shared_ptr<Object>> objectsToDelete;
-		//
-		//for (auto obj : gameObjects_)
-		//{
-		//	if (obj->type == Object::Type::Delete)
-		//	{
-		//		objectsToDelete.push_back(obj);
-		//	}
-		//	else
-		//	{
-		//		obj->FixedUpdate();
-		//	}
-		//}
+		for (auto deleteObj : objectsToDelete)
+		{
+			//消す処理
+
+			deleteObj->Uninit();
+
+			gameObjects_.erase(std::remove(gameObjects_.begin(), gameObjects_.end(), deleteObj), gameObjects_.end());
+
+		}
 
 		//for (auto deleteObj : objectsToDelete)
 		//{
@@ -72,42 +84,54 @@ namespace ym
 	}
 
 	void GameObjectManager::Update() {
+		//std::vector<std::shared_ptr<Object>> objectsToDelete;
+		//std::mutex deleteMutex;
+		//std::mutex updateMutex;
+
+		//// 並列に Update を実行
+		//std::for_each(std::execution::par, gameObjects_.begin(), gameObjects_.end(), [&](auto &gameObject) {
+		//	if (gameObject->type == Object::Type::Delete) {
+		//		std::lock_guard<std::mutex> lock(deleteMutex); // 削除リストへのアクセスを保護
+		//		objectsToDelete.push_back(gameObject);
+		//	}
+		//	else {
+		//		std::lock_guard<std::mutex> lock(updateMutex);// Updateのアクセスを保護
+		//		gameObject->Update();
+		//	}
+		//	});
+
+		//// 削除処理はシングルスレッドで実行
+		//for (auto &gameObject : objectsToDelete) {
+		//	gameObject->Uninit();
+		//	std::lock_guard<std::mutex> lock(deleteMutex);
+		//	gameObjects_.erase(std::remove(gameObjects_.begin(), gameObjects_.end(), gameObject), gameObjects_.end());
+		//}
+
 		std::vector<std::shared_ptr<Object>> objectsToDelete;
-		std::mutex deleteMutex;
-		std::mutex updateMutex;
 
-		// 並列に Update を実行
-		std::for_each(std::execution::par, gameObjects_.begin(), gameObjects_.end(), [&](auto &gameObject) {
-			if (gameObject->type == Object::Type::Delete) {
-				std::lock_guard<std::mutex> lock(deleteMutex); // 削除リストへのアクセスを保護
-				objectsToDelete.push_back(gameObject);
+		for (auto obj : gameObjects_)
+		{
+			if (!obj)continue;
+			if (obj->type == Object::Type::Delete)
+			{
+				objectsToDelete.push_back(obj);
 			}
-			else {
-				std::lock_guard<std::mutex> lock(updateMutex);// Updateのアクセスを保護
-				gameObject->Update();
+			else
+			{
+				obj->Update();
 			}
-			});
-
-		// 削除処理はシングルスレッドで実行
-		for (auto &gameObject : objectsToDelete) {
-			gameObject->Uninit();
-			std::lock_guard<std::mutex> lock(deleteMutex);
-			gameObjects_.erase(std::remove(gameObjects_.begin(), gameObjects_.end(), gameObject), gameObjects_.end());
 		}
 
-		//std::vector<std::shared_ptr<Object>> objectsToDelete;
+		for (auto deleteObj : objectsToDelete)
+		{
+			//消す処理
 
-		//for (auto obj : gameObjects_)
-		//{
-		//	if (obj->type == Object::Type::Delete)
-		//	{
-		//		objectsToDelete.push_back(obj);
-		//	}
-		//	else
-		//	{
-		//		obj->Update();
-		//	}
-		//}
+			deleteObj->Uninit();
+
+			gameObjects_.erase(std::remove(gameObjects_.begin(), gameObjects_.end(), deleteObj), gameObjects_.end());
+
+		}
+
 
 		//for (auto deleteObj : objectsToDelete)
 		//{
@@ -144,7 +168,10 @@ namespace ym
 
 	std::shared_ptr<Object> GameObjectManager::AddGameObject(std::shared_ptr<Object> gameObject, Object *const parent)
 	{	
-
+		if (parent != nullptr)
+		{
+			parent->AddChild(gameObject);
+		}
 		gameObjects_.push_back(gameObject);
 		gameObject->objectManager = this;
 		gameObject->Init();

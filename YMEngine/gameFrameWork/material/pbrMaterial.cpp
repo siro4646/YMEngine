@@ -40,16 +40,34 @@ namespace ym
 		cmdList->SetPipelineState(pipelineState_->GetPSO());
 		auto ds = descriptorSet_.get();
 		ds->Reset();
-		ds->SetPsSrv(0, diffuseMapTexView_->GetDescInfo().cpuHandle);
+		if (testTextureView)
+		{
+			ds->SetPsSrv(0, testTextureView->GetDescInfo().cpuHandle);			
+		}
+		else
+		{
+			ds->SetPsSrv(0, diffuseMapTexView_->GetDescInfo().cpuHandle);
+		}
 		ds->SetPsSampler(0, sampler_->GetDescInfo().cpuHandle);
 		ds->SetPsSrv(1, specularMapTexView_->GetDescInfo().cpuHandle);
 		ds->SetPsSrv(2, maskMapTexView_->GetDescInfo().cpuHandle);
 
 	}
+	void PBRMaterial::SetTexture(Texture *tex)
+	{
+		testTexture = tex;
+	}
+	void PBRMaterial::SetTextureView(TextureView *texView)
+	{
+		testTextureView = texView;
+	}
 	void PBRMaterial::LoadTexture()
 	{
 		//テクスチャの読み込み
-		diffuseMap_ = ym::Utf16ToUtf8(mesh_.DiffuseMap);
+		if (diffuseMap_ == "")
+		{
+			diffuseMap_ = ym::Utf16ToUtf8(mesh_.DiffuseMap);
+		}
 		diffuseMapTex_ = std::make_shared<Texture>();
 		diffuseMapTex_->LoadTexture(device_, commandList_, diffuseMap_.c_str());
 		diffuseMapTexView_ = std::make_shared<TextureView>();

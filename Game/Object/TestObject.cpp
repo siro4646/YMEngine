@@ -2,6 +2,9 @@
 #include "gameFrameWork/components/sprite/sprite.h"
 #include "gameFrameWork/components/fbxLoader/fbxLoader.h"
 #include "gameFrameWork/components/objLoader/objLoader.h"
+
+#include "gameFrameWork/components/rigidBody/rigidBody.h"
+
 #include "utility/inputSystem/keyBoard/keyBoardInput.h"
 
 #include "camera/camera.h"
@@ -15,31 +18,25 @@
 
 #include "gameFrameWork/collider/collider.h"
 
+#include "Game/Object/board/gameBoard.h"
+
+
 namespace ym
 {
 	void TestObject::Init()
 	{
 		name = "TestObject";
-		localTransform.Scale = { 3.0f,0.01f,3.0f };
+		//localTransform.Scale = { 3.0f,0.01f,3.0f };
 		//localTransform.Scale *= 10;
 
-		localTransform.Scale *= 100;
-		//localTransform.Rotation = { 0.0f,0.0f,0.0f };
+		localTransform.Scale *= 50;
+
+		localTransform.Rotation.y = 90;
 		//localTransform.Position = { 0.0f,-0.5f,1.2f };
 
-		localTransform.Position = { 0.0f,-1.0f,2.0f };
+		//localTransform.Position = { 0.0f,-1.0f,2.0f };
 
-		const wchar_t *modelFile = L"asset/Alicia/FBX/Alicia_solid_Unity.FBX";
-		const wchar_t *modelFile2 = L"asset/Dragon/Dragon 2.5_fbx.fbx";
-		const wchar_t *modelFile3 = L"asset/a.fbx";
-		const wchar_t *modelFile4 = L"asset/sponza (1)/sponza.obj";	
-		const wchar_t *modelFile5 = L"asset/model/sphere_smooth.obj";
-		const wchar_t *modelFile6 = L"asset/model/cylinder.obj";
-		const wchar_t *modelFile7 = L"asset/model/cube.obj";
-		const wchar_t *modelFile8 = L"asset/model/tornado.fbx";
-
-
-
+		const wchar_t *modelFile = L"asset/sponza (1)/sponza.obj";
 
 		//material->Init();
 		
@@ -50,7 +47,7 @@ namespace ym
 		flag |= ModelSetting::AdjustScale;
 		ImportSettings importSetting = // ‚±‚ê©‘Ì‚Í©ì‚Ì“Ç‚İ‚İİ’è\‘¢‘Ì
 		{
-			modelFile7,
+			modelFile,
 			flag
 		};
 

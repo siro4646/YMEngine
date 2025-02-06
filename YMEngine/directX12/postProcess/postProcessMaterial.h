@@ -20,6 +20,8 @@ namespace ym
 	class Shader;
 	class Sampler;
 
+	class PostProcessManager;
+
 	class PostProcessMaterial
 	{
 	public:
@@ -51,6 +53,9 @@ namespace ym
 	protected:
 		Device *device_;
 		CommandList *graphicsCmdList_;
+		PostProcessManager *pPM_;
+
+
 
 
 		std::shared_ptr<Texture> texture_;

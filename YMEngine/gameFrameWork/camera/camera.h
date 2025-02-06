@@ -80,8 +80,24 @@ namespace ym
 		{
 			DirectX::XMMATRIX view;//ビュー行列
 			DirectX::XMMATRIX projection;//プロジェクション行列
-			DirectX::XMFLOAT3 eye;//カメラの位置
+			//==================================================
+			DirectX::XMMATRIX invView;
+			DirectX::XMMATRIX invProjection;
+			DirectX::XMMATRIX invViewProj;
+			//==================================================
+			DirectX::XMFLOAT4 eye;//カメラの位置
+			float nearZ;
+			float farZ;
+			float aspect;
+			float fov;
 		};
+
+
+
+
+
+
+
 		CameraData *pMapppedData_{};
 
 	};

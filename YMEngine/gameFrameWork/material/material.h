@@ -61,6 +61,7 @@ namespace ym
 
 		void SetMainTex(string diffuse)
 		{
+			//mesh_.DiffuseMap = ym::Utf8ToUtf16(diffuse);
 			diffuseMap_ = diffuse;
 		}
 

@@ -40,6 +40,9 @@ namespace ym
 
 		void SetMaterial()override;
 
+		void SetTexture(Texture *tex);
+		void SetTextureView(TextureView *texView);
+
 	private:
 
 		std::string maskMap_;
@@ -49,6 +52,10 @@ namespace ym
 		std::shared_ptr<Texture> specularMapTex_;
 		std::shared_ptr<TextureView> specularMapTexView_;
 
+		//================================================================================================
+		Texture *testTexture{};
+		TextureView *testTextureView{};
+		//================================================================================================
 
 		void LoadTexture()override;
 

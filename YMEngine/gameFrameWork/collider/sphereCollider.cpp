@@ -109,4 +109,12 @@ namespace ym
 	{
 		Collider::Uninit();
 	}
+	bool SphereCollider::IsCollidingAt(const Vector3 &futurePosition, const Collider &other)
+	{
+		Vector3 originalPosition = object->worldTransform.Position;
+		SetCenter(futurePosition);
+		bool result = IsColliding(other);
+		SetCenter(originalPosition);
+		return result;
+	}
 }

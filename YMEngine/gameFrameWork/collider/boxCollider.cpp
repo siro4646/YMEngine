@@ -68,6 +68,17 @@ namespace ym
 
 	}
 
+	bool BoxCollider::IsCollidingAt(const Vector3 &futurePosition, const Collider &other) 
+	{
+		Vector3 originalPosition = GetCenter(); // 現在の位置
+		SetCenter(futurePosition); // 仮の位置に移動
+
+		bool result = other.IsColliding(*this); // 衝突判定
+
+		SetCenter(originalPosition); // 元の位置に戻す
+		return result;
+	}
+
 	/**
 	 * ローカル座標系の各軸を計算する
 	 * @return 各軸の方向ベクトルを格納した配列

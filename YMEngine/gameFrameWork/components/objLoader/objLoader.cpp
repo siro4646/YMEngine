@@ -173,7 +173,6 @@ namespace ym
 			material_[i] = std::make_shared<OBJMaterial>();
 			material_[i]->CreateMaterial(meshes[i]);
 			//======================================
-
 		}
 
 

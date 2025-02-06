@@ -52,7 +52,7 @@ namespace ym {
         {
 			sceneOctree->Remove(object);
         }
-
+		inline virtual bool IsCollidingAt(const Vector3 &futurePosition, const Collider &other) = 0;
 
        inline virtual bool IsColliding(const Collider &other) const = 0;
         // BoxColliderとの衝突判定（ダブルディスパッチ用）
@@ -79,6 +79,17 @@ namespace ym {
         inline Vector3 GetRotation() const {
             return object->worldTransform.Rotation; // Transformの回転を取得
         }
+		inline void SetCenter(const Vector3 &center) {
+			object->worldTransform.Position = center; // Transformの位置を設定
+		}
+
+		inline void SetScale(const Vector3 &scale) {
+			object->worldTransform.Scale = scale; // Transformのスケールを設定
+		}
+
+		inline void SetRotation(const Vector3 &rotation) {
+			object->worldTransform.Rotation = rotation; // Transformの回転を設定
+		}
 
 		bool isTrigger = false; // トリガーかどうか
 
@@ -104,6 +115,7 @@ namespace ym {
 		void FixedUpdate()override;
         void Draw()override;
         void Uninit()override;
+		bool IsCollidingAt(const Vector3 &futurePosition, const Collider &other)  override;
 		bool IsColliding(const Collider &other) const override;
         bool CollideWithBox(const BoxCollider &box) const override;
         bool CollideWithSphere(const SphereCollider &sphere) const override;
@@ -134,7 +146,7 @@ namespace ym {
         void FixedUpdate()override;
         void Draw() override;
 		void Uninit()override;
-
+        bool IsCollidingAt(const Vector3 &futurePosition, const Collider &other)  override;
         bool IsColliding(const Collider &other) const override;
         bool CollideWithSphere(const SphereCollider &sphere) const override;
         bool CollideWithBox(const BoxCollider &box) const override;

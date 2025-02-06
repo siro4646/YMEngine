@@ -148,6 +148,7 @@ namespace ym {
         currentCollisions.clear();
         previousTriggers = currentTriggers;
         currentTriggers.clear();
+		hitObjects.clear();
 
         //auto collider = object->GetComponent<Collider>();
         if (!collider) return;
@@ -198,7 +199,7 @@ namespace ym {
         }
 
         if (isGround) {
-            float frictionCoefficient = 0.0f;
+            float frictionCoefficient = 0.3f;
             Vector3 friction = -velocity.Normalize() * frictionCoefficient * Application::Instance()->GetDeltaTime();
             velocity += friction;
 
@@ -208,34 +209,128 @@ namespace ym {
         }
     }
 
-    //bool Rigidbody::IsOnGround() {
-    //    isGround = false;
+    void Rigidbody::ResolveCollision(Object *hitTarget, Vector3 normal)
+    {
+        //
+        bool hasRigidbody = false;
 
-    //    // 現在のオブジェクトのコライダーを取得
-    //    //auto collider = object->GetComponent<Collider>();
-    //    if (!collider) return false; // コライダーがない場合は即座に終了
+		Rigidbody *hitRb = hitTarget->GetComponent<Rigidbody>().get();
+        if (hitRb) {
+            if (hitRb->CheckHitObject(object))
+            {
+                return;
+            }
+			hasRigidbody = true;
+        }
+        if (hasRigidbody) 
+        {
 
-    //    // 衝突候補リストをチェック
-    //    for (auto obj : result) {
-    //        if (obj == object) continue; // 自分自身はスキップ
 
-    //        auto otherCollider = obj->GetComponent<Collider>();
-    //        if (!otherCollider) continue; // 他のオブジェクトにコライダーがなければスキップ
+        Vector3 scaleA = this->collider->GetScale();
+        Vector3 scaleB = hitRb->collider->GetScale();
 
-    //        // 衝突しているかを確認
-    //        if (collider->IsColliding(*otherCollider)) {
-    //            // 衝突法線を計算
-    //            Vector3 normal = CalculateCollisionNormal(*collider, *otherCollider);
+        Vector3 radSum = (scaleA + scaleB) * 0.5f;
+		Vector3 distance = hitTarget->worldTransform.Position - object->worldTransform.Position;
 
-    //            // 法線が上向きの場合（Y軸が正の値）を接地として判断
-    //            if (normal.y > 0.5f) {
-    //                isGround = true;
-    //                return true;
-    //            }
-    //        }
-    //    }
-    //    return false;
-    //}
+		Vector3 penetration = radSum -Vector3(abs(distance.x), abs(distance.y), abs(distance.z));
+
+        // 最も深いめり込み軸を特定
+        Vector3 penetrationAxis = Vector3::zero;
+        float minPenetration = std::numeric_limits<float>::max();
+
+        if (penetration.x < minPenetration) {
+            minPenetration = penetration.x;
+            penetrationAxis = Vector3(1, 0, 0);
+        }
+        if (penetration.y < minPenetration) {
+            minPenetration = penetration.y;
+            penetrationAxis = Vector3(0, 1, 0);
+        }
+        if (penetration.z < minPenetration) {
+            minPenetration = penetration.z;
+            penetrationAxis = Vector3(0, 0, 1);
+        }
+        // 位置補正の適用（過補正を防ぐ）
+
+        float correctionFactor = 1.05f; // 100% だと振動するため微調整
+        float epsilon = 0.001f; // 小さな隙間を開ける
+        Vector3 correction = normal * (minPenetration * correctionFactor + epsilon);
+
+
+
+            // 質量比を考慮（軽い方がより押し戻される）
+            float totalMass = mass + hitRb->mass;
+            float massRatioA = (totalMass > 0) ? (hitRb->mass / totalMass) : 0.5f;
+            float massRatioB = 1.0f - massRatioA;
+
+            object->localTransform.Position += correction * massRatioA;
+            hitTarget->localTransform.Position -= correction * massRatioB;
+
+            // 反発係数の決定（両者の平均を取る）
+            float restitution = std::min(this->restitution, hitRb->restitution);
+
+            // 速度の分解（法線方向と接線方向）
+            Vector3 relativeVelocity = velocity - hitRb->velocity;
+            float normalVelocity = relativeVelocity.Dot(normal);
+
+            float inverseMassA = (mass > 0) ? (1 / mass) : 0;
+            float inverseMassB = (hitRb->mass > 0) ? (1 / hitRb->mass) : 0;
+
+            float impulse = -(1 + restitution) * normalVelocity;
+            impulse /= (inverseMassA + inverseMassB);
+
+            if (normalVelocity < 0) { // 衝突している場合のみ適用
+                velocity += impulse * normal * inverseMassA;
+                hitRb->velocity -= impulse * normal * inverseMassB;
+            }
+
+			RegisterHitObject(hitTarget);
+			hitRb->RegisterHitObject(object);
+		}
+		else {
+            velocity = velocity - (1 + restitution) * velocity.Dot(normal) * normal;
+        }
+    }
+
+    void Rigidbody::ResolveCollision(Object *hitTarget, Vector3 normal, Vector3 predictedPosition)
+    {
+        Rigidbody *hitRb = hitTarget->GetComponent<Rigidbody>().get();
+        if (!hitRb) return; // Rigidbody がない場合は何もしない
+        if (hitRb->CheckHitObject(object)) return; // すでに処理済みならスキップ
+
+        // スケールの取得
+        Vector3 scaleA = this->collider->GetScale();
+        Vector3 scaleB = hitRb->collider->GetScale();
+        Vector3 radSum = (scaleA + scaleB) * 0.5f;
+        Vector3 distance = hitTarget->worldTransform.Position - predictedPosition;
+        Vector3 penetration = radSum - Vector3(abs(distance.x), abs(distance.y), abs(distance.z));
+
+        // **最大の penetrationDepth を取得**
+        float penetrationDepth = std::max({ penetration.x, penetration.y, penetration.z });
+        if (penetrationDepth <= 0.0f) return; // 衝突していない場合はスキップ
+
+        // **位置補正の適用**
+        float correctionFactor = 1.05f; // 過補正を防ぐ
+        float epsilon = 0.001f; // 小さな隙間を開ける
+        Vector3 correction = normal * (penetrationDepth * correctionFactor + epsilon);
+
+        // **質量比を考慮**
+        float totalMass = mass + hitRb->mass;
+        float massRatioA = (totalMass > 0) ? (hitRb->mass / totalMass) : 0.5f;
+        float massRatioB = 1.0f - massRatioA;
+
+        // **未来位置を適用**
+        Vector3 correctedPosition = predictedPosition + correction * massRatioA;
+
+        // **オブジェクトの位置を更新**
+        object->localTransform.Position = correctedPosition;
+
+        // **衝突リストに登録**
+        RegisterHitObject(hitTarget);
+        hitRb->RegisterHitObject(object);
+    }
+
+
 
     void Rigidbody::HitTest()
     {
@@ -283,13 +378,14 @@ namespace ym {
                 }
 
                 // 反発係数を使用した速度計算
-                float restitution = 0.4f;
+               // float restitution = 0.4f;
                 velocity = velocity - (1 + restitution) * velocity.Dot(normal) * normal;
             }
         }
     }
 
-    void Rigidbody::AsyncHitTest() {
+    void Rigidbody::AsyncHitTest()
+    {
         thread_local std::vector<Collision> localCollisions; // スレッドローカルの一時データ
         thread_local std::vector<Collision> localTriggers;
 
@@ -300,7 +396,10 @@ namespace ym {
         localCollisions.reserve(result.size());
         localTriggers.reserve(result.size());
 
-		isGround = false;
+        isGround = false;
+
+
+
 
         std::for_each(std::execution::par, result.begin(), result.end(), [&](auto &gameObject) {
             if (gameObject == object) return;
@@ -327,11 +426,20 @@ namespace ym {
                     Collision collision = Collision::CreateCollision(otherCollider.get(), gameObject, contactPoint, normal);
                     localCollisions.push_back(collision);
 
-                    // 反発係数を使用した速度計算
-                    float restitution = 0.4f;
+                    // obj->worldTransform.Position -= velocity;
+
+                    // ResolveCollision(gameObject, normal);
+
+                     // 反発係数を使用した速度計算
+                    // float restitution = 0.4f;
                     velocity = velocity - (1 + restitution) * velocity.Dot(normal) * normal;
                 }
             }
+
+
+
+
+
             });
 
         // 結果をマージ（競合回避）
@@ -348,6 +456,9 @@ namespace ym {
                     }
                 }
             }
+            
+            
+
 
             for (auto &trigger : localTriggers) {
                 currentTriggers.insert(trigger.object);
@@ -359,9 +470,46 @@ namespace ym {
                         component->OnTriggerStay(trigger);
                     }
                 }
+                for (auto &component : trigger.object->components)
+                {
+                    if (previousTriggers.find(trigger.object) == previousTriggers.end())
+                    {
+						Collision triggerCollision = Collision::CreateCollision(collider, object, trigger.contactPoint, trigger.normal);
+                        component->OnTriggerEnter(triggerCollision);
+                    }
+                    else
+                    {
+						Collision triggerCollision = Collision::CreateCollision(collider, object, trigger.contactPoint, trigger.normal);
+						component->OnTriggerStay(triggerCollision);
+                    }
+                }
+
+
             }
+            //OntriggerExit
+
+			for (auto obj : previousTriggers)
+            {
+                if (currentTriggers.find(obj) == currentTriggers.end())
+                {
+                    for (auto &component : object->components)
+                    {
+						Collision triggerCollision = Collision::CreateCollision(obj->GetComponent<Collider>().get(), obj, Vector3::zero, Vector3::zero);
+						component->OnTriggerExit(triggerCollision);
+					}
+                    //トリガー側も
+                    for (auto &component : obj->components)
+                    {
+						Collision triggerCollision = Collision::CreateCollision(collider, object, Vector3::zero, Vector3::zero);
+						component->OnTriggerExit(triggerCollision);
+                    }
+				}
+			}
+
+
         }
     }
+    
 
 
 

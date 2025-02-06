@@ -32,6 +32,7 @@
 #include "material/postProcess/blur/blurMaterial.h"
 #include "material/postProcess/lightPass/lightPassMaterial.h"
 #include "material/postProcess/lumPass/lumPassMaterial.h"
+#include "material/postProcess/ssr/ssrMaterial.h"
 
 
 #include "utility/inputSystem/keyBoard/keyBoardInput.h"
@@ -138,8 +139,12 @@ namespace ym
 		lumPassMaterial_ = std::make_shared<LumPassMaterial>();
 		lumPassMaterial_->Init();
 
+		ssrMaterial_ = std::make_shared<SSRMaterial>();
+		ssrMaterial_->Init();
+
 		pPM->AddPostProcessMaterial(lightPassMaterial_.get());
 		pPM->AddPostProcessMaterial(lumPassMaterial_.get());
+		pPM->AddPostProcessMaterial(ssrMaterial_.get());
 
 		//usePostProcess_[0] = true;
 
@@ -270,36 +275,36 @@ namespace ym
 		auto lightManager = LightManager::Instance();
 		lightManager->Update();
 		auto &input = KeyboardInput::GetInstance();
-		//if (input.GetKeyDown("1"))
-		//{
-		//	auto pPM = PostProcessManager::Instance();
-		//	pPM->AddPostProcessMaterial(mosaicMaterial_.get());
-		//}
-		//if (input.GetKeyDown("2"))
-		//{
-		//	auto pPM = PostProcessManager::Instance();
-		//	pPM->AddPostProcessMaterial(grayScaleMaterial_.get());
-		//}
-		//if (input.GetKeyDown("3"))
-		//{
-		//	auto pPM = PostProcessManager::Instance();
-		//	pPM->AddPostProcessMaterial(blurMaterial_.get());
-		//}
-		//if (input.GetKeyDown("4"))
-		//{
-		//	auto pPM = PostProcessManager::Instance();
-		//	pPM->RemovePostProcessMaterial(mosaicMaterial_.get());
-		//}
-		//if (input.GetKeyDown("5"))
-		//{
-		//	auto pPM = PostProcessManager::Instance();
-		//	pPM->RemovePostProcessMaterial(grayScaleMaterial_.get());
-		//}
-		//if (input.GetKeyDown("6"))
-		//{
-		//	auto pPM = PostProcessManager::Instance();
-		//	pPM->RemovePostProcessMaterial(blurMaterial_.get());
-		//}
+		if (input.GetKeyDown("1"))
+		{
+			auto pPM = PostProcessManager::Instance();
+			pPM->AddPostProcessMaterial(mosaicMaterial_.get());
+		}
+		if (input.GetKeyDown("2"))
+		{
+			auto pPM = PostProcessManager::Instance();
+			pPM->AddPostProcessMaterial(grayScaleMaterial_.get());
+		}
+		if (input.GetKeyDown("3"))
+		{
+			auto pPM = PostProcessManager::Instance();
+			pPM->AddPostProcessMaterial(blurMaterial_.get());
+		}
+		if (input.GetKeyDown("4"))
+		{
+			auto pPM = PostProcessManager::Instance();
+			pPM->RemovePostProcessMaterial(mosaicMaterial_.get());
+		}
+		if (input.GetKeyDown("5"))
+		{
+			auto pPM = PostProcessManager::Instance();
+			pPM->RemovePostProcessMaterial(grayScaleMaterial_.get());
+		}
+		if (input.GetKeyDown("6"))
+		{
+			auto pPM = PostProcessManager::Instance();
+			pPM->RemovePostProcessMaterial(blurMaterial_.get());
+		}
 
 		/*for (int i = 0; i < (int)PostProcessType::Max; ++i)
 		{
@@ -590,6 +595,53 @@ namespace ym
 			rM->SetTexture("white", *dummyTextures_[DummyTex::White].get());
 		}
 
+		//Checker
+		{
+			TextureDesc desc{};
+			desc.initialState = D3D12_RESOURCE_STATE_COPY_DEST;
+			desc.width = desc.height = 4;
+			desc.depth = 1;
+			desc.dimension = TextureDimension::Texture2D;
+			desc.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.mipLevels = 1;
+
+			std::vector<ym::u32> bin;
+			bin.resize(64 * 4);
+
+			// Checker pattern		
+
+			for (int y = 0; y < 4; ++y)
+			{
+				for (int x = 0; x < 4; ++x)
+				{
+					ym::u32 color = 0xFFFFFFFF;
+					if ((x + y) % 2 == 0)
+					{
+						color = 0xFF000000;
+					}
+					bin[x* 16 + y * 4 + 0] = color;
+					bin[x * 16 + y * 4 + 1] = color;
+					bin[x * 16 + y * 4 + 2] = color;
+					bin[x * 16 + y * 4 + 3] = color;
+				}
+			}
+
+
+			dummyTextures_[DummyTex::Checker] = std::make_unique<Texture>();
+			if (!dummyTextures_[DummyTex::Checker]->InitFromBin(device_.get(), pGraphicCommandList_.get(), desc, bin.data()))
+			{
+				return;
+			}
+
+			dummyTextureViews_[DummyTex::Checker] = std::make_unique<TextureView>();
+			if (!dummyTextureViews_[DummyTex::Checker]->Init(device_.get(), dummyTextures_[DummyTex::Checker].get()))
+			{
+				return;
+			}
+
+			rM->SetTexture("checker", *dummyTextures_[DummyTex::Checker].get());
+		}
+
 		//Purple
 		{
 			TextureDesc desc{};
@@ -613,6 +665,93 @@ namespace ym
 				return;
 			}
 			rM->SetTexture("purple", *dummyTextures_[DummyTex::Purple].get());
+		}
+
+		//LightGreen
+		{
+			TextureDesc desc{};
+			desc.initialState = D3D12_RESOURCE_STATE_COPY_DEST;
+			desc.width = desc.height = 4;
+			desc.depth = 1;
+			desc.dimension = TextureDimension::Texture2D;
+			desc.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.mipLevels = 1;
+
+			std::vector<ym::u32> bin;
+			bin.resize(64 * 4);
+			for (auto &&pix : bin)
+			{
+				pix = 0xFF00FF00;
+			}
+
+			dummyTextures_[DummyTex::LightGreen] = std::make_unique<Texture>();
+			if (!dummyTextures_[DummyTex::LightGreen]->InitFromBin(device_.get(), pGraphicCommandList_.get(), desc, bin.data()))
+			{
+				return;
+			}
+			rM->SetTexture("lightGreen", *dummyTextures_[DummyTex::LightGreen].get());
+		}
+
+		//Cyen
+		{
+			TextureDesc desc{};
+			desc.initialState = D3D12_RESOURCE_STATE_COPY_DEST;
+			desc.width = desc.height = 4;
+			desc.depth = 1;
+			desc.dimension = TextureDimension::Texture2D;
+			desc.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.mipLevels = 1;
+
+			std::vector<ym::u32> bin;
+			bin.resize(64 * 4);
+			for (auto &&pix : bin)
+			{
+				pix = 0xFF00FFFF;
+			}
+
+			dummyTextures_[DummyTex::Cyen] = std::make_unique<Texture>();
+			if (!dummyTextures_[DummyTex::Cyen]->InitFromBin(device_.get(), pGraphicCommandList_.get(), desc, bin.data()))
+			{
+				return;
+			}
+
+			dummyTextureViews_[DummyTex::Cyen] = std::make_unique<TextureView>();
+			if (!dummyTextureViews_[DummyTex::Cyen]->Init(device_.get(), dummyTextures_[DummyTex::Cyen].get()))
+			{
+				return;
+			}
+			rM->SetTexture("cyen", *dummyTextures_[DummyTex::Cyen].get());
+		}
+
+		//Green
+		{
+			TextureDesc desc{};
+			desc.initialState = D3D12_RESOURCE_STATE_COPY_DEST;
+			desc.width = desc.height = 4;
+			desc.depth = 1;
+			desc.dimension = TextureDimension::Texture2D;
+			desc.format = DXGI_FORMAT_R8G8B8A8_UNORM;
+			desc.mipLevels = 1;
+
+			std::vector<ym::u32> bin;
+			bin.resize(64 * 4);
+			for (auto &&pix : bin)
+			{
+				pix = 0xFF008800;
+			}
+
+			dummyTextures_[DummyTex::Green] = std::make_unique<Texture>();
+			if (!dummyTextures_[DummyTex::Green]->InitFromBin(device_.get(), pGraphicCommandList_.get(), desc, bin.data()))
+			{
+				return;
+			}
+
+			dummyTextureViews_[DummyTex::Green] = std::make_unique<TextureView>();
+			if (!dummyTextureViews_[DummyTex::Green]->Init(device_.get(), dummyTextures_[DummyTex::Green].get()))
+			{
+				return;
+			}
+			rM->SetTexture("green", *dummyTextures_[DummyTex::Green].get());
 		}
 
 		// FlatNormal

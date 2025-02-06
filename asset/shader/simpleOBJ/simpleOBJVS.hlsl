@@ -1,36 +1,13 @@
+#include "../Header/modelStruct.hlsli"
 struct PSInput
 {
     float4 pos : SV_POSITION;
+    float4 worldPos : POSITION0;
     float4 normal : NORMAL0; //法線ベクトル 
     float4 color : COLOR;
     float2 uv : TEXCOORD;
     float3 ray : VECTOR;
 };
-
-
-struct VSInput
-{
-    float3 pos : POSITION; // 頂点座標
-    float3 normal : NORMAL; // 法線
-    float2 uv : TEXCOORD; // UV
-    float3 tangent : TANGENT; // 接空間
-    float4 color : COLOR; // 頂点色
-};
-
-cbuffer cbScene : register(b0)
-{
-    matrix mat;
-}
-
-cbuffer SceneData : register(b1)
-{
-    matrix view; //ビュー行列
-    matrix proj; //プロジェクション行列
-    float3 eye; //カメラの位置
-};
-
-//struct 
-
 PSInput main(VSInput Input)
 {
     PSInput output;
@@ -40,6 +17,7 @@ PSInput main(VSInput Input)
     float4 viewPos = mul(view, worldPos); // ビュー座標に変換
     float4 projPos = mul(proj, viewPos); // 投影変換
     output.pos = projPos; // クリップ座標に変換
+    output.worldPos = worldPos;
     
     
     // // 初期化
@@ -51,9 +29,10 @@ PSInput main(VSInput Input)
     //output.pos = mul(output.pos, proj); // プロジェクション行列適用
     
     //Input.normal.
-    output.normal = mul(mat, Input.normal); //float4(Input.normal, 1.0f); 
+    float3x3 normalMatrix = (float3x3) mat; // 上3x3を取り出す
+    output.normal = float4(normalize(mul(normalMatrix, Input.normal)), 1);
     output.color = Input.color;
     output.uv = Input.uv;
-    output.ray = normalize(Input.pos.xyz - mul(view, eye));
+    output.ray = normalize(worldPos.xyz - eye); // カメラ位置からワールド座標への方向
     return output;
 }

@@ -85,9 +85,27 @@ namespace ym
 	}
 	void Camera::UpdateShaderBuffer()
 	{
+		// 1. ‹ts—ñ‚ðŒvŽZ‚·‚é
+		DirectX::XMMATRIX invView = DirectX::XMMatrixInverse(nullptr, view_);
+		DirectX::XMMATRIX invProjection = DirectX::XMMatrixInverse(nullptr, projection_);
+		DirectX::XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, view_ * projection_);
+
 		pMapppedData_->view = DirectX::XMMatrixTranspose(view_);
 		pMapppedData_->projection = DirectX::XMMatrixTranspose(projection_);
-		pMapppedData_->eye = eye_.ToXMFLOAT3();
+		pMapppedData_->invView = DirectX::XMMatrixTranspose(invView);
+		pMapppedData_->invProjection = DirectX::XMMatrixTranspose(invProjection);
+		pMapppedData_->eye.x = eye_.ToXMFLOAT3().x;
+		pMapppedData_->eye.y = eye_.ToXMFLOAT3().y;
+		pMapppedData_->eye.z = eye_.ToXMFLOAT3().z;
+		pMapppedData_->eye.w = 0;
+		pMapppedData_->nearZ = nearZ_;
+		pMapppedData_->farZ = farZ_;
+		pMapppedData_->aspect = aspectRatio_;
+		pMapppedData_->fov = fov_;
+
+		/*pMapppedData_->view = DirectX::XMMatrixTranspose(view_);
+		pMapppedData_->projection = DirectX::XMMatrixTranspose(projection_);
+		pMapppedData_->eye = eye_.ToXMFLOAT3();*/
 	}
 
 	bool Camera::CreateConstantBuffer()

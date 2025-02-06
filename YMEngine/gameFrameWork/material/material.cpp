@@ -115,6 +115,7 @@ namespace ym
 	void Material::CreateMaterial(Mesh mesh)
 	{
 		mesh_ = mesh;
+		//diffuseMap_ = ym::Utf16ToUtf8(mesh_.DiffuseMap);
 		renderer_ = Renderer::Instance();
 		device_ = renderer_->GetDevice();
 		commandList_ = renderer_->GetGraphicCommandList();

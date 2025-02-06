@@ -43,6 +43,7 @@ namespace ym
 
 		inline void SetWarpTexture(TextureView *texture) { warpTexture = texture; }
 
+
 	private:
 		TextureView *warpTexture;
 

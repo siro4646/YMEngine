@@ -81,4 +81,15 @@ namespace ym
 		}
 		//force += additionalForce;
 	}
+	void Rigidbody::RegisterHitObject(Object *hitObject)
+	{
+		hitObjects.insert(hitObject);
+	}
+
+	bool Rigidbody::CheckHitObject(Object *hitObject)
+	{
+		//‚Æ‚¤‚ë‚­‚³‚ê‚Ä‚¢‚é‚©‚³‚ê‚Ä‚½‚çtrue
+		return hitObjects.find(hitObject) != hitObjects.end();
+	}
+
 	}

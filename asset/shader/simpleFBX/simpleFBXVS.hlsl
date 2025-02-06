@@ -1,27 +1,6 @@
 #include "simpleFBX.hlsli"
+#include "../Header/modelStruct.hlsli"
 
-struct VSInput
-{
-    float3 pos : POSITION; // 頂点座標
-    float3 normal : NORMAL; // 法線
-    float2 uv : TEXCOORD; // UV
-    float3 tangent : TANGENT; // 接空間
-    float4 color : COLOR; // 頂点色
-};
-
-cbuffer cbScene : register(b0)
-{
-    matrix mat;
-}
-
-cbuffer SceneData : register(b1)
-{
-    matrix view; //ビュー行列
-    matrix proj; //プロジェクション行列
-    float3 eye; //カメラの位置
-};
-
-//struct 
 
 PSInput main(VSInput Input)
 {

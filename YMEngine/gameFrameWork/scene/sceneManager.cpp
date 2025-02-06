@@ -2,6 +2,7 @@
 #include "baseScene.h"
 #include <iostream> // デバッグ用
 
+#include "../Game/Scene/TitleScene/titleScene.h"
 #include "../Game/Scene/TestScene/testScene.h"
 #include "../Game/Scene/TestScene2/testScene2.h"
 
@@ -49,7 +50,7 @@ namespace ym {
         }
 
         // 現在のシーンを終了し、スタックから削除
-        m_pScene.top()->UnInit();
+        //m_pScene.top()->UnInit();
         m_pScene.pop();
     }
 
@@ -86,7 +87,9 @@ namespace ym {
     SceneManager::SceneManager()
     {
 		// テストシーンを追加
-		PushScene(std::make_unique<TestScene>());		
+		//PushScene(std::make_unique<TitleScene>());
+        PushScene(std::make_unique<TestScene>());
+
     }
     void SceneManager::Terminate()
     {

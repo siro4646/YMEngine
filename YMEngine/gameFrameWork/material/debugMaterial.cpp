@@ -31,8 +31,6 @@ namespace ym
 		cmdList->SetPipelineState(pipelineState_->GetPSO());
 		auto ds = descriptorSet_.get();
 		ds->Reset();
-		
-
 	}
 	void DebugMaterial::CreateShader()
 	{

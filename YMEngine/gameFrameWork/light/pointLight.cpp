@@ -7,18 +7,24 @@
 
 #include "gameFrameWork/light/lightManager.h"
 
+#include "application/application.h"
 
 namespace ym
 {
 	void PointLight::Init()
 	{		
 		//x,zç¿ïWÇ-3,3ÇÃä‘Ç≈ÉâÉìÉ_ÉÄÇ…ê›íË
-		randX = (float)(rand() % 600 - 300) /100;
-		randZ = (float)(rand() % 600 - 300)/100;
-		localTransform.Position = { randX, 1.0f, randZ };
+		randX = (float)(rand() % 600 - 300) /100 ;
+		randZ = (float)(rand() % 1200 - 600)/100;
+
+		r = (rand() % 2);
+		g = (rand() % 2);
+		b = (rand() % 2);
+
+		localTransform.Position = { randX, 0.0f, randZ };
 
 		localTransform.Scale = { 1.0f,1.0f,1.0f };
-		localTransform.Scale *= 4.5;
+		localTransform.Scale *= 10;
 		//Object::Init();		
 		objLoader = AddComponent<OBJLoader>().get();
 		const wchar_t *modelFile = L"asset/model/sphere_smooth.obj";
@@ -57,10 +63,7 @@ namespace ym
 
 	void PointLight::Update()
 	{
-		
-		angle += 0.01f;
-		localTransform.Position.x = 5.0f * cos(angle) + randX;
-		localTransform.Position.z = 5.0f * sin(angle) + randZ;
+		float deltaTime = Application::Instance()->GetDeltaTime();		
 
 		Object::Update();
 		SetLightData();
@@ -96,14 +99,14 @@ namespace ym
 		data.position.x = worldTransform.Position.ToXMFLOAT3().x;
 		data.position.y = worldTransform.Position.ToXMFLOAT3().y;
 		data.position.z = worldTransform.Position.ToXMFLOAT3().z;
-		data.intensity = 50.0f;
+		data.intensity = 10.0f;
 		//static float randR = (rand() % 100) / 100.0f;
 		//static float randG = (rand() % 100) / 100.0f;
 		//float randB = (rand() % 100) / 100.0f;
 
-		data.color.x = 1.0f;
-		data.color.y = 1.0f;
-		data.color.z = 1.0f;
+		data.color.x = r;
+		data.color.y = g;
+		data.color.z = b;
 		data.radius = worldTransform.Scale.x*0.5f;
 	}
 }

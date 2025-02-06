@@ -159,6 +159,141 @@
     <ClCompile Include="YMEngine\gameFrameWork\material\objMaterial.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="Game\Object\player\player.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\TestObject2.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\TestObject3.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scene\TestScene2\testScene2.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\imgui\imguiRender.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\renderTargetManager\renderTargetManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\directX12\renderTexture\renderTexture.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\collider\boxCollider.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\collider\collider.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\collider\sphereCollider.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\components\rigidBody\rigidBody.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\components\rigidBody\rigidbodyMath.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\light\light.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\light\lightManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\light\pointLight.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\debugMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\dissolveMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\pbrMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\blur\blurMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\lightPass\lightPassMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\lumPass\lumPassMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\tornadoMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\warpGateMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\requiredObject\directionalLight.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\requiredObject\sceneOcTree\sceneOcTree.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\requiredObject\sphereMap\sphereMap.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\sceneRenderRegistrar\sceneRenderRegistrar.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\ocTree\ocTree.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_demo.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_draw.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_impl_dx12.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_impl_win32.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_tables.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\thirdParty\imgui\imgui_widgets.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\utility\transform\transform.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\board\childBoard.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\board\gameBoard.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\koma\koma.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Component\othello\gameManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\sound\soundManager.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scene\TitleScene\titleScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Object\titleSprite\titleSprite.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Game\Scene\ResultScene\resultScene.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="YMEngine\gameFrameWork\material\postProcess\ssr\ssrMaterial.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pch.h">
@@ -359,6 +494,135 @@
     <ClInclude Include="YMEngine\gameFrameWork\material\objMaterial.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="Game\Object\player\player.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\TestObject2.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\TestObject3.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\TestScene2\testScene2.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\imgui\imguiRender.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\renderTargetManager\renderTargetManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\renderTexture\renderTexture.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\directX12\renderTexture\renderTextureManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\collider\collider.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\components\rigidBody\rigidBody.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\light\light.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\light\lightManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\light\pointLight.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\debugMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\dissolveMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\pbrMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\blur\blurMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\lightPass\lightPassMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\lumPass\lumPassMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\tornadoMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\warpGateMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\requiredObject\directionalLight.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\requiredObject\sceneOcTree\sceneOcTree.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\requiredObject\sphereMap\sphereMap.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\sceneRenderRegistrar\sceneRenderRegistrar.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\ocTree\ocTree.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\thirdParty\imgui\imconfig.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\thirdParty\imgui\imgui.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\thirdParty\imgui\imgui_impl_dx12.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\thirdParty\imgui\imgui_impl_win32.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\thirdParty\imgui\imgui_internal.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\thirdParty\imgui\imstb_rectpack.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\thirdParty\imgui\imstb_textedit.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\thirdParty\imgui\imstb_truetype.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\board\childBoard.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\board\gameBoard.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\koma\koma.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Component\othello\gameManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\sound\soundManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\TitleScene\titleScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Object\titleSprite\titleSprite.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Game\Scene\ResultScene\resultScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="YMEngine\gameFrameWork\material\postProcess\ssr\ssrMaterial.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="assimp-vc143-mt.dll" />
@@ -366,6 +630,9 @@
     <None Include="asset\shader\test\test.hlsli" />
     <None Include="asset\shader\2dSprite\2dSprite.hlsli" />
     <None Include="asset\shader\simpleFBX\simpleFBX.hlsli" />
+    <None Include=".gitignore" />
+    <None Include="asset\shader\Header\func.hlsli" />
+    <None Include="asset\shader\Header\modelStruct.hlsli" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="assimp-vc143-mt.lib" />
@@ -393,6 +660,24 @@
     <FxCompile Include="asset\shader\unlit\unlitPS.hlsl" />
     <FxCompile Include="asset\shader\simpleOBJ\simpleOBJVS.hlsl" />
     <FxCompile Include="asset\shader\simpleOBJ\simpleOBJPS.hlsl" />
+    <FxCompile Include="asset\shader\copy\copyPS.hlsl" />
+    <FxCompile Include="asset\shader\copy\copyVS.hlsl" />
+    <FxCompile Include="asset\shader\debug\debugPS.hlsl" />
+    <FxCompile Include="asset\shader\debug\debugVS.hlsl" />
+    <FxCompile Include="asset\shader\dissolveModel\dissolveModelPS.hlsl" />
+    <FxCompile Include="asset\shader\dissolveModel\dissolveModelVS.hlsl" />
+    <FxCompile Include="asset\shader\gausBlur\gausBlurPS.hlsl" />
+    <FxCompile Include="asset\shader\gausBlur\gausBlurVS.hlsl" />
+    <FxCompile Include="asset\shader\lightPass\lightPassPS.hlsl" />
+    <FxCompile Include="asset\shader\lightPass\lightPassVS.hlsl" />
+    <FxCompile Include="asset\shader\lumPass\lumPassPS.hlsl" />
+    <FxCompile Include="asset\shader\lumPass\lumPassVS.hlsl" />
+    <FxCompile Include="asset\shader\pbr\pbrPS.hlsl" />
+    <FxCompile Include="asset\shader\pbr\pbrVS.hlsl" />
+    <FxCompile Include="asset\shader\shrink\shrinkPS.hlsl" />
+    <FxCompile Include="asset\shader\shrink\shrinkVS.hlsl" />
+    <FxCompile Include="asset\shader\ssr\ssrVS.hlsl" />
+    <FxCompile Include="asset\shader\ssr\ssrPS.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="asset\texture\blue_noise.tga" />

@@ -43,6 +43,7 @@ namespace ym
 	class BlurMaterial;
 	class LightPassMaterial;
 	class LumPassMaterial;
+	class SSRMaterial;
 
 	enum MultiRenderTargets
 	{
@@ -225,6 +226,7 @@ namespace ym
 		float blurValue_ = 0.0f;
 		std::shared_ptr<LightPassMaterial> lightPassMaterial_;
 		std::shared_ptr<LumPassMaterial> lumPassMaterial_;
+		std::shared_ptr<SSRMaterial> ssrMaterial_;
 
 		bool usePostProcess_[(int)PostProcessType::Max]{ false };
 

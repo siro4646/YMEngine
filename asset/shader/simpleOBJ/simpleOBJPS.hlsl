@@ -1,6 +1,8 @@
 struct PSInput
 {
     float4 pos : SV_POSITION;
+    
+    float4 worldPos : POSITION0;
     float4 normal : NORMAL0; //法線ベクトル 
     float4 color : COLOR;
     float2 uv : TEXCOORD;
@@ -11,6 +13,8 @@ struct PSOutput
     float4 color : SV_TARGET;
     float4 normal : SV_TARGET1;
     float4 highLum : SV_TARGET2;
+    float4 worldPos : SV_TARGET3;
+    
 };
 
 Texture2D g_texture : register(t0);
@@ -23,6 +27,15 @@ Texture2D g_maskTexture : register(t2);
 PSOutput main(PSInput input) : SV_TARGET
 {
     PSOutput output;
+    
+    //output.color = g_texture.Sample(g_sampler, input.uv) * input.color;
+    //output.normal = normalize(input.normal);
+    //output.normal.a = 2.0f;
+    //output.worldPos = input.worldPos;
+    //output.highLum = 0.0f;
+    
+    //return output;
+    
     
     float3 light = normalize(float3(-1, -1, 1)); //光の向かうベクトル(平行光線)
     
@@ -52,11 +65,7 @@ PSOutput main(PSInput input) : SV_TARGET
     
     output.highLum = luminance > 0.9 ? output.color : 0.0f;
     
-    
-    
-    
-    
-    
+    output.worldPos = input.worldPos;
     
     return output;
       

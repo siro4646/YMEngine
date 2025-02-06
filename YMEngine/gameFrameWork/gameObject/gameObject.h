@@ -39,12 +39,12 @@ namespace ym
 		Type type =Type::None;
 		std::vector<std::shared_ptr<Component>> components;
 		std::string name;
+		std::vector <std::shared_ptr<Object>> _childs;
 	private:
 		bool isUninit = false;
 	protected:
 		std::string tag;
 		std::shared_ptr<Object>_parent = nullptr;
-		std::vector <std::shared_ptr<Object>> _childs;
 	public:
 
 		Object();

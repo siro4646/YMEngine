@@ -31,6 +31,10 @@ namespace ym
 		float randX;
 		float randZ;
 		float angle = (float)(rand() % 100);
+		float r = 0;
+		float g = 0;
+		float b = 0;
+
 		void SetLightData();
 		PointLightData data;
 		std::vector<std::shared_ptr<DebugMaterial>>materials;

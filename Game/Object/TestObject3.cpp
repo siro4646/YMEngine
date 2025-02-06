@@ -14,6 +14,8 @@
 #include "gameFrameWork/collider/collider.h"
 
 #include "gameFrameWork/components/rigidBody/rigidBody.h"
+#include "gameFrameWork/sceneRenderRegistrar/sceneRenderRegistrar.h"
+
 
 
 namespace ym
@@ -78,9 +80,12 @@ namespace ym
 		/*auto sprite = AddComponent<ym::Sprite>();
 		sprite->LoadTexture("asset/texture/Jacket_BaseColor.jpg");*/
 
+		auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();
+		sceneRenderRegistrar->AddRenderObject(this);	
+
 		auto boxCollider = AddComponent<BoxCollider>();
-		auto rb = AddComponent<Rigidbody>();
-		//rb->useGravity = false;
+		auto rb = AddComponent<Rigidbody>().get();
+		rb->mass = 1000;
 	}
 
 	void TestObject3::FixedUpdate()
@@ -93,6 +98,16 @@ namespace ym
 	{
 
 		auto &input = KeyboardInput::GetInstance();
+		if (input.GetKeyDown("7"))
+		{
+			auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();
+			sceneRenderRegistrar->AddRenderObject(this);
+		}
+		if (input.GetKeyDown("8"))
+		{
+			auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();
+			sceneRenderRegistrar->RemoveRenderObject(this);
+		}
 
 		
 		Object::Update();

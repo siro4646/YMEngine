@@ -181,7 +181,7 @@ namespace ym
 			ym::ConsoleLog("[%s]\n", filename.c_str());
 			//LoadTexture(pDev, pCmdList, "asset/texture/test.png", isForceSRGB, forceSysRam);
 			auto renderer = Renderer::Instance();
-			*this = *renderer->GetDummyTexture(DummyTex::Purple);
+			*this = *renderer->GetDummyTexture(DummyTex::White);
 		}
 		return res;
 

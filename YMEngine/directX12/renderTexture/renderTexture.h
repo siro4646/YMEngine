@@ -39,7 +39,7 @@ namespace ym
 		}
 
 		std::shared_ptr<TextureView> GetRenderTargetTextureView(u32 index = 0) {
-			int next = ((bbidx + 1) % SwapChain::kFrameCount) * MultiRenderTargets::Max + index;
+			int next = ((bbidx + 1) % SwapChain::kFrameCount) * MultiRenderTargets::Max + index;			
 			return renderTargetTextureView_[next];
 		}
 

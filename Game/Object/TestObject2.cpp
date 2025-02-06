@@ -14,6 +14,8 @@
 #include "gameFrameWork/collider/collider.h"
 
 #include "gameFrameWork/components/rigidBody/rigidBody.h"
+#include "gameFrameWork/sceneRenderRegistrar/sceneRenderRegistrar.h"
+
 
 
 namespace ym
@@ -81,9 +83,13 @@ namespace ym
 		/*auto sprite = AddComponent<ym::Sprite>();
 		sprite->LoadTexture("asset/texture/Jacket_BaseColor.jpg");*/
 
+		auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();
+		sceneRenderRegistrar->AddRenderObject(this);
+
 		auto boxCollider = AddComponent<SphereCollider>();
 		//boxCollider->isTrigger = true;
-		auto rb = AddComponent<Rigidbody>();
+		auto rb = AddComponent<Rigidbody>().get();
+		rb->mass = 1000;
 		//rb->useGravity = false;
 	}
 

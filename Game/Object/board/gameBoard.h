@@ -1,11 +1,12 @@
 #pragma once
 
 #include "gameFrameWork/gameObject/gameObject.h"
-namespace ym
-{
-	class WarpGate;
+namespace ym {
 
-	class WarpGateManager :public Object
+	class ChildBoard;
+
+	//コピー用テンプレート
+	class GameBoard : public Object
 	{
 	public:
 		void Init()override;
@@ -15,9 +16,11 @@ namespace ym
 		void Uninit()override;
 		std::shared_ptr<Object>Clone()override;
 
-		std::shared_ptr<WarpGate> warpGates1;
-		std::shared_ptr<WarpGate> warpGates2;
+		vector<ChildBoard *> GetChildBoards() { return _childBoards; }
+
+		//Object
 
 	private:
+		std::vector<ChildBoard *> _childBoards;
 	};
 }

@@ -13,6 +13,8 @@
 
 #include "gameFrameWork/sceneRenderRegistrar/sceneRenderRegistrar.h"
 
+#include "gameFrameWork/sound/soundManager.h"
+
 namespace ym
 {
 	Application *Application::m_instance = nullptr;
@@ -44,6 +46,7 @@ namespace ym
 	{
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
+		
 
 
 		//pix‚Ì‰Šú‰»
@@ -76,6 +79,8 @@ namespace ym
 		auto input = InputManager::GetInstance();
 		auto keybord = KeyboardInput::GetInstance();
 		auto sceneManager = ym::SceneManager::Instance();
+
+
 		while (1)
 		{
 			deltaTime_.reset();
@@ -130,6 +135,8 @@ namespace ym
 		auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();
 		sceneRenderRegistrar->Init();
 
+		auto soundManager = SoundManager::GetInstance();
+		soundManager->Init();
 
 		ym::InputManager::GetInstance().Initialize(m_window->GetWndHandle());
 
@@ -147,6 +154,12 @@ namespace ym
 		if (sceneRenderRegistrar)
 		{
 			sceneRenderRegistrar->Uninit();
+		}
+
+		auto soundManager = SoundManager::GetInstance();
+		if (soundManager)
+		{
+			soundManager->Uninit();
 		}
 
 		auto renderTargetManager = RenderTargetManager::Instance();

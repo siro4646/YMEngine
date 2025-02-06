@@ -18,7 +18,11 @@ namespace ym
 
 			Black,
 			White,
+			Checker,
 			Purple,
+			Cyen,
+			LightGreen,
+			Green,
 			FlatNormal,
 
 			Max

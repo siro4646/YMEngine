@@ -47,6 +47,9 @@ namespace ym
 
 		void AddForce(const Vector3 &additionalForce,const ForceMode mode = ForceMode::Force);
 
+		void RegisterHitObject(Object *hitObject);
+
+		bool CheckHitObject(Object *hitObject);
 
 	private:
 
@@ -55,6 +58,9 @@ namespace ym
 		void UpdatePosition();
 		void UpdateVelocity();		
 		//bool IsOnGround();	
+		void ResolveCollision(Object *hitTarget,Vector3 normal);
+
+		void ResolveCollision(Object *hitTarget, Vector3 normal, Vector3 predictedPosition);
 
 		void  HitTest();
 		void AsyncHitTest();
@@ -77,6 +83,7 @@ namespace ym
 		//力
 		Vector3 force;
 
+		float restitution = 0.3f;//反発係数
 		
 
 		std::vector<Object *> result;//オクツリーをもとに衝突する可能性があるオブジェクトの格納
@@ -93,6 +100,10 @@ namespace ym
 
 		std::unordered_set<Object *> previousTriggers; // 前フレームのトリガー
 		std::unordered_set<Object *> currentTriggers;  // 現フレームのトリガー
+
+		//このフレームで衝突したオブジェクト
+		std::unordered_set<Object *> hitObjects;
+
 	};
 
 }

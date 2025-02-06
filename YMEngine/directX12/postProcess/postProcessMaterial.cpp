@@ -17,12 +17,15 @@
 
 #include "renderTargetManager/renderTargetManager.h"
 
+#include "postProcess/postProcessManager.h"
+
 namespace ym
 {
 	void PostProcessMaterial::Init()
 	{
 		device_ = Renderer::Instance()->GetDevice();
 		graphicsCmdList_ = Renderer::Instance()->GetGraphicCommandList();
+		pPM_ = PostProcessManager::Instance();
 
 		rootSignature_ = std::make_shared<RootSignature>();
 		descriptorSet_ = std::make_shared<DescriptorSet>();

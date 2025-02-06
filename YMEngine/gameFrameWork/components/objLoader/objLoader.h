@@ -44,6 +44,9 @@ namespace ym
 
 		std::vector<Mesh> Load(ImportSettings settings); // FBXƒtƒ@ƒCƒ‹‚ð“Ç‚Ý
 
+		std::vector<std::shared_ptr<Material>>material_;
+
+
 	private:
 		void LoadMesh(Mesh &dst, const aiMesh *src, bool inverseU, bool inverseV);
 
@@ -54,6 +57,7 @@ namespace ym
 		void CreateConstantBuffer();
 
 		void UpdateMatrix();
+
 
 	private:
 
@@ -87,7 +91,6 @@ namespace ym
 		std::vector<std::shared_ptr<ym::Texture>> maskTextures_;
 		std::vector<std::shared_ptr<ym::TextureView>> maskTextureViews_;*/
 
-		std::vector<std::shared_ptr<Material>>material_;
 
 
 

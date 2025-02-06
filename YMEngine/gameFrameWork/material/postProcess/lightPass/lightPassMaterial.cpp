@@ -53,12 +53,12 @@ namespace ym
 	void LightPassMaterial::Draw()
 	{
 		
-		ImGui::Begin("LightPassMaterial");
-		//float dir[3]
-		ImGui::SliderFloat3("Direction", dir, -1.0f, 1.0f);
-		ImGui::SliderFloat3("Color", color, 0.0f, 1.0f);
-		ImGui::SliderFloat("Intensity", &intensity, 0.0f, 5.0f);
-		ImGui::End();
+		//ImGui::Begin("LightPassMaterial");
+		////float dir[3]
+		//ImGui::SliderFloat3("Direction", dir, -1.0f, 1.0f);
+		//ImGui::SliderFloat3("Color", color, 0.0f, 1.0f);
+		//ImGui::SliderFloat("Intensity", &intensity, 0.0f, 5.0f);
+		//ImGui::End();
 
 		light_.direction = XMFLOAT3(dir[0], dir[1], dir[2]);
 		light_.color = XMFLOAT3(color[0], color[1], color[2]);
@@ -101,10 +101,10 @@ namespace ym
 		descriptorSet_->SetPsSrv(0, colorView->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSrv(1, normalView->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSrv(2, worldPosView->GetDescInfo().cpuHandle);	
-		descriptorSet_->SetPsCbv(0, camera->GetDescriptorHandle());
-		descriptorSet_->SetPsCbv(1, constantBufferView_->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSrv(3, lightManager->GetPointLightCPUHandle());
-		descriptorSet_->SetPsCbv(2, lightManager->GetConstantBufferView()->GetDescInfo().cpuHandle);
+		descriptorSet_->SetPsCbv(1, camera->GetDescriptorHandle());
+		descriptorSet_->SetPsCbv(2, constantBufferView_->GetDescInfo().cpuHandle);
+		descriptorSet_->SetPsCbv(3, lightManager->GetConstantBufferView()->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSampler(0, sampler_->GetDescInfo().cpuHandle);
 		cmdList->SetGraphicsRootSignatureAndDescriptorSet(rootSignature_.get(), descriptorSet_.get());
 
