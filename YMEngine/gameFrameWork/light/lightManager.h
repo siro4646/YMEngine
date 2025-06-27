@@ -3,7 +3,7 @@
 #include "buffer/buffer.h"
 #include "bufferView/bufferView.h"
 
-#include "pointLight.h"
+#include "../components/pointLight/pointLight.h"
 
 namespace ym
 {

@@ -53,6 +53,43 @@ namespace ym
 	{
 	}
 
+	void Rigidbody::DrawImguiBody()
+	{
+		ImGui::Text("Rigidbody");
+
+		ImGui::Checkbox("Use Gravity", &useGravity);
+		ImGui::Checkbox("Is Kinematic", &isKinematic);
+
+		ImGui::DragFloat("Mass", &mass, 0.1f, 0.0f, 100.0f);
+		ImGui::DragFloat("Drag", &drag, 0.01f, 0.0f, 10.0f);
+		ImGui::DragFloat("Angular Drag", &angularDrag, 0.01f, 0.0f, 10.0f);
+		ImGui::DragFloat("Restitution", &restitution, 0.01f, 0.0f, 1.0f);
+
+		ImGui::Separator();
+		ImGui::Text("Velocity");
+		ImGui::DragFloat3("Linear", &velocity.x, 0.01f);
+		ImGui::DragFloat3("Angular", &angularVelocity.x, 0.01f);
+
+		ImGui::Separator();
+		ImGui::Text("Constraints");
+		ImGui::Checkbox("Freeze Pos X", &constraints.freezePositionX);
+		ImGui::Checkbox("Freeze Pos Y", &constraints.freezePositionY);
+		ImGui::Checkbox("Freeze Pos Z", &constraints.freezePositionZ);
+		ImGui::Checkbox("Freeze Rot X", &constraints.freezeRotationX);
+		ImGui::Checkbox("Freeze Rot Y", &constraints.freezeRotationY);
+		ImGui::Checkbox("Freeze Rot Z", &constraints.freezeRotationZ);
+
+		ImGui::Separator();
+		ImGui::Text("Interpolation");
+		static const char *interpItems[] = { "None", "Interpolate", "Extrapolate" };
+		int current = static_cast<int>(interpolation);
+		if (ImGui::Combo("Mode", &current, interpItems, IM_ARRAYSIZE(interpItems)))
+		{
+			interpolation = static_cast<RB_INTERPOLATION>(current);
+		}
+	}
+
+
 	void Rigidbody::Uninit()
 	{
 	}

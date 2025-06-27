@@ -3,12 +3,19 @@
 
 namespace ym
 {
-
+	struct LumPassConstants
+	{
+		float threshold = 0.95f;
+		float padding[3];
+		float knee = 0.1f;
+		float padding2[3];
+	};
 
 	class Device;
 	class CommandList;
 
 	class Buffer;
+	class ConstantBufferView;
 	class VertexBufferView;
 	class IndexBufferView;
 
@@ -28,11 +35,15 @@ namespace ym
 		void Uninit() override;
 		void Update() override;
 		void Draw() override;
+		void DrawImgui() override;
 		void SetMaterial() override;
 	private:
 		void CreateBuffer();
 		void CreateShader();
 		void CreatePipelineState();
+		void UpdateBuffer();
+
+		void CreateConstantBuffer();
 	private:
 		Vertex2D vertices_[4]
 		{
@@ -55,6 +66,12 @@ namespace ym
 
 		std::shared_ptr<RootSignature> copyRootSignature_;
 		std::shared_ptr<GraphicsPipelineState> copyPipelineState_;
+
+		LumPassConstants constants_;
+		LumPassConstants *pConstants_;
+
+		std::shared_ptr<Buffer> constantBuffer_;
+		std::shared_ptr<ConstantBufferView> constantBufferView_;
 
 	};
 

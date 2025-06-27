@@ -109,6 +109,7 @@ namespace ym
 
 	bool Texture::LoadTexture(Device *pDev, CommandList *pCmdList, const std::string filename, bool isForceSRGB, bool forceSysRam)
 	{
+		textureName_ = filename;
 		auto rM = ResourceManager::Instance();
 		//auto textureMap = rM->GetTextureMap();
 		if (rM->FindTexture(filename))
@@ -177,10 +178,10 @@ namespace ym
 		}
 		else
 		{
-			ym::ConsoleLog("failed to load texture");
-			ym::ConsoleLog("[%s]\n", filename.c_str());
+			ym::DebugLog("failed to load texture");
+			ym::DebugLog("[%s]\n", filename.c_str());
 			//LoadTexture(pDev, pCmdList, "asset/texture/test.png", isForceSRGB, forceSysRam);
-			auto renderer = Renderer::Instance();
+			static auto renderer = Renderer::Instance();
 			*this = *renderer->GetDummyTexture(DummyTex::White);
 		}
 		return res;

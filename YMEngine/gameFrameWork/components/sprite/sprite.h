@@ -36,6 +36,7 @@ namespace ym
 		void Update() override;
 		void Draw() override;
 		void Uninit() override;
+		const char *GetName() const override { return "Sprite"; }
 
 		void LoadTexture(const std::string &path);
 
@@ -88,4 +89,5 @@ namespace ym
 
 		bool isInit_ = false;
 	};
+	REGISTER_COMPONENT(Sprite);
 }

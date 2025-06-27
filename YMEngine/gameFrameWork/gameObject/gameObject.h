@@ -1,111 +1,101 @@
 #pragma once
 
-//#include "utility/transform/transform.h"
+#include "../propertyProvider/propertyProvider.h"
+#include "../propertyProvider/transform/transformPropertyProvider.h"
 
-namespace ym
-{
+namespace ym {
 
-	class GameObjectManager;
-	class Component;
+    class GameObjectManager;
+    class Component;
 
+    class Object : public std::enable_shared_from_this<Object> {
+    public:
+        enum Type {
+            Delete,
+            None,
+            Max,
+        };
 
+        GameObjectManager *objectManager = nullptr;
 
-	//コピー用テンプレート
-	//class ClassName : public Object
-	//{
-	//public:
-	//	void Init()override;
-	//	void FixedUpdate()override;
-	//	void Update()override;
-	//	void Draw()override;
-	//	void Uninit()override;
-	//  std::shared_ptr<Object>Clone()override;
-	//};
+        Transform localTransform;
+        Transform worldTransform;
+        Type type = Type::None;
+        std::vector<std::shared_ptr<Component>> components;
+        std::vector<std::shared_ptr<Object>> _childs;
+        std::string name;
 
+        Object();
+        virtual ~Object();
 
-	class Object:public std::enable_shared_from_this<Object>
-	{
-	public:
-		enum Type
-		{
-			Delete,
-			None,
-			Max,
-		};
+        virtual void Init();
+        virtual void FixedUpdate();
+        virtual void Update();
+        virtual void Draw();
+        virtual void Uninit();
 
-		GameObjectManager *objectManager;//参照だけもつ
-		Transform localTransform;
-		Transform worldTransform;
-		Type type =Type::None;
-		std::vector<std::shared_ptr<Component>> components;
-		std::string name;
-		std::vector <std::shared_ptr<Object>> _childs;
-	private:
-		bool isUninit = false;
-	protected:
-		std::string tag;
-		std::shared_ptr<Object>_parent = nullptr;
-	public:
+        void DrawImgui();
+        void DrawInspector();
 
-		Object();
-		virtual ~Object();
+        std::shared_ptr<Object> GetParent() const;
+        void SetParent(std::shared_ptr<Object> newParent);
 
-		//初期化
-		virtual void Init() = 0;
+        virtual std::shared_ptr<Object> Clone();
 
-		//固定更新
-		virtual void FixedUpdate();
+        bool AddChild(std::shared_ptr<Object> child);
+        bool DeleteChild(const std::shared_ptr<Object> &child);
 
-		//更新
-		virtual void Update();
-			
-		//描画
-		virtual void Draw();
-		//解放
-		virtual void Uninit();
+        void UpdateHierarchy();
 
-		// 親オブジェクトを取得
-		std::shared_ptr<Object> GetParent() const; 
+        template <typename T>
+        std::shared_ptr<T> AddComponent() {
+            auto component = std::make_shared<T>(this);
+            component->Init();
+            if (component->isFailed) {
+                ym::ConsoleLog("Component %s initialization failed.\n", typeid(T).name());
+                return nullptr;
+            }
+            components.push_back(component);
+            return component;
+        }
 
-		// 親オブジェクトを設定
-		void SetParent(std::shared_ptr<Object> newParent);
+        void AddComponent(std::unique_ptr<Component> component);
 
-
-		virtual std::shared_ptr<Object>Clone() = 0;
-		//子供の追加(動くか未検証)
-		bool AddChild(std::shared_ptr<Object> child);
-		//子供の削除
-		bool DeleteChild(const std::shared_ptr<Object> &child);
-
-		void UpdateHierarchy();
-
-
-	
-
-		//コンポーネントの追加
-		template <typename T> std::shared_ptr<T> AddComponent()
-		{
-			// スマートポインタでメモリ管理
-			auto component = std::make_shared<T>(this);
-			component->Init();
-			components.push_back(component);
-			return component;
-		}
-		//コンポーネントの取得
-		template <typename T> std::shared_ptr<T> GetComponent()
-		{
-			for (auto &component : components)
-			{
-				// dynamic_cast を使用して、T 型にキャスト可能か判定
-				if (auto castedComponent = std::dynamic_pointer_cast<T>(component))
-				{
-					return castedComponent;
+        template <typename T>
+        std::shared_ptr<T> GetComponent() {
+            for (auto &component : components) {
+                if (auto casted = std::dynamic_pointer_cast<T>(component)) {
+                    return casted;
+                }
+            }
+            //このオブジェクトとも探す
+			for (auto &child : _childs) {
+				if (auto found = child->GetComponent<T>()) {
+					return found;
 				}
 			}
-			return nullptr;
-		}
-	};
+            return nullptr;
+        }
 
-}
+        template <typename T>
+        void RemoveComponent() {
+            components.erase(
+                std::remove_if(components.begin(), components.end(),
+                    [](const std::shared_ptr<Component> &c) {
+                        return std::dynamic_pointer_cast<T>(c) != nullptr;
+                    }),
+                components.end());
+        }
 
+        std::shared_ptr<Object> GetSharedPtr() {
+            return shared_from_this();
+        }
+        std::vector<std::unique_ptr<IPropertyProvider>>CollectPropertyProviders();
 
+    protected:
+        std::shared_ptr<Object> _parent = nullptr;
+        bool isActive = true;
+        bool isUninit = false;
+    };
+
+} // namespace ym

@@ -1,5 +1,6 @@
 #include "keyBoardInput.h"
 
+#include "application/application.h"
 namespace ym 
 {
 
@@ -8,37 +9,45 @@ namespace ym
 	HRESULT KeyboardInput::result = S_OK;
 	LPDIRECTINPUT8 KeyboardInput::input = nullptr;
 	LPDIRECTINPUTDEVICE8 KeyboardInput::key = nullptr;
-	BYTE KeyboardInput::keys[] = {};
-	BYTE KeyboardInput::olds[] = {};
+	BYTE KeyboardInput::keys[KEY_MAX] = {};
+	BYTE KeyboardInput::olds[KEY_MAX] = {};
 	std::unordered_map<std::string, UINT> KeyboardInput::keyMap{};
 
 
-	bool KeyboardInput::GetKey(const std::string &key)
+    bool KeyboardInput::GetKey(const std::string &key)
 	{
-		//キー情報を取得
-		this->key->GetDeviceState(sizeof(keys), &keys);
+		if (!Application::Instance()->IsWindowFocus())
+		{
+			return false;
+		}
 
 		return keys[keyMap[key]] & 0x80;
 	}
 
 	bool KeyboardInput::GetKeyDown(const std::string &key)
 	{
-		//キー情報を取得
-		this->key->GetDeviceState(sizeof(keys), &keys);
-
+		bool isFocus = Application::Instance()->IsWindowFocus();
+		if (!isFocus)
+		{
+			return false;
+		}
+		// キーが押された瞬間を検出
 		return (keys[keyMap[key]] & 0x80) && !(olds[keyMap[key]] & 0x80);
 	}
 
-	bool KeyboardInput::GetKeyUp(const std::string &key)
+    bool KeyboardInput::GetKeyUp(const std::string &key)
 	{
+		if (!Application::Instance()->IsWindowFocus())
+		{
+			return false;
+		}
 
-		//キー情報を取得
-		this->key->GetDeviceState(sizeof(keys), &keys);
 		return !(keys[keyMap[key]] & 0x80) && (olds[keyMap[key]] & 0x80);
 	}
 
 
-	KeyboardInput &KeyboardInput::GetInstance()
+
+	KeyboardInput &KeyboardInput::Instance()
 	{
 		static KeyboardInput instance;
 		return instance;

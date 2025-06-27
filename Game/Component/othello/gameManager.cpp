@@ -52,7 +52,7 @@ namespace ym
 
 	void GameManager::Update()
 	{
-		auto &kb = KeyboardInput::GetInstance();
+		auto &kb = KeyboardInput::Instance();
 
 		static Timer cpuTimer;
 

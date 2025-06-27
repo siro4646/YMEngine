@@ -6,6 +6,8 @@
 #include "../Game/Scene/TestScene/testScene.h"
 #include "../Game/Scene/TestScene2/testScene2.h"
 
+#include "../Game/Scene/ImguiTest/imguiTestScene.h"
+
 #include "Renderer/renderer.h"
 #include "device/device.h"
 
@@ -88,7 +90,9 @@ namespace ym {
     {
 		// テストシーンを追加
 		//PushScene(std::make_unique<TitleScene>());
-        PushScene(std::make_unique<TestScene>());
+        //PushScene(std::make_unique<ImguiTestScene>());
+        PushScene(std::make_unique<TestScene2>());
+
 
     }
     void SceneManager::Terminate()

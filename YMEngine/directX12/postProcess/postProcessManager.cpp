@@ -85,26 +85,31 @@ namespace ym
 		resultRTVs_[bbidx] = Renderer::Instance()->GetSceneRenderTargetView(bbidx ,type);
 		resultTextures_[bbidx] = Renderer::Instance()->GetSceneRenderTexture(bbidx, type);
 		resultTextureViews_[bbidx] = Renderer::Instance()->GetSceneRenderTargetTexView(bbidx,type);
+		ImGui::Begin("PostProccesMaterial");
 		for (auto material : materials_)
 		{
-			//ルートシグネチャなどシェーダーに渡す情報をセット
-			material->SetMaterial();
-			material->Draw();
-			//描画
-			cmdList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			cmdList->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_->GetView());
-			cmdList->GetCommandList()->IASetIndexBuffer(&indexBufferView_->GetView());
-			cmdList->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-			//描画したマテリアルのバリアを遷移
-			cmdList->TransitionBarrier(material->GetTexture(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+			material->DrawImgui();
+			if (material->IsUsed()) {
+				//ルートシグネチャなどシェーダーに渡す情報をセット
+				material->SetMaterial();
+				material->Draw();
+				//描画
+				cmdList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+				cmdList->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_->GetView());
+				cmdList->GetCommandList()->IASetIndexBuffer(&indexBufferView_->GetView());
+				cmdList->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
-			//描画したものをリザルトにコピーyyy
-			resultRTVs_[bbidx] = material->GetRTV();
-			resultTextures_[bbidx] = material->GetTexture();
-			resultTextureViews_[bbidx] = material->GetTextureView();
+				//描画したマテリアルのバリアを遷移
+				cmdList->TransitionBarrier(material->GetTexture(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
+				//描画したものをリザルトにコピーyyy
+				resultRTVs_[bbidx] = material->GetRTV();
+				resultTextures_[bbidx] = material->GetTexture();
+				resultTextureViews_[bbidx] = material->GetTextureView();
+			}
 		}
+		ImGui::End();
 	}
 	void PostProcessManager::AddPostProcessMaterial(PostProcessMaterial *material)
 	{

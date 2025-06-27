@@ -44,10 +44,11 @@ namespace ym
 			heapType = D3D12_HEAP_TYPE_READBACK;
 		}
 
-		size_t allocSize = size;
+		size_t allocSize = size;	
 		if (type == BufferUsage::ConstantBuffer)
 		{
 			allocSize = GetAlignedSize(allocSize, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT);
+			//ym::ConsoleLogRelease("元バッファのサイズ : %d, アライメント後のサイズ : %d\n", size, allocSize);
 		}
 
 		// ByteAddressBufferの場合はR32_TYPELESSに設定する
@@ -119,7 +120,7 @@ namespace ym
 				memcpy(p + offset, pData, size);
 				//std::cout << "Data copied to upload buffer" << std::endl;
 			}
-			Unmap();
+				Unmap();
 		}
 		else
 		{

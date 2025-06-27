@@ -74,7 +74,7 @@ namespace ym
 		_renderer->Update();
 		BaseScene::Update();
 
-		auto &kb = KeyboardInput::GetInstance();
+		auto &kb = KeyboardInput::Instance();
 
 
 		//_testObject->Update();

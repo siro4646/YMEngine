@@ -4,6 +4,8 @@
 #include "Game/Object/TestObject.h"
 #include "Game/Object/TestObject2.h"
 
+#include "gameFrameWork/requiredObject/sphereMap/sphereMap.h"
+
 
 #include "gameFrameWork/requiredObject/mainCamera.h"
 #include "rootSignature/rootSignature.h"
@@ -22,21 +24,147 @@
 
 #include "application/application.h"
 
+#include "gpuParticle/gpuParticle.h"
+#include "gameFrameWork/components/fbxLoader/fbxLoader.h"
+#include "gameFrameWork/requiredObject/sceneOcTree/sceneOcTree.h"
+#include "gameFrameWork/collider/collider.h"
+
+#include "gameFrameWork/meshGenerator/meshGenerator.h"
+
+#include "gameFrameWork/components/rigidBody/rigidBody.h"
+#include "Game/Component/Test/testComponent.h"
+#include "gameFrameWork/components/mesh/filter/meshFilter.h"
+#include "gameFrameWork/components/mesh/loader/meshLoader.h"
+#include "gameFrameWork/components/mesh/renderer/meshRenderer.h"
+
+#include "components/animation/curve/animationCurve.h"
+#include "components/animation/animator/animator.h"
+#include "components/animation/clip/animationClip.h"
+
 namespace ym
 {
+	// GameObjectにAnimatorを追加して、アニメーションクリップを設定する
+	void SetupTestAnimation(Object *obj)
+	{
+		//// 1. Animatorを追加
+		//auto animator = obj->AddComponent<ym::Animator>();
+		//if (!animator) return;
+
+		//// 2. クリップ作成
+		//auto clip = std::make_shared<ym::AnimationClip>();
+		//clip->length = 1.0f; // 1秒ループ
+
+		//// 3. 対象の自分自身にカーブを設定（"ObjectName"）
+		//// ※階層構造でRoot/Childなどがあればそのパスで指定
+		//auto &curves = clip->AddCurvesForPath(obj->name);
+
+		//// Y軸に沿って上下するアニメーション（0→1→0）
+		//curves.posY.AddKey(0.0f, 0.0f);
+		//curves.posY.AddKey(0.5f, 2.0f);
+		//curves.posY.AddKey(1.0f, 0.0f);
+
+		///*curves.sclX.AddKey(0.0f,obj->localTransform.Scale.x);
+		//curves.sclX.AddKey(0.5f, 10.0f);
+		//curves.sclX.AddKey(1.0f,obj->localTransform.Scale.x);
+
+		//curves.sclY.AddKey(0.0f, obj->localTransform.Scale.y);
+		//curves.sclY.AddKey(0.5f, 10.0f);
+		//curves.sclY.AddKey(1.0f, obj->localTransform.Scale.y);
+
+		//curves.sclZ.AddKey(0.0f, obj->localTransform.Scale.z);
+		//curves.sclZ.AddKey(0.5f, 10.0f);
+		//curves.sclZ.AddKey(1.0f, obj->localTransform.Scale.z);*/
+
+
+		//// 4. Animatorにクリップ追加
+		//animator->AddClip("Bounce", clip);
+
+		//// 5. 再生（ループ）
+		//animator->Play("Bounce", true);
+	}
+
+
 	void TestScene2::Init()
 	{
 		BaseScene::Init();
 
 		ym::ConsoleLog("TestScene2::Init()\n");
-		_renderer = Renderer::Instance();
-		auto comCmdList = _renderer->GetComputeCommandList();
-		//comCmdList->GetCommandList
-		//_testObject->Init();
+
+		_renderer = Renderer::Instance();		
+
+		gameObjectManager_->AddGameObject(std::make_shared<SphereMap>());
 		_mainCamera = std::make_shared<MainCamera>();
+		_mainCamera->localTransform.Position = Vector3(0, 2, -5);
 		gameObjectManager_->AddGameObject(_mainCamera);
 
-		CreateAsset();
+		gameObjectManager_->AddGameObject(std::make_shared<SceneOcTree>());
+
+		auto obj = MeshGenerator::GenerateCube(gameObjectManager_, "Cube1");
+		obj->localTransform.Scale.x *= 5;
+		obj->localTransform.Scale.z *= 5;
+		obj->localTransform.Rotation.y = 90;
+
+		for (int i = 0; i < 5; i++)
+		{
+			auto obj2 = MeshGenerator::GenerateCube(gameObjectManager_, "Cube" + std::to_string(i));
+			obj2->localTransform.Position.x += i * 2.0f;
+			obj2->localTransform.Position.y += 1.0f;
+			obj2->localTransform.Scale.x *= 0.5f;
+			obj2->localTransform.Scale.z *= 0.5f;
+		}
+
+		//obj->AddComponent<Animator>();
+		//SetupTestAnimation(obj);
+		/*auto obj2 = MeshGenerator::GenerateCube(gameObjectManager_, "Cube2");
+		obj2->localTransform.Position.y += 2.0f;
+		obj2->localTransform.Scale.x *= 4;
+		obj2->localTransform.Scale.z *= 4;
+		obj2->AddComponent<Rigidbody>().get();*/
+
+		/*auto sphere = MeshGenerator::GenerateSphere(gameObjectManager_, "Sphere");
+		sphere->localTransform.Position.y += 2.0f;
+		sphere->localTransform.Scale.x *= 2;
+		sphere->localTransform.Scale.y *= 2;
+		sphere->localTransform.Scale.z *= 2;
+		sphere->AddComponent<Rigidbody>();*/
+		//mf->SetMeshInstance(mesh::MeshLoader::LoadMesh("asset/Alicia/FBX/Alicia_solid_Unity.FBX"));
+		//mf->SetMeshInstance(mesh::MeshLoader::LoadMesh("asset/sponza (1)/sponza.obj"));
+		//sphere->AddComponent<TestComponent>();
+
+		/*sphere = MeshGenerator::GenerateSphere(gameObjectManager_, "Sphere2");
+		sphere->localTransform.Position.y += 2.0f;
+		sphere->localTransform.Position.x += 2.0f;
+		sphere->localTransform.Scale.x *= 2;
+		sphere->localTransform.Scale.y *= 2;
+		sphere->localTransform.Scale.z *= 2;
+		sphere->AddComponent<Rigidbody>();*/
+		//sphere->AddComponent<TestComponent>();
+
+
+
+		/*auto obj1 = gameObjectManager_->AddGameObject(std::make_shared<Object>());
+		obj1->name = "TestObject";
+		obj1->localTransform.Position.x = 0;
+		obj1->localTransform.Position.y = 1;*/
+		//SetupTestAnimation(obj1.get());
+		//mesh::MeshLoader::LoadMeshHierarchy(obj1, "asset/Alicia/FBX/Alicia_solid_Unity.FBX");
+		//mesh::MeshLoader::LoadMeshHierarchy(obj1, "asset/X Bot.fbx");
+		//mesh::MeshLoader::LoadMeshHierarchy(obj1, "asset/sponza1/sponza.obj");
+		//mesh::MeshLoader::LoadMeshHierarchy(obj1, "asset/model/cube.obj");
+		//auto mf = obj1->AddComponent<mesh::MeshFilter>().get();
+		//mf->SetMeshInstance(mesh::MeshLoader::LoadMesh("asset/Alicia/FBX/Alicia_solid_Unity.FBX"));
+		//obj1->AddComponent(ComponentRegistry::Create("MeshRenderer", obj1.get()));
+		//auto mr = obj1->AddComponent<mesh::MeshRenderer>().get();
+
+		//obj->localTransform.Scale.x *= 5;
+		//obj->localTransform.Scale.z *= 5;
+		//obj->localTransform.Rotation.y = 90;
+		////auto fbx = obj->AddComponent<FBXLoader>().get();
+		////fbx->Load(ImportSettings{ L"asset/model/cube.obj", ModelSetting::InverseV | ModelSetting::AdjustCenter | ModelSetting::AdjustScale });
+		//auto col = obj->AddComponent<BoxCollider>().get();
+
+
+
 		//_mainCamera->Init();
 	}
 	void TestScene2::UnInit()
@@ -67,14 +195,16 @@ namespace ym
 	void TestScene2::Update()
 	{
 		_renderer->Update();
+
+
+
 		BaseScene::Update();
 	}
 	void TestScene2::Draw()
 	{
 		_renderer->BeginFrame();
 		BaseScene::Draw();
-		SendDataToGPU();
-
+		//SendDataToGPU();
 		_renderer->Draw();
 		_renderer->EndFrame();
 	}

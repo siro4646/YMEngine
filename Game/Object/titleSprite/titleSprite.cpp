@@ -50,7 +50,7 @@ namespace ym {
 	void TitleSprite::Update()
 	{
 		Object::Update();
-		auto &kb = KeyboardInput::GetInstance();
+		auto &kb = KeyboardInput::Instance();
 		if (kb.GetKeyDown("SPACE")&& !isGameStart)
 		{
 			isGameStart = true;

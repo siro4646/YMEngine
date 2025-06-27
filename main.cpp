@@ -1,7 +1,7 @@
 #include "application/application.h"
 #ifdef _DEBUG
 int main() {
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	// ƒƒ‚ƒŠƒŠ[ƒN‚ğ’m‚ç‚¹‚é
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½[ï¿½Nï¿½ï¿½mï¿½ç‚¹ï¿½ï¿½
 	ym::EnableDebugLayer();
 #else
 #include<Windows.h>

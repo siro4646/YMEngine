@@ -1,0 +1,4 @@
+namespace ym
+{
+	Random GlobalRandom{};
+}

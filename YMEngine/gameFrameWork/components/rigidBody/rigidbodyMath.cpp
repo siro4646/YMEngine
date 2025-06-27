@@ -187,26 +187,30 @@ namespace ym {
     }
 
     void Rigidbody::UpdatePosition() {
-        object->localTransform.Position += velocity * Application::Instance()->GetDeltaTime();
+        float dt = Application::Instance()->GetFixedDeltaTime();
+        object->localTransform.Position += velocity * dt;
     }
 
     void Rigidbody::UpdateVelocity() {
+        float dt = Application::Instance()->GetFixedDeltaTime();
+
         velocity += force;
         auto preVelocity = velocity;
 
         if (velocity.Length() > 0) {
-            velocity *= (1.0f - drag * Application::Instance()->GetDeltaTime());
+            velocity *= (1.0f - drag * dt);
         }
 
         if (isGround) {
             float frictionCoefficient = 0.3f;
-            Vector3 friction = -velocity.Normalize() * frictionCoefficient * Application::Instance()->GetDeltaTime();
+            Vector3 friction = -velocity.Normalize() * frictionCoefficient * dt;
             velocity += friction;
 
             if (velocity.Length() < 0.01f) {
                 velocity = Vector3::zero;
             }
         }
+
     }
 
     void Rigidbody::ResolveCollision(Object *hitTarget, Vector3 normal)
@@ -348,11 +352,15 @@ namespace ym {
 
                     if (previousTriggers.find(obj) == previousTriggers.end()) {
                         for (auto &component : object->components) {
+							if (!component->isEnabled)
+								continue; // コンポーネントが無効な場合はトリガーイベントを送らない
                             component->OnTriggerEnter(triggerCollision);
                         }
                     }
                     else {
                         for (auto &component : object->components) {
+							if (!component->isEnabled)
+								continue; // コンポーネントが無効な場合はトリガーイベントを送らない
                             component->OnTriggerStay(triggerCollision);
                         }
                     }
@@ -368,11 +376,15 @@ namespace ym {
 
                 if (previousCollisions.find(obj) == previousCollisions.end()) {
                     for (auto &component : object->components) {
+						if (!component->isEnabled)
+							continue; // コンポーネントが無効な場合は衝突イベントを送らない
                         component->OnCollisionEnter(collision);
                     }
                 }
                 else {
                     for (auto &component : object->components) {
+						if (!component->isEnabled)
+							continue; // コンポーネントが無効な場合は衝突イベントを送らない
                         component->OnCollisionStay(collision);
                     }
                 }
@@ -449,9 +461,14 @@ namespace ym {
                 currentCollisions.insert(collision.object);
                 for (auto &component : object->components) {
                     if (previousCollisions.find(collision.object) == previousCollisions.end()) {
+						if (!component->isEnabled)
+							continue; // コンポーネントが無効な場合は衝突イベントを送らない
                         component->OnCollisionEnter(collision);
+
                     }
                     else {
+						if (!component->isEnabled)
+							continue; // コンポーネントが無効な場合は衝突イベントを送らない
                         component->OnCollisionStay(collision);
                     }
                 }
@@ -464,9 +481,11 @@ namespace ym {
                 currentTriggers.insert(trigger.object);
                 for (auto &component : object->components) {
                     if (previousTriggers.find(trigger.object) == previousTriggers.end()) {
+						if (!component->isEnabled) continue; // コンポーネントが無効な場合はトリガーイベントを送らない
                         component->OnTriggerEnter(trigger);
                     }
                     else {
+						if (!component->isEnabled) continue; // コンポーネントが無効な場合はトリガーイベントを送らない
                         component->OnTriggerStay(trigger);
                     }
                 }
@@ -474,11 +493,13 @@ namespace ym {
                 {
                     if (previousTriggers.find(trigger.object) == previousTriggers.end())
                     {
+						if (!component->isEnabled) continue; // コンポーネントが無効な場合はトリガーイベントを送らない
 						Collision triggerCollision = Collision::CreateCollision(collider, object, trigger.contactPoint, trigger.normal);
                         component->OnTriggerEnter(triggerCollision);
                     }
                     else
                     {
+						if (!component->isEnabled) continue; // コンポーネントが無効な場合はトリガーイベントを送らない
 						Collision triggerCollision = Collision::CreateCollision(collider, object, trigger.contactPoint, trigger.normal);
 						component->OnTriggerStay(triggerCollision);
                     }
@@ -494,12 +515,14 @@ namespace ym {
                 {
                     for (auto &component : object->components)
                     {
+						if (!component->isEnabled) continue; // コンポーネントが無効な場合はトリガーイベントを送らない
 						Collision triggerCollision = Collision::CreateCollision(obj->GetComponent<Collider>().get(), obj, Vector3::zero, Vector3::zero);
 						component->OnTriggerExit(triggerCollision);
 					}
                     //トリガー側も
                     for (auto &component : obj->components)
                     {
+						if (!component->isEnabled) continue; // コンポーネントが無効な場合はトリガーイベントを送らない
 						Collision triggerCollision = Collision::CreateCollision(collider, object, Vector3::zero, Vector3::zero);
 						component->OnTriggerExit(triggerCollision);
                     }

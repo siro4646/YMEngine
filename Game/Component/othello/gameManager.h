@@ -26,6 +26,7 @@ namespace ym
 		int CountFlippableDisks(int index, KomaType currentColor);
 		void Draw()override;
 		void Uninit()override;
+		const char *GetName() const override { return "GameManager"; }
 
 		void Put();
 		void Put(int _x, int _y);

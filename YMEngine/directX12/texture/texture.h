@@ -80,7 +80,10 @@ namespace ym
 			textureMap_.clear();
 		}
 
+
+
 		//Getter
+		string GetTextureName() const { return textureName_; }
 		ID3D12Resource *GetResourceDep() { return pResource_.Get(); }
 		const TextureDesc &GetTextureDesc() const { return textureDesc_; }
 		const D3D12_RESOURCE_DESC &GetResourceDesc() const { return resourceDesc_; }
@@ -105,7 +108,7 @@ namespace ym
 
 	private:
 		static  std::unordered_map<std::string,ym::Texture> textureMap_;
-
+		std::string textureName_;
 		ComPtr<ID3D12Resource> pResource_{ nullptr };
 		TextureDesc textureDesc_{};
 		D3D12_RESOURCE_DESC resourceDesc_{};

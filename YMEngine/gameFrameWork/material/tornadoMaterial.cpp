@@ -31,7 +31,7 @@ namespace ym
 	void TornadoMaterial::Update()
 	{
 		if (isInit_ == false) return;
-		auto &input = KeyboardInput::GetInstance();		
+		auto &input = KeyboardInput::Instance();		
 		// マップしてデータを更新
 		data_.time += 0.03f;
 		data_.dissolve = 0.65f;

@@ -6,6 +6,7 @@
 
 
 namespace ym {
+	class Object;
 	/*class Vector2;
 	class Vector3;*/
 
@@ -34,8 +35,70 @@ namespace ym {
 		//クォータニオン
 		Quaternion quaternion;
 
+		Object *gameObject = nullptr;
+
 		Transform() : Position(0, 0, 0), Scale(1.f, 1.f, 1.f), Rotation(0, 0, 0) {}
 		Transform(Vector3 pos, Vector3 scale, Vector3 rot) : Position(pos), Scale(scale), Rotation(rot) {}
+
+		static Transform FromMatrix(const XMMATRIX &matrix)
+		{
+			Transform transform;
+
+			XMVECTOR scaleVec, rotQuat, translation;
+			if (XMMatrixDecompose(&scaleVec, &rotQuat, &translation, matrix))
+			{
+				// 位置
+				transform.Position = Vector3(
+					XMVectorGetX(translation),
+					XMVectorGetY(translation),
+					XMVectorGetZ(translation)
+				);
+
+				// スケール
+				transform.Scale = Vector3(
+					XMVectorGetX(scaleVec),
+					XMVectorGetY(scaleVec),
+					XMVectorGetZ(scaleVec)
+				);
+
+				// 回転（オイラー角に変換）
+				XMFLOAT4 q;
+				XMStoreFloat4(&q, rotQuat);
+
+				float ysqr = q.y * q.y;
+
+				// Pitch（X軸）
+				float t0 = +2.0f * (q.w * q.x + q.y * q.z);
+				float t1 = +1.0f - 2.0f * (q.x * q.x + ysqr);
+				float pitch = atan2(t0, t1);
+
+				// Yaw（Y軸）
+				float t2 = +2.0f * (q.w * q.y - q.z * q.x);
+				t2 = std::clamp(t2, -1.0f, 1.0f);
+				float yaw = asin(t2);
+
+				// Roll（Z軸）
+				float t3 = +2.0f * (q.w * q.z + q.x * q.y);
+				float t4 = +1.0f - 2.0f * (ysqr + q.z * q.z);
+				float roll = atan2(t3, t4);
+
+				transform.Rotation = Vector3(
+					XMConvertToDegrees(pitch),
+					XMConvertToDegrees(yaw),
+					XMConvertToDegrees(roll)
+				);
+			}
+
+			return transform;
+		}
+
+		inline void SetObject(Object *obj) {
+			gameObject = obj;
+		}
+		inline Object *GetOwner() {
+			return gameObject;
+		}
+
 
 		inline XMMATRIX GetMatrixRotation()
 		{

@@ -29,7 +29,7 @@ namespace ym
 		//localTransform.Scale = { 3.0f,0.01f,3.0f };
 		//localTransform.Scale *= 10;
 
-		localTransform.Scale *= 50;
+		localTransform.Scale *= 5;
 
 		localTransform.Rotation.y = 90;
 		//localTransform.Position = { 0.0f,-0.5f,1.2f };
@@ -99,7 +99,7 @@ namespace ym
 
 	void TestObject::Update()
 	{
-		auto &input = KeyboardInput::GetInstance();
+		auto &input = KeyboardInput::Instance();
 		static float speed = 0.0f;
 		static bool flag = false;
 		//if (!flag)

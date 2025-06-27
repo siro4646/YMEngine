@@ -150,7 +150,7 @@ namespace ym {
             return (*this) * (1 / len);
         }
 
-		inline Vector3 Min(const Vector3 &a, const Vector3 &b) {
+		static inline Vector3 Min(const Vector3 &a, const Vector3 &b) {
 			return Vector3(
 				std::min(a.x, b.x),
 				std::min(a.y, b.y),
@@ -158,7 +158,7 @@ namespace ym {
 			);
 		}
 
-        inline Vector3 Max(const Vector3 &a, const Vector3 &b) {
+       static inline Vector3 Max(const Vector3 &a, const Vector3 &b) {
 
 			return Vector3(
 				std::max(a.x, b.x),

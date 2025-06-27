@@ -107,7 +107,7 @@ namespace ym
 
 	void Player::FixedUpdate()
 	{
-		auto &input = KeyboardInput::GetInstance();
+		auto &input = KeyboardInput::Instance();
 
 
 		const float speed = 10;
@@ -145,7 +145,7 @@ namespace ym
 
 	void Player::Update()
 	{
-		auto &input = KeyboardInput::GetInstance();		
+		auto &input = KeyboardInput::Instance();		
 
 		subCamera_->UpdateViewMatrix();
 		subCamera_->UpdateProjectionMatrix();

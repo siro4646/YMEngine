@@ -11,6 +11,8 @@ namespace ym
 	class SceneOcTree : public Object
 	{
 	public:
+		
+
 		void Init()override;
 		void FixedUpdate()override;
 		void Update()override;

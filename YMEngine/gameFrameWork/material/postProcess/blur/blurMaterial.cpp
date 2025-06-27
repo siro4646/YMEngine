@@ -18,6 +18,8 @@
 
 #include "renderTargetManager/renderTargetManager.h"
 
+#include "blurTexture/blurTextureGenerator.h"
+
 namespace ym
 {
 	void BlurMaterial::Init()
@@ -115,7 +117,7 @@ namespace ym
 		cmdList->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_->GetView());
 		cmdList->GetCommandList()->IASetIndexBuffer(&indexBufferView_->GetView());
 		
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 8; i++)
 		{
 
 			cmdList->GetCommandList()->RSSetViewports(1, &vp);
@@ -135,16 +137,27 @@ namespace ym
 		//元のサイズに戻す
 		Renderer::Instance()->SetViewPort();
 
+
+		BlurTextureGenerator::Instance()->Draw(shrinkTexture_.get(), shrinkTexView_.get());
+
+		auto blurTex = BlurTextureGenerator::Instance()->GetBlurTexture();
+		auto blurView = BlurTextureGenerator::Instance()->GetBlurTextureView();
+
+
 		PostProcessMaterial::SetMaterial();
 
-		//最終結果を書き込む
 
 		//テクスチャをシェーダーに渡すためにバリアを遷移
 		cmdList->TransitionBarrier(tex, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+		cmdList->TransitionBarrier(blurTex, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		//最終結果を書き込む
+
+
 		cmdList->GetCommandList()->SetPipelineState(pipelineState_->GetPSO());
 		descriptorSet_->Reset();		
 		descriptorSet_->SetPsSrv(0, lumTexView->GetDescInfo().cpuHandle);
-		descriptorSet_->SetPsSrv(1, shrinkTexView_->GetDescInfo().cpuHandle);
+		descriptorSet_->SetPsSrv(1, blurView->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSrv(2, texView->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSampler(0, sampler_->GetDescInfo().cpuHandle);
 		cmdList->SetGraphicsRootSignatureAndDescriptorSet(rootSignature_.get(), descriptorSet_.get());

@@ -23,12 +23,13 @@ namespace ym
 	{
 		PostProcessMaterial::Init();
 
-		CreateBuffer();
 		CreateShader();
+		CreateBuffer();
 		PostProcessMaterial::BaseRootSignature();
 		PostProcessMaterial::BaseSampler();
 		//PostProcessMaterial::BasePipelineState();
 		CreatePipelineState();
+		CreateConstantBuffer();
 	}
 	void LumPassMaterial::Uninit()
 	{
@@ -37,6 +38,10 @@ namespace ym
 		indexBufferView_.reset();
 		indexBuffer_.reset();
 
+		constantBuffer_->Unmap();
+		constantBuffer_.reset();
+		constantBufferView_->Destroy();
+		constantBufferView_.reset();
 
 
 		copyVS_.reset();
@@ -47,10 +52,22 @@ namespace ym
 	}
 	void LumPassMaterial::Update()
 	{
-		PostProcessMaterial::Update();		
+		PostProcessMaterial::Update();
+		UpdateBuffer();
+
+		//pipelineState_->Update(device_);
+
 	}
 	void LumPassMaterial::Draw()
 	{
+	}
+	void LumPassMaterial::DrawImgui()
+	{
+		ImGui::Text("LumPassMaterial");
+		PostProcessMaterial::DrawImgui("LumPassMaterial");
+		ImGui::SliderFloat("Threshold", &constants_.threshold, 0.0f, 1.0f);
+		ImGui::SliderFloat("Knee", &constants_.knee, 0.0f, 1.0f);
+
 	}
 	void LumPassMaterial::SetMaterial()
 	{
@@ -79,6 +96,7 @@ namespace ym
 		descriptorSet_->Reset();
 		descriptorSet_->SetPsSrv(0, colorView->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSampler(0, sampler_->GetDescInfo().cpuHandle);
+		descriptorSet_->SetPsCbv(0, constantBufferView_->GetDescInfo().cpuHandle);
 		cmdList->SetGraphicsRootSignatureAndDescriptorSet(rootSignature_.get(), descriptorSet_.get());
 		cmdList->GetCommandList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 		cmdList->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_->GetView());
@@ -183,5 +201,35 @@ namespace ym
 		desc.numRTVs = 0;
 		desc.rtvFormats[desc.numRTVs++] = device_->GetSwapChain().GetCurrentTexture()->GetTextureDesc().format;
 		copyPipelineState_->Init(device_, desc);
-	}	
+	}
+	void LumPassMaterial::UpdateBuffer()
+	{
+		void *p = (LumPassConstants *)constantBuffer_->Map();
+		if (p)
+		{
+			memcpy(p, &constants_, sizeof(constants_));
+			constantBuffer_->Unmap();
+		}
+
+		//pConstants_ = &constants_;
+	}
+
+	void LumPassMaterial::CreateConstantBuffer()
+	{
+		auto renderer = Renderer::Instance();
+		device_ = renderer->GetDevice();
+		graphicsCmdList_ = renderer->GetGraphicCommandList();
+
+		constantBuffer_ = std::make_shared<Buffer>();
+		constantBuffer_->Init(device_, sizeof(LumPassConstants), sizeof(LumPassConstants), BufferUsage::ConstantBuffer, true, false);
+		constantBufferView_ = std::make_shared<ConstantBufferView>();
+		constantBufferView_->Init(device_, constantBuffer_.get());
+		pConstants_ = (LumPassConstants *)constantBuffer_->Map();
+
+		constants_.threshold = 0.95f; // 適当な初期値
+		constants_.knee = 0.01f; // 適当な初期値
+
+		UpdateBuffer();
+	}
+
 }

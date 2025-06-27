@@ -44,6 +44,7 @@ namespace ym
 		void Update() override;
 		void Draw() override;
 		void Uninit() override;
+		const char *GetName() const override { return "FBXLoader"; }
 		void SetMaterial(std::shared_ptr<Material>material, u32 index);
 
 		std::vector<Mesh> Load(ImportSettings settings); // FBXƒtƒ@ƒCƒ‹‚ğ“Ç‚İ‚Ş

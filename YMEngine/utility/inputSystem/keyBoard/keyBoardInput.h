@@ -197,9 +197,31 @@ namespace ym {
 		bool GetKeyDown(const std::string &key) override;
 		bool GetKeyUp(const std::string &key) override;
 
-		static KeyboardInput &GetInstance();
+		static KeyboardInput &Instance();
 
 		void Initialize(HWND hWnd);
+
+		void Poll()  // –ˆƒtƒŒ[ƒ€Å‰‚É‚±‚ê‚ðŒÄ‚Ô
+		{
+
+			HRESULT hr = this->key->GetDeviceState(sizeof(keys), &keys);
+			if (FAILED(hr))
+			{
+				HRESULT acq = this->key->Acquire();
+				if (FAILED(acq))
+				{
+					ym::ConsoleLogRelease("Keyboard Acquire failed! HRESULT=%08X\n", acq);
+				}
+				else
+				{
+					ym::ConsoleLogRelease("Keyboard Acquire success\n");
+				}
+
+				memset(keys, 0, sizeof(keys));
+				this->key->GetDeviceState(sizeof(keys), &keys);
+			}
+
+		}
 
 		void Update()
 		{

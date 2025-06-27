@@ -28,6 +28,10 @@ namespace ym
         {
 			gameObjectManager_->Draw();
         }
+		std::shared_ptr<GameObjectManager> GetGameObjectManager() const
+		{
+			return gameObjectManager_;
+		}
     protected:
 		std::shared_ptr<GameObjectManager> gameObjectManager_;
     };

@@ -4,7 +4,7 @@
 
 #include "device/device.h"
 #include "Renderer/renderer.h"
-
+#include "scene/sceneManager.h"
 
 namespace ym
 {
@@ -31,14 +31,14 @@ namespace ym
 	}
 	void LightManager::CreateBuffer()
 	{
-		int CreateNum = 1000;
+		int CreateNum = 50;
 		auto renderer = Renderer::Instance();
 		auto device = renderer->GetDevice();
-		auto dataSize = sizeof(PointLightData) * 1000;
+		auto dataSize = sizeof(PointLightData) * CreateNum;
 		pointLightBuffer = std::make_shared<Buffer>();
 		pointLightBuffer->Init(device, dataSize, sizeof(PointLightData), BufferUsage::ShaderResource,false,false);
 		pointLightBufferView = std::make_shared<BufferView>();
-		pointLightBufferView->Init(device,pointLightBuffer.get(),0, 1000,sizeof(PointLightData));
+		pointLightBufferView->Init(device,pointLightBuffer.get(),0, CreateNum,sizeof(PointLightData));
 		pointLightBuffer->UpdateBuffer(device, renderer->GetGraphicCommandList(), pointLightDatas.data(), dataSize);
 
 		constantBuffer_ = std::make_shared<Buffer>();

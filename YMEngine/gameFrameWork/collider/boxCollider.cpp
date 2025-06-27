@@ -5,6 +5,11 @@
 
 #include "gameFrameWork/material/debugMaterial.h"
 
+#include "utility/debug/debugDraw.h"
+
+#include "camera/cameraManager.h"
+#include "camera/camera.h"
+
 
 namespace ym
 {
@@ -14,7 +19,10 @@ namespace ym
 	{
 		const wchar_t *modelFile = L"asset/model/cube.obj";
 		//material->Init();
-
+		size = Vector3::zero;
+		transform.Position = GetCenter(); // 中心座標を初期化
+		transform.Scale = object->worldTransform.Scale; // スケールを初期化
+		transform.Rotation = object->worldTransform.Rotation;
 		int flag = 0;
 		flag |= ModelSetting::InverseV;
 		//flag |= ModelSetting::InverseU;
@@ -26,16 +34,17 @@ namespace ym
 			flag
 		};
 
-		auto objLoader = object->AddComponent<OBJLoader>().get();
-		auto meshes = objLoader->Load(importSetting);
-		int count = 0;
-		for (auto &mesh : meshes)
-		{
-			auto debugMaterial = std::make_shared<DebugMaterial>();
-			//debugMaterial->SetMainTex("asset/texture/white.dds");
-			objLoader->SetMaterial(debugMaterial, count);
-			count++;
-		}
+		//auto objLoader = object->AddComponent<OBJLoader>().get();
+		//objLoader->SetTransform(&transform);
+		//auto meshes = objLoader->Load(importSetting);
+		//int count = 0;
+		//for (auto &mesh : meshes)
+		//{
+		//	auto debugMaterial = std::make_shared<DebugMaterial>();
+		//	//debugMaterial->SetMainTex("asset/texture/white.dds");
+		//	objLoader->SetMaterial(debugMaterial, count);
+		//	count++;
+		//}
 
 
 		Collider::Init();
@@ -45,8 +54,10 @@ namespace ym
 	}
 
 	void BoxCollider::Update()
-	{
-		
+	{		
+		transform.Position = GetCenter(); // 中心座標を初期化
+		transform.Scale = object->worldTransform.Scale; // スケールを初期化
+		transform.Rotation = object->worldTransform.Rotation;
 	}
 
 	void BoxCollider::FixedUpdate()
@@ -59,7 +70,7 @@ namespace ym
 
 	void BoxCollider::Draw()
 	{
-
+		debug::DebugDraw::Instance().WireCube(object->worldTransform); // デバッグ描画
 	}
 
 	void BoxCollider::Uninit()
@@ -210,5 +221,47 @@ namespace ym
 
 		return closestPoint + center; // ワールド座標に戻す
 	}
+
+	// レイとOBB(BoxCollider)との交差判定
+	bool BoxCollider::Raycast(const Ray &ray, float &t, Vector3 &hitPoint) const {
+		Vector3 center = GetCenter();             // OBBの中心座標
+		auto axes = GetLocalAxes();               // OBBのローカル軸（回転ベクトル）
+		Vector3 halfSize = GetScale();            // OBBの半サイズ（スケーリング済）
+
+		Vector3 toCenter = center - ray.origin;   // レイ原点からOBB中心へのベクトル
+		float tMin = 0.0f;
+		float tMax = FLT_MAX;
+
+		for (int i = 0; i < 3; ++i) {
+			float e = axes[i].Dot(toCenter);      // OBB軸方向への距離成分
+			float f = axes[i].Dot(ray.direction); // レイ方向のOBB軸投影成分
+
+			if (std::abs(f) > 1e-6f) {
+				// t1: 面1との交点 / t2: 面2との交点
+				float t1 = (e + halfSize[i]) / f;
+				float t2 = (e - halfSize[i]) / f;
+
+				if (t1 > t2) std::swap(t1, t2);
+
+				tMin = std::max(tMin, t1);
+				tMax = std::min(tMax, t2);
+
+				if (tMin > tMax)
+					return false; // レイが箱を貫通していない
+			}
+			else {
+				// レイが軸と平行な場合、OBBのこの軸の厚み外なら交差しない
+				if (-e - halfSize[i] > 0.0f || -e + halfSize[i] < 0.0f)
+					return false;
+			}
+		}
+
+		// 衝突点と距離を記録
+		t = tMin;
+		hitPoint = ray.origin + ray.direction * t;
+		return true;
+	}
+
+
 
 }

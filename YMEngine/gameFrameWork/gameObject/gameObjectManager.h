@@ -23,6 +23,8 @@ namespace ym
 
 		std::vector<std::shared_ptr<Object>> GetGameObjects() const { return gameObjects_; }
 
+
+
 		template <typename T>std::vector<std::shared_ptr<T>> FindGameObjects()
 		{
 			std::vector<std::shared_ptr<T>> result;
@@ -34,11 +36,29 @@ namespace ym
 					result.push_back(std::dynamic_pointer_cast<T>(obj));
 				}
 			}
+			//addÇÃï˚Ç‡åüçı
+			for (auto obj : addObjects_)
+			{
+				if (typeid(*obj) == typeid(T))
+				{
+					result.push_back(std::dynamic_pointer_cast<T>(obj));
+				}
+			}
+
 			return result;
 		}
 
 		std::vector<std::shared_ptr<Object>> gameObjects_;
 	private:
+		std::shared_ptr<Object> GetSharedPtrFromRaw(Object *raw);
+		std::shared_ptr<Object> SearchInChildren(std::shared_ptr<Object> &parent, Object *raw);
+		void DrawHierarchy();
+		void DrawRenamePopup(Object *renameTarget);
+		bool IsDescendantOf(Object *parent, Object *child) const;
+
+		std::vector<std::shared_ptr<Object>> addObjects_;
+
+		Object *renameTarget_ = nullptr;
 	};
 
 }

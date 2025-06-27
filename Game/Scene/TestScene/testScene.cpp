@@ -10,6 +10,8 @@
 
 
 #include "gameFrameWork/requiredObject/mainCamera.h"
+#include "gameFrameWork/camera/camera.h"
+#include "gameFrameWork/camera/cameraManager.h"
 #include "gameFrameWork/requiredObject/sphereMap/sphereMap.h"
 
 
@@ -24,9 +26,14 @@
 
 #include "Game/Component/othello/gameManager.h"
 
+#include "cubeMap/cubeMap.h"
 
+#include "../system/threadPool/threadPool.h"
 namespace ym
 {
+
+	CubeMapGenerater c;
+
 	void TestScene::Init()
 	{
 		BaseScene::Init();
@@ -44,6 +51,9 @@ namespace ym
 
 
 		gameObjectManager_->AddGameObject(std::make_shared<TestObject>());
+		//gameObjectManager_->AddGameObject(std::make_shared<TestObject2>());
+
+		//c.Generate(Vector3(0, 0, 0));
 
 		//gameObjectManager_->AddGameObject(std::make_shared<Koma>());
 
@@ -107,6 +117,7 @@ namespace ym
 	{
 		BaseScene::UnInit();
 		ym::ConsoleLog("TestScene::UnInit()\n");
+		//c.Uninit();
 
 		//_testObject->Uninit();
 		//_mainCamera->Uninit();
@@ -119,19 +130,7 @@ namespace ym
 	}
 	void TestScene::Update()
 	{
-		static int c = 0;
-		static Timer t;
 		_renderer->Update();
-		if (t.elapsedTime() > 2)
-		{
-			t.reset();
-			if (c < 1000)
-			{
-				gameObjectManager_->AddGameObject(std::make_shared<PointLight>());
-				c++;
-			}
-		}
-
 		BaseScene::Update();
 		//_testObject->Update();
 		//_mainCamera->Update();
@@ -140,8 +139,6 @@ namespace ym
 	{
 		_renderer->BeginFrame();
 		BaseScene::Draw();
-		//_testObject->Draw();
-		//_mainCamera->Draw();
 		_renderer->Draw();
 		_renderer->EndFrame();
 	}

@@ -24,7 +24,6 @@ namespace ym
 		pCommandList_ = _renderer->GetGraphicCommandList();
 		auto &swapChain = pDevice_->GetSwapChain();
 		Vector2 windowSize = swapChain.GetSize();
-
 		eye_ = Vector3(0.0f, 0.0f, -1.0f);
 		target_ = Vector3(eye_.x,eye_.y,distance_ - eye_.z);
 		up_ = Vector3(0.0f, 1.0f, 0.0f);
@@ -66,7 +65,7 @@ namespace ym
 
 		view_ = DirectX::XMMatrixLookAtLH(eyeVector, targetVector, upVector);
 		//transpose
-		view_ = DirectX::XMMatrixTranspose(view_);
+		//view_ = DirectX::XMMatrixTranspose(view_);
 
 
 	}
@@ -74,34 +73,47 @@ namespace ym
 	{
 		projection_ = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(fov), aspectRatio, nearZ, farZ);
 		//transpose
-		projection_ = DirectX::XMMatrixTranspose(projection_);
+	//	projection_ = DirectX::XMMatrixTranspose(projection_);
 
 	}
 	void Camera::UpdateProjectionMatrix()
 	{
 		projection_ = DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(fov_), aspectRatio_, nearZ_, farZ_);
 		//transpose
-		projection_ = DirectX::XMMatrixTranspose(projection_);
+		//projection_ = DirectX::XMMatrixTranspose(projection_);
 	}
 	void Camera::UpdateShaderBuffer()
 	{
 		// 1. ‹ts—ñ‚ðŒvŽZ‚·‚é
 		DirectX::XMMATRIX invView = DirectX::XMMatrixInverse(nullptr, view_);
 		DirectX::XMMATRIX invProjection = DirectX::XMMatrixInverse(nullptr, projection_);
-		DirectX::XMMATRIX invViewProj = DirectX::XMMatrixInverse(nullptr, view_ * projection_);
 
-		pMapppedData_->view = DirectX::XMMatrixTranspose(view_);
-		pMapppedData_->projection = DirectX::XMMatrixTranspose(projection_);
-		pMapppedData_->invView = DirectX::XMMatrixTranspose(invView);
-		pMapppedData_->invProjection = DirectX::XMMatrixTranspose(invProjection);
+		// C³F‹ts—ñ‚ÌÏ‚Å\’ziŒÂ•Ê‚ÉŒvŽZ‚µ‚ÄÏ‚Þj
+		DirectX::XMMATRIX invViewProj = invProjection * invView;
+
+		//pMapppedData_->view = DirectX::XMMatrixTranspose(view_);
+		//pMapppedData_->projection = DirectX::XMMatrixTranspose(projection_);
+
+		pMapppedData_->view = view_;
+		pMapppedData_->projection = projection_;
+
+		pMapppedData_->invView = invView;
+		pMapppedData_->invProjection = invProjection;
+		pMapppedData_->invViewProj = invViewProj;
 		pMapppedData_->eye.x = eye_.ToXMFLOAT3().x;
 		pMapppedData_->eye.y = eye_.ToXMFLOAT3().y;
 		pMapppedData_->eye.z = eye_.ToXMFLOAT3().z;
-		pMapppedData_->eye.w = 0;
+		pMapppedData_->eye.w = 1;
 		pMapppedData_->nearZ = nearZ_;
 		pMapppedData_->farZ = farZ_;
 		pMapppedData_->aspect = aspectRatio_;
 		pMapppedData_->fov = fov_;
+
+
+
+		pConstantBuffer_->UpdateBuffer(pDevice_, pCommandList_, pMapppedData_, sizeof(CameraData));
+
+		//pMapppedData_ = (Camera::CameraData *)pConstantBuffer_->Map();
 
 		/*pMapppedData_->view = DirectX::XMMatrixTranspose(view_);
 		pMapppedData_->projection = DirectX::XMMatrixTranspose(projection_);
@@ -111,7 +123,7 @@ namespace ym
 	bool Camera::CreateConstantBuffer()
 	{
 		pConstantBuffer_ = std::make_shared<Buffer>();
-		if (!pConstantBuffer_->Init(pDevice_, sizeof(pMapppedData_), sizeof(CameraData), BufferUsage::ConstantBuffer, true, false))
+		if (!pConstantBuffer_->Init(pDevice_, sizeof(*pMapppedData_), sizeof(CameraData), BufferUsage::ConstantBuffer, true, false))
 		{
 			return false;
 		}
@@ -122,11 +134,14 @@ namespace ym
 		{
 			return false;
 		}
+
 		pMapppedData_ = (Camera::CameraData *)pConstantBuffer_->Map();
 		if (!pMapppedData_)
 		{
 			return false;
 		}
+
+		pConstantBuffer_->UpdateBuffer(pDevice_, pCommandList_, pMapppedData_, sizeof(CameraData));
 
 		pDescriptorSet_ = std::make_shared<DescriptorSet>();
 

@@ -32,6 +32,7 @@ namespace ym
 		void Uninit() override;
 		void Update() override;
 		void Draw() override;
+		void DrawImgui() override;
 		void SetMaterial() override;
 	private:
 		void CreateShader();

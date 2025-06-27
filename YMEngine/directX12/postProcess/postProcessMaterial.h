@@ -30,9 +30,10 @@ namespace ym
 		virtual void Uninit();
 		virtual void Update();
 		virtual void Draw();
+		virtual void DrawImgui();
+		virtual void DrawImgui(string guid);
 
 		virtual void SetMaterial();
-
 
 
 		TextureView *GetTextureView()
@@ -47,17 +48,17 @@ namespace ym
 		{
 			return rtv_.get();
 		}
-
+		bool IsUsed() const
+		{
+			return isUsed_;
+		}
 
 	private:
 	protected:
+		bool isUsed_ = true;
 		Device *device_;
 		CommandList *graphicsCmdList_;
 		PostProcessManager *pPM_;
-
-
-
-
 		std::shared_ptr<Texture> texture_;
 		std::shared_ptr<TextureView> textureView_;
 		std::shared_ptr<RenderTargetView> rtv_;

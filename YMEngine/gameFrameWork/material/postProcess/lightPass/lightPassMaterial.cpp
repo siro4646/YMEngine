@@ -47,6 +47,7 @@ namespace ym
 	void LightPassMaterial::Update()
 	{
 		PostProcessMaterial::Update();
+		//pipelineState_->Update(device_);
 		UpdateBuffer();
 		
 	}
@@ -74,14 +75,23 @@ namespace ym
 
 		//PostProcessMaterial::Draw();
 	}
+	void LightPassMaterial::DrawImgui()
+	{
+		ImGui::Text("LightPassMaterial");
+		PostProcessMaterial::DrawImgui("LightPassMaterial");
+		ImGui::SliderFloat3("Direction", dir, -1.0f, 1.0f);
+		ImGui::SliderFloat3("Color", color, 0.0f, 1.0f);
+		ImGui::SliderFloat("Intensity", &intensity, 0.0f, 5.0f);
+		//ImGui::End();
+	}
 	void LightPassMaterial::SetMaterial()
 	{
 		PostProcessMaterial::SetMaterial();
 		auto bbidx = device_->GetSwapChain().GetFrameIndex();
 		auto cmdList = graphicsCmdList_;
 		auto renderer = Renderer::Instance();
-		auto colorTex = renderer->GetSceneRenderTexture(bbidx, MultiRenderTargets::Color);
-		auto colorView = renderer->GetSceneRenderTargetTexView(bbidx, MultiRenderTargets::Color);
+		auto colorTex = PostProcessManager::Instance()->GetResultTexture(bbidx);
+		auto colorView = PostProcessManager::Instance()->GetResultTextureView(bbidx);
 		auto normalTex = renderer->GetSceneRenderTexture(bbidx, MultiRenderTargets::Normal);
 		auto normalView = renderer->GetSceneRenderTargetTexView(bbidx, MultiRenderTargets::Normal);
 		auto worldPosTex = renderer->GetSceneRenderTexture(bbidx, MultiRenderTargets::WorldPos);

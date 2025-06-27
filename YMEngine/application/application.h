@@ -28,6 +28,7 @@ namespace ym
 		{
 			if (fixedDeltaTime_.elapsedTime() > 1.0f / (ym::config::kFrameRate))
 			{
+				m_lastFixedDeltaTime = fixedDeltaTime_.elapsedTime();
 				fixedDeltaTime_.reset();
 				return true;
 			}
@@ -49,14 +50,21 @@ namespace ym
 			return m_instance;
 		}
 
+		bool IsWindowFocus();
+
 		inline Window *GetWindow() const
 		{
 			return m_window.get();
 		}
 		inline float GetDeltaTime()
 		{
-			return ym::config::kDeltaTime;
+			return ImGui::GetIO().DeltaTime;
+			//return ym::config::kDeltaTime;
 			return deltaTime_.elapsedTime();			
+		}
+		inline float GetFixedDeltaTime()
+		{
+			return m_lastFixedDeltaTime;
 		}
 		/// <summary>
 		/// ‰Šú‰»
@@ -72,6 +80,7 @@ namespace ym
 		/// Œãˆ—
 		/// </summary>
 		void Terminate();
-
+	private:
+		float m_lastFixedDeltaTime = 0;
 	};
 }

@@ -34,16 +34,32 @@ namespace ym
 		Acceleration//デルタタイムを計算し,Massを考慮しない
 	};
 
-	class Rigidbody : public Component
+	class Rigidbody : public Component, public IPropertyProvider
 	{
 	public:
+		std::string GetProviderName() const override { return "Rigidbody"; }
+		std::vector<PropertyInfo> GetProperties() override
+		{
+			return {
+				{ "Mass", &mass },
+				{ "Drag", &drag },
+				{ "Angular Drag", &angularDrag },
+				//{ "Use Gravity", &useGravity },
+				//{ "Is Kinematic", &isKinematic },
+				{ "Interpolation", reinterpret_cast<float *>(&interpolation) }, // enum を float ポインタにキャスト
+				{ "Restitution", &restitution }
+			};
+		}
+
 		using Component::Component;
 
 		void Init()override;
 		void FixedUpdate() override;
 		void Update()override;
 		void Draw()override;
+		void DrawImguiBody() override;
 		void Uninit()override;
+		const char *GetName() const override { return "Rigidbody"; }
 
 		void AddForce(const Vector3 &additionalForce,const ForceMode mode = ForceMode::Force);
 
@@ -105,5 +121,5 @@ namespace ym
 		std::unordered_set<Object *> hitObjects;
 
 	};
-
+	REGISTER_COMPONENT(Rigidbody);
 }

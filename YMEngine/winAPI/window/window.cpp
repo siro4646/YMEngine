@@ -1,6 +1,8 @@
 //pch.h is included in window.h
 #include "window.h"
 
+#include "Renderer/renderer.h"
+
 	extern LRESULT ImGui_ImplWin32_WndProcHandler(
 		HWND, UINT, WPARAM, LPARAM);
 namespace ym {
@@ -9,7 +11,10 @@ namespace ym {
 	LRESULT WindowProcedure(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 
-		ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam);
+		if (ImGui_ImplWin32_WndProcHandler(hWnd, message, wParam, lParam))
+		{
+			return DefWindowProc(hWnd, message, wParam, lParam);
+		}
 		// メッセージ毎に処理を選択
 		switch (message)
 		{
@@ -32,7 +37,38 @@ namespace ym {
 				break;
 			}
 			break;
-			
+		//case WM_SIZE:
+		//	if (wParam != SIZE_MINIMIZED) // 最小化時は無視
+		//	{
+		//		UINT newWidth = LOWORD(lParam);
+		//		UINT newHeight = HIWORD(lParam);
+		//		if (newWidth > 0 && newHeight > 0)
+		//		{
+		//			if (Renderer::Instance()->GetDevice())
+		//			{
+
+
+		//				Renderer::Instance()->GetDevice()->GetSwapChain().Resize(Application::Instance()->GetWindow()->GetWndHandle()); // ←ここで呼ぶ
+		//			}
+		//		}
+		//	}
+		//	break;
+		case WM_DROPFILES:
+		{
+			HDROP hDrop = (HDROP)wParam;
+			UINT fileCount = DragQueryFile(hDrop, 0xFFFFFFFF, nullptr, 0);
+
+			for (UINT i = 0; i < fileCount; ++i) {
+				TCHAR filePath[MAX_PATH];
+				DragQueryFile(hDrop, i, filePath, MAX_PATH);
+				DropFileManager::Instance().AddDroppedFile(std::string(filePath)); // ドロップされたファイルのパスを保存
+				// ここでファイルパスを使える。ImGuiに渡すなら保存して後で描画時に使う
+				//droppedFiles.push_back(filePath); // std::vector<std::string> などに保存
+			}
+
+			DragFinish(hDrop); // 解放
+			break;
+		}
 
 
 		default:

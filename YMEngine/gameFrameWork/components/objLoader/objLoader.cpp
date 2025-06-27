@@ -1,4 +1,5 @@
 #include "objLoader.h"
+#include "gameFrameWork/components/fbxLoader/fbxLoader.h"
 
 #include "device/device.h"
 #include "commandList/commandList.h"
@@ -36,6 +37,9 @@ namespace ym
 {
 	void OBJLoader::Init()
 	{	
+		//既にFBXLoaderまたはObjLoaderがアタッチされている場合は自分を削除する
+		
+
 		CreateConstantBuffer();
 		//descriptorSet_ = std::make_shared<DescriptorSet>();
 
@@ -72,6 +76,34 @@ namespace ym
 			material_[i]->Draw();	
 		}
 	}
+
+	void OBJLoader::DrawImguiBody()
+	{
+		ImGui::Text("OBJ Loader Info");
+
+		if (ImGui::TreeNode("Meshes & Materials"))
+		{
+			for (size_t i = 0; i < meshes.size(); ++i)
+			{
+				std::string label = "Mesh[" + std::to_string(i) + "]";
+				if (ImGui::TreeNode(label.c_str()))
+				{
+					ImGui::Text("Vertices: %zu", meshes[i].Vertices.size());
+					ImGui::Text("Indices: %zu", meshes[i].Indices.size());
+
+					if (i < material_.size() && material_[i])
+					{
+						string className = ym::GetShortClassName(*material_[i]);
+						ImGui::Text("Material: %s", className.c_str());
+					}
+					ImGui::TreePop();
+				}
+			}
+			ImGui::TreePop();
+		}
+	}
+
+
 	void OBJLoader::Uninit()
 	{
 	
@@ -364,7 +396,13 @@ namespace ym
 	}
 	void OBJLoader::UpdateMatrix()
 	{
-		(*pMatrix_) = object->worldTransform.GetMatrix();
+		if (transform_ )
+		{
+			(*pMatrix_) = transform_->GetMatrix();
+		}
+		else {
+			(*pMatrix_) = object->worldTransform.GetMatrix();
+		}
 	}
 	
 }

@@ -6,6 +6,8 @@
 #include "quaternion/quaternion.h"
 #include "stringUtility.h"
 
+#include "debug/logSystem.h"
+
 namespace ym
 {
 	struct Color
@@ -73,6 +75,18 @@ namespace ym
 		va_end(arg);
 
 		OutputDebugStringA(tsv);
+	}
+	inline void DebugLog(const char *format, ...)
+	{
+		va_list arg;
+
+		char tsv[4096];
+		va_start(arg, format);
+		vsprintf_s(tsv, format, arg);
+		va_end(arg);
+
+		LogSystem::Instance().AddLog(tsv);
+
 	}
 
 	static const u32 kFnv1aPrime32 = 16777619;
@@ -268,9 +282,21 @@ namespace ym
 	class Random
 	{
 	public:
+
 		Random()
-		{}
+		{
+			Random::Random((u32)timeGetTime());
+		}
 		Random(u32 seed)
+		{
+			//ym::ConsoleLogRelease("aaaaaaaaa");
+			x_ = seed = 1812433253 * (seed ^ (seed >> 30));
+			y_ = seed = 1812433253 * (seed ^ (seed >> 30)) + 1;
+			z_ = seed = 1812433253 * (seed ^ (seed >> 30)) + 2;
+			w_ = seed = 1812433253 * (seed ^ (seed >> 30)) + 3;
+		}
+
+		void SetSeed(u32 seed)
 		{
 			x_ = seed = 1812433253 * (seed ^ (seed >> 30));
 			y_ = seed = 1812433253 * (seed ^ (seed >> 30)) + 1;
@@ -521,6 +547,4 @@ namespace ym
 
 	
 	extern Random GlobalRandom;
-
-
 }	// namespace ym

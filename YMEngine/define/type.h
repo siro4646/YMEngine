@@ -53,6 +53,36 @@ namespace ym
 		std::wstring SpecularMap;// スペキュラーマップのファイルパス
 		std::wstring MaskMap; // マスクマップのファイルパス
 	};
+	namespace mesh
+	{
+		struct SubMesh {
+			u32 indexOffset;
+			u32 indexCount;
+			u32 materialIndex;
+		};
+		struct BoneWeight {
+			u32 indices[4];
+			float weights[4];
+		};
+		struct Mesh
+		{
+			std::vector<Vertex3D> Vertices;
+			std::vector<u32> Indices;
+			std::vector<SubMesh> SubMeshes;
+			std::vector<BoneWeight> BoneWeights;
+			std::vector<XMFLOAT4X4> BindPoseInverse; // ボーンのバインドポーズ逆行列
+			std::vector<std::string> BoneNames;  // オプション：マッチングのためのボーン名
+		};
+	}
+
+	struct MaterialData {
+		std::wstring DiffuseMap;
+		std::wstring SpecularMap;
+		std::wstring MaskMap;
+
+		float Roughness = 0.5f;
+		float Metalness = 0.0f;
+	};
 
 	enum ModelSetting
 	{

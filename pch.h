@@ -25,6 +25,8 @@
 #include <cassert>
 
 #include <wrl/client.h>
+#include <ShellScalingAPI.h>
+#pragma comment(lib, "Shcore.lib")
 
 //===============================================
 // STL
@@ -96,6 +98,10 @@
 #include "thirdParty/imgui/imgui_impl_dx12.h"
 #include "thirdParty/imgui/imgui_impl_win32.h"
 
+//nlohmann json
+#include "thirdParty/nlohmann/json.hpp"
+using json = nlohmann::json;
+
 //Direct2D
 #include <d2d1.h>
 
@@ -115,7 +121,10 @@ using namespace std;
 #include "utility/utility.h"
 #include "utility/stringUtility.h"
 #include "utility/timer.h"
+#include "utility/debug/debugDraw.h"
 #include "debug/debug.h"
+
+#include "winAPI/window/DropFileManager.h"
 
 
 

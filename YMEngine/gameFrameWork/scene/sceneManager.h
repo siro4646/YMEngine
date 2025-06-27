@@ -32,6 +32,13 @@ namespace ym {
 		// 現在のシーンを更新
 		void FixedUpdate();
 
+		BaseScene *GetCurrentScene() const {
+			if (m_pScene.empty()) {
+				return nullptr; // スタックが空の場合はnullptrを返す
+			}
+			return m_pScene.top().get(); // 現在のシーンを取得
+		}
+
 		// 現在のシーンをフレームレートに同期して更新
         void Update();
 

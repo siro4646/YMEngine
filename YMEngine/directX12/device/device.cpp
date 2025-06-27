@@ -442,7 +442,7 @@ namespace ym {
 	{
 		D3D12_DESCRIPTOR_HEAP_DESC desc{};
 		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		desc.NumDescriptors = 500000;
+		desc.NumDescriptors = 50000;
 		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		desc.NodeMask = 1;
 		pGlobalViewDescHeap_ = new GlobalDescriptorHeap();
@@ -452,8 +452,9 @@ namespace ym {
 		}
 
 		desc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
-		desc.NumDescriptors = 1000;
-		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		desc.NumDescriptors = 10000;
+		//desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		desc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 		pViewDescHeap_ = new DescriptorAllocator();
 		if (!pViewDescHeap_->Initialize(this, desc))
 		{

@@ -7,6 +7,7 @@
 
 namespace ym
 {
+
 	void SceneOcTree::Init()
 	{
 		name = "SceneOcTree";
@@ -20,7 +21,7 @@ namespace ym
 				SCENE_MAX_SIZE,
 				SCENE_MAX_SIZE));
 
-		sceneOctree = std::make_shared<Octree>(sceneBounds,10,10);
+		sceneOctree = std::make_shared<Octree>(sceneBounds, 10, 10);
 	}
 
 	void SceneOcTree::FixedUpdate()

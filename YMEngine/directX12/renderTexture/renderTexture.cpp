@@ -90,6 +90,58 @@ namespace ym
 		return true;
 	}
 
+	bool RenderTexture::Draw()
+	{
+		if (!isCreated_)return false;
+
+		auto renderTargetManager = ym::RenderTargetManager::Instance();
+		auto sceneRenderRegistrar = ym::SceneRenderRegistrar::Instance();
+		auto &cManager = CameraManager::Instance();
+		auto prvCamera = cManager.GetMainCamera();
+		//bbidx = Renderer::Instance()->GetDevice()->GetSwapChain().GetFrameIndex();
+
+		auto cmdList = Renderer::Instance()->GetGraphicCommandList();
+
+		cManager.SetMainCamera(useCameraName_);
+		vector<RenderTargetView>rtvs;
+		vector<Texture>rts;
+		for (int i = 0; i < renderTargetTextureView_.size(); i++)
+		{
+			//bbidxが0なら0からMaxまで、1ならMaxからMax*2までを格納するそれ以外ならskip
+			if (i / MultiRenderTargets::Max != bbidx)continue;
+			rtvs.push_back(*renderTargetView_[i]);
+			rts.push_back(*renderTargetTexture_[i]);
+			//レンダーターゲットとしてバリアを張る
+			cmdList->TransitionBarrier(renderTargetTexture_[i].get(), D3D12_RESOURCE_STATE_RENDER_TARGET);
+		}
+
+
+		if (createDepthStencil_)
+			renderTargetManager->PushRenderTarget(rtvs, rts, depthStencilView_.get(), depthStencilTexture_.get(), true);
+		else
+			renderTargetManager->PushRenderTarget(rtvs, rts, nullptr, nullptr, true);
+		sceneRenderRegistrar->Draw();
+
+		renderTargetManager->PopRenderTarget();
+
+		for (int i = 0; i < renderTargetTextureView_.size(); i++)
+		{
+			//bbidxが0なら0からMaxまで、1ならMaxからMax*2までを格納するそれ以外ならskip
+			if (i / MultiRenderTargets::Max != bbidx)continue;
+			//rtvs.push_back(*renderTargetView_[i]);
+			//rts.push_back(*renderTargetTexture_[i]);
+			//テクスチャとしてバリアを張る
+			cmdList->TransitionBarrier(renderTargetTexture_[i].get(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		}
+
+		cManager.SetMainCamera(prvCamera->name_);
+
+		rtvs.clear();
+		rts.clear();
+		bbidx = (bbidx + 1) % SwapChain::kFrameCount;//次のバックバッファのインデックスをセット
+		return true;
+	}
+
 	void RenderTexture::Uninit()
 	{
 

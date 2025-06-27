@@ -1,4 +1,5 @@
 #pragma once
+#include "swapChain/swapChain.h"
 
 namespace ym
 {
@@ -58,15 +59,15 @@ namespace ym
 
 		TextureView *GetResultTextureView(u32 idx)
 		{
-			return resultTextureViews_[idx];
+			return resultTextureViews_[idx%SwapChain::kFrameCount];
 		}
 		Texture *GetResultTexture(u32 idx)
 		{
-			return resultTextures_[idx];
+			return resultTextures_[idx % SwapChain::kFrameCount];
 		}
 		RenderTargetView *GetResultRTV(u32 idx)
 		{
-			return resultRTVs_[idx];
+			return resultRTVs_[idx % SwapChain::kFrameCount];
 		}
 
 	private:

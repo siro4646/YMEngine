@@ -24,7 +24,7 @@ namespace ym
 		void Present(int syncInterval);
 
 		void Resize(u32 width, u32 height);
-
+		void Resize(HWND hwnd);
 		Vector2 GetSize() const
 		{
 			return Vector2(width_, height_);

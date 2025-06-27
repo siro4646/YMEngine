@@ -1,4 +1,5 @@
 #include "fbxLoader.h"
+#include "gameFrameWork/components/objLoader/objLoader.h"
 
 #include "device/device.h"
 #include "commandList/commandList.h"
@@ -35,6 +36,7 @@
 
 
 
+
 namespace ym
 {
 	//const D3D12_INPUT_ELEMENT_DESC FBXLoader::Vertex::InputElements[] =
@@ -52,7 +54,8 @@ namespace ym
 	//};
 
 	void FBXLoader::Init()
-	{		
+	{	
+
 		CreateConstantBuffer();		
 		pCamera_ = CameraManager::Instance().GetMainCamera();
 		if (!pCamera_)

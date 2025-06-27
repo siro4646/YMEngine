@@ -6,6 +6,19 @@
 
 namespace ym
 {
+	inline std::string NormalizePath(const std::string &path)
+	{
+		std::string fixed = path;
+
+		// Windowsの区切り文字 `\` を `/` に置き換える
+		std::replace(fixed.begin(), fixed.end(), '\\', '/');
+
+		// 先頭や末尾の不要な空白や改行などを削除したい場合はこちらも追加
+		// fixed.erase(fixed.find_last_not_of(" \n\r\t") + 1);
+		// fixed.erase(0, fixed.find_first_not_of(" \n\r\t"));
+
+		return fixed;
+	}
 
 	inline std::string GetExtent(const std::string &name)
 	{
@@ -114,6 +127,43 @@ namespace ym
 		return utf8;
 	}
 
+	inline std::string MakeImGuiID(const std::string &label, const void *ptr)
+	{
+		std::ostringstream oss;
+		oss << label << "##" << ptr;
+		return oss.str();
+	}
+	inline std::filesystem::path GetSolutionDirectory()
+	{
+		wchar_t buffer[MAX_PATH] = {};
+		GetModuleFileNameW(nullptr, buffer, MAX_PATH);
+		std::filesystem::path exePath = buffer;
+
+		// exe -> bin/Debug/app.exe → ソリューションルートに戻る
+		std::filesystem::path solutionDir = exePath.parent_path().parent_path().parent_path();
+		return solutionDir;
+	}
+
+	inline std::string GetRelativePathToSolution(const std::filesystem::path &droppedPath)
+	{
+		auto solutionDir = GetSolutionDirectory();
+		std::filesystem::path relative = std::filesystem::relative(droppedPath, solutionDir);
+		return relative.string(); // または .wstring() if Unicode
+	}
+
+
+	// 任意のオブジェクトからクラス名（末尾部分）を取得
+	template <typename T>
+	inline std::string GetShortClassName(const T &obj) {
+		std::string fullName = typeid(obj).name();
+
+		// "::" の最後の位置を探す（MSVCでは"::"が含まれない場合があるので':'だけにする）
+		size_t pos = fullName.find_last_of(':');
+		if (pos != std::string::npos) {
+			return fullName.substr(pos + 1);
+		}
+		return fullName; // ':' が見つからなければそのまま返す
+	}
 }	// namespace ym
 
 

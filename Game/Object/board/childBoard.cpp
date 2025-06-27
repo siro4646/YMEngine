@@ -48,7 +48,7 @@ namespace ym
 
 	void ChildBoard::Update()
 	{
-		auto &key = KeyboardInput::GetInstance();
+		auto &key = KeyboardInput::Instance();
 
 
 		Object::Update();

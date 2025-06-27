@@ -22,11 +22,24 @@ namespace ym
 	void SSRMaterial::Init()
 	{
 		PostProcessMaterial::Init();
-
+		isUsed_ = false;
 		CreateShader();
 		PostProcessMaterial::BaseRootSignature();
-		PostProcessMaterial::BaseSampler();
+		//PostProcessMaterial::BaseSampler();
 		PostProcessMaterial::BasePipelineState();
+
+		sampler_ = std::make_shared<Sampler>();
+
+		D3D12_SAMPLER_DESC desc{};
+		desc.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+		desc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		desc.AddressV = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+		desc.AddressW = D3D12_TEXTURE_ADDRESS_MODE_CLAMP;
+
+		sampler_->Initialize(device_, desc);
+
+		CreateConstantBuffer();
+
 
 		//CreatePipelineState();
 	}
@@ -38,27 +51,37 @@ namespace ym
 	void SSRMaterial::Update()
 	{
 		PostProcessMaterial::Update();
-
+		UpdateBuffer();
 	}
 	void SSRMaterial::Draw()
 	{
 
 	
 	}
+	void SSRMaterial::DrawImgui()
+	{
+		ImGui::Text("SSRMaterial");
+		PostProcessMaterial::DrawImgui("SSRMaterial");
+		ImGui::SliderFloat("thickness", &ssrConstants_.thickness, 0.0f, 0.3f);
+		ImGui::SliderFloat("maxRayDistance", &ssrConstants_.maxRayDistance, 0.0f, 1000);
+		ImGui::SliderFloat("stride", &ssrConstants_.stride, 0.0f,0.3f);
+		ImGui::SliderInt("maxRayMerchCount", &ssrConstants_.maxRayMerchCount, 1, 128);
+		ImGui::SliderFloat("baseReflectance", &ssrConstants_.baseReflectance, 0.0f, 0.5f);
+	}
 	void SSRMaterial::SetMaterial()
 	{
 		PostProcessMaterial::SetMaterial();
 
 		auto bbidx = device_->GetSwapChain().GetFrameIndex();
-		auto cmdList = graphicsCmdList_;
+		auto cmdList = graphicsCmdList_;	
 		auto renderer = Renderer::Instance();
-
+		//DebugLog("SSRMaterial::SetMaterial");
 		auto colorTex = pPM_->GetResultTexture(bbidx);
 		auto colorView = pPM_->GetResultTextureView(bbidx);
 		auto normalTex = renderer->GetSceneRenderTexture(bbidx, MultiRenderTargets::Normal);
 		auto normalView = renderer->GetSceneRenderTargetTexView(bbidx, MultiRenderTargets::Normal);
-		auto worldPosTex = renderer->GetSceneRenderTexture(bbidx, MultiRenderTargets::WorldPos);
-		auto worldPosView = renderer->GetSceneRenderTargetTexView(bbidx, MultiRenderTargets::WorldPos);
+		auto depthTex = renderer->GetSceneRenderTexture(bbidx, MultiRenderTargets::WorldPos);
+		auto depthView = renderer->GetSceneRenderTargetTexView(bbidx, MultiRenderTargets::WorldPos);
 
 		auto dsvTex = renderer->GetDepthStencilTexture();
 		auto dsvTexView = renderer->GetDepthStencilTexView();
@@ -67,16 +90,18 @@ namespace ym
 
 		cmdList->TransitionBarrier(colorTex, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 		cmdList->TransitionBarrier(normalTex, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+		cmdList->TransitionBarrier(depthTex, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 		cmdList->TransitionBarrier(dsvTex,D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 		cmdList->GetCommandList()->SetPipelineState(pipelineState_->GetPSO());
 		descriptorSet_->Reset();
 		descriptorSet_->SetPsSrv(0, colorView->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSrv(1, normalView->GetDescInfo().cpuHandle);
-		descriptorSet_->SetPsSrv(2, worldPosView->GetDescInfo().cpuHandle);
+		descriptorSet_->SetPsSrv(2, depthView->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSrv(3, dsvTexView->GetDescInfo().cpuHandle);
 		descriptorSet_->SetPsSampler(0, sampler_->GetDescInfo().cpuHandle);
-		descriptorSet_->SetPsCbv(0, camera->GetDescriptorHandle());
+		descriptorSet_->SetPsCbv(1, camera->GetDescriptorHandle());
+		descriptorSet_->SetPsCbv(0, constantBufferView_->GetDescInfo().cpuHandle);
 		cmdList->SetGraphicsRootSignatureAndDescriptorSet(rootSignature_.get(), descriptorSet_.get());
 
 
@@ -126,5 +151,43 @@ namespace ym
 
 		pipelineState_->Init(device_, desc);
 
+	}
+	void SSRMaterial::CreateConstantBuffer()
+	{
+		auto renderer = Renderer::Instance();
+
+		constantBuffer_ = std::make_unique<Buffer>();
+		constantBuffer_->Init(
+			device_,
+			sizeof(pSSRConstants_),
+			sizeof(SSRConstants),
+			BufferUsage::ConstantBuffer,
+			true,
+			false
+		);
+		constantBufferView_ = std::make_unique<ConstantBufferView>();
+		constantBufferView_->Init(
+			device_,
+			constantBuffer_.get()
+		);
+		ssrConstants_.stride = 0.2f;
+		ssrConstants_.maxRayDistance = 1000.0f;
+		ssrConstants_.thickness = 0.2f;
+		ssrConstants_.maxRayMerchCount = 32;
+		ssrConstants_.baseReflectance = 0.05f; // Default reflectance value
+
+		pSSRConstants_ = (SSRConstants *)constantBuffer_->Map();
+
+		//ssrConstants_.
+	}
+	void SSRMaterial::UpdateBuffer()
+	{
+		void *p = (SSRConstants *)constantBuffer_->Map();
+		if (p)
+		{
+			memcpy(p, &ssrConstants_, sizeof(ssrConstants_));
+			constantBuffer_->Unmap();
+			pSSRConstants_ = (SSRConstants *)p;
+		}
 	}
 }

@@ -44,6 +44,11 @@ namespace ym
 	class LightPassMaterial;
 	class LumPassMaterial;
 	class SSRMaterial;
+	class SSAAMaterial;
+	class FXAAMaterial;
+	class ToonMapMaterial;
+	class DoFMaterial;
+	class BloomMaterial;
 
 	enum MultiRenderTargets
 	{
@@ -51,6 +56,7 @@ namespace ym
 		Normal,//法線
 		HighLuminance,//輝度
 		WorldPos,//ワールド座標
+		Depth,//深度
 		Max,//最大数
 		//ダブルバッファの場合 0,1,2と3,4,5のペアで使う
 	};
@@ -222,11 +228,15 @@ namespace ym
 
 		std::shared_ptr<MosaicMaterial> mosaicMaterial_;
 		std::shared_ptr<GrayScaleMaterial> grayScaleMaterial_;
-		std::shared_ptr<BlurMaterial> blurMaterial_;
 		float blurValue_ = 0.0f;
 		std::shared_ptr<LightPassMaterial> lightPassMaterial_;
 		std::shared_ptr<LumPassMaterial> lumPassMaterial_;
 		std::shared_ptr<SSRMaterial> ssrMaterial_;
+		std::shared_ptr<SSAAMaterial> ssaaMaterial_;
+		std::shared_ptr<FXAAMaterial> fxaaMaterial_;
+		std::shared_ptr<ToonMapMaterial> toonMapMaterial_;
+		std::shared_ptr<DoFMaterial> dofMaterial_;
+		std::shared_ptr<BloomMaterial> bloomMaterial_;
 
 		bool usePostProcess_[(int)PostProcessType::Max]{ false };
 

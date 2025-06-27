@@ -20,6 +20,7 @@ namespace ym
 		void FixedUpdate();
 		void Update();
 		bool Draw(Object*);
+		bool Draw();
 		void Uninit();
 		void Create(u32 width, u32 height, bool createDepthStencil = false);
 		void SetCamera(std::string useCameraName) {

@@ -45,7 +45,7 @@ namespace ym
 		/// </summary>
 		void SetWndName(const std::string &name)
 		{
-			SetWindowText(m_hWnd, name.c_str());
+			SetWindowTextA(m_hWnd, name.c_str());
 		}
 
 		void Show()
@@ -59,6 +59,11 @@ namespace ym
 				SHIFTJIS_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
 				DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, L"Meiryo");
 			SendMessage(hwnd, WM_SETFONT, (WPARAM)hFont, TRUE);
+		}
+
+		inline bool IsWindowFocus() const
+		{
+			return GetForegroundWindow() == m_hWnd;
 		}
 
 

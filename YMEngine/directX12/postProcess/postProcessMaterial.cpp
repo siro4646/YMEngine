@@ -73,6 +73,17 @@ namespace ym
 		
 	}
 
+	void PostProcessMaterial::DrawImgui()
+	{
+	}
+
+	void PostProcessMaterial::DrawImgui(string guid)
+	{
+		ImGui::PushID(guid.c_str());
+		ImGui::Checkbox("isUsed", &isUsed_);
+		ImGui::PopID();
+	}
+
 	void PostProcessMaterial::SetMaterial()
 	{
 		auto cmdList = graphicsCmdList_;

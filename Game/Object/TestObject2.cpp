@@ -24,16 +24,16 @@ namespace ym
 	{
 		name = "TestObject2";
 		localTransform.Scale = { 1.0f,1.0f,1.0f };
-		localTransform.Scale *= 3;
+		//localTransform.Scale *= 3;
 		//localTransform.Rotation = { 0.0f,180.0f,0.0f };
-		float randX = rand() % 10;
-		float randZ = rand() % 10;
+		//float randX = rand() % 10;
+		//float randZ = rand() % 10;
 		//localTransform.Position = { 0.0f,5.0f,0.0f };
-		localTransform.Position = { randX,5.0f,randZ };
+		//localTransform.Position = { randX,5.0f,randZ };
 
 
 		const wchar_t *modelFile = L"asset/Alicia/FBX/Alicia_solid_Unity.FBX";
-		//const wchar_t *modelFile2 = L"asset/Dragon/Dragon 2.5_fbx.fbx";
+		const wchar_t *modelFile2 = L"asset/Dragon/Dragon 2.5_fbx.fbx";
 		//const wchar_t *modelFile3 = L"asset/a.fbx";
 		const wchar_t *modelFile4 = L"asset/sponza (1)/sponza.obj";	
 		const wchar_t *modelFile5 = L"asset/model/sphere_smooth.obj";
@@ -47,7 +47,7 @@ namespace ym
 		flag |= ModelSetting::AdjustScale;
 		ImportSettings importSetting = // ‚±‚êŽ©‘Ì‚ÍŽ©ì‚Ì“Ç‚Ýž‚ÝÝ’è\‘¢‘Ì
 		{
-			modelFile5,
+			modelFile2,
 			flag
 		};
 
@@ -85,12 +85,11 @@ namespace ym
 
 		auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();
 		sceneRenderRegistrar->AddRenderObject(this);
-
-		auto boxCollider = AddComponent<SphereCollider>();
-		//boxCollider->isTrigger = true;
-		auto rb = AddComponent<Rigidbody>().get();
-		rb->mass = 1000;
-		//rb->useGravity = false;
+		//auto boxCollider = AddComponent<SphereCollider>();
+		////boxCollider->isTrigger = true;
+		//auto rb = AddComponent<Rigidbody>().get();
+		//rb->mass = 1000;
+		////rb->useGravity = false;
 	}
 
 	void TestObject2::FixedUpdate()
@@ -102,7 +101,7 @@ namespace ym
 	void TestObject2::Update()
 	{
 
-		auto &input = KeyboardInput::GetInstance();
+		//auto &input = KeyboardInput::Instance();
 
 		
 		Object::Update();

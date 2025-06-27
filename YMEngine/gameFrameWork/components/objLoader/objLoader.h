@@ -38,8 +38,12 @@ namespace ym
 		void FixedUpdate() override;
 		void Update() override;
 		void Draw() override;
+		void DrawImguiBody() override;
 		void Uninit() override;
+		const char *GetName() const override { return "OBJLoader"; }
 		void SetMaterial(std::shared_ptr<Material>material,u32 index);
+
+		void SetTransform(Transform *transform) { transform_ = transform; }
 
 
 		std::vector<Mesh> Load(ImportSettings settings); // FBXファイルを読み
@@ -81,6 +85,7 @@ namespace ym
 		int flags_ = 0;// 読み込みフラグ
 
 		bool isInit_ = false;
+		Transform *transform_ = nullptr;//個別にモデルの大きさや位置を設定したい場合を設定したい場合
 		/*std::vector<std::string> texturePaths_;
 		std::vector<std::shared_ptr<ym::Texture>> textures_;
 		std::vector<std::shared_ptr<ym::TextureView>> textureViews_;

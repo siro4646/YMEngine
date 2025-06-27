@@ -4,6 +4,12 @@
 
 #include "utility/inputSystem/keyBoard/keyBoardInput.h"
 
+#include "application/application.h"
+
+#include "gameFrameWork/light/pointLight.h"
+
+#include "gameFrameWork/gameObject/gameObjectManager.h"
+
 namespace ym
 {
 	void MainCamera::Init()
@@ -20,57 +26,74 @@ namespace ym
 
 	void MainCamera::Update()
 	{		
-		auto &input = KeyboardInput::GetInstance();
+		auto &input = KeyboardInput::Instance();
+		static float speed = 0.3f;
 
 		//親がいないなら
 		if (!_parent)
 		{
+			if (input.GetKeyDown("RSHIFT"))
+			{
+				speed = 6.f;
+			}
+			if (input.GetKeyUp("RSHIFT"))
+			{
+				speed = 0.3f;
+			}
+			if (input.GetKeyDown("SPACE"))
+			{							
+
+			}
+			auto delta = Application::Instance()->GetDeltaTime();
 			if (input.GetKey("W"))
 			{
 				auto forward = localTransform.GetForward();
-				localTransform.Position += 0.05f * forward;
+				localTransform.Position += speed * forward *delta;
 			}
 			if (input.GetKey("S"))
 			{
-				//localTransform.Position.z -= 0.05f;
+				//localTransform.Position.z -= speed;
 				auto forward = localTransform.GetForward();
-				localTransform.Position -= 0.05f * forward;
+				localTransform.Position -= speed * forward * delta;
 
 			}
 			if (input.GetKey("A"))
 			{
 				auto right = localTransform.GetRight();
 
-				localTransform.Position -= 0.05f * right;
+				localTransform.Position -= speed * right * delta;
 			}
 			if (input.GetKey("D"))
 			{
 				auto right = localTransform.GetRight();
 
-				localTransform.Position += 0.05f * right;
+				localTransform.Position += speed * right * delta;
 			}
 			if (input.GetKey("Q"))
 			{
-				localTransform.Position.y += 0.05f;
+				localTransform.Position.y += speed * delta;
 			}
 			if (input.GetKey("E"))
 			{
-				localTransform.Position.y -= 0.05f;
+				localTransform.Position.y -= speed * delta;
 			}
-			//サイズ変える
-			if (input.GetKey("T"))
+			if (input.GetKeyDown("T"))
 			{
-				localTransform.Rotation.y -= 1.0f;
+				localTransform.Rotation.y -= speed*100;
 			}
-			if (input.GetKey("Y"))
+			if (input.GetKeyDown("Y"))
 			{
-				localTransform.Rotation.y += 1.0f;
+				localTransform.Rotation.y += speed*100;
 
 			}
-			if (input.GetKey("0"))
+
+			if (input.GetKeyDown("U"))
 			{
-				localTransform.Position = Vector3::zero;
-				//localTransform.Rotation = Vector3::zero;
+				distance_ -= 100;
+			}
+			if (input.GetKeyDown("I"))
+			{
+				distance_ += 100;
 			}
 		}
 

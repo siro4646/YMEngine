@@ -35,7 +35,7 @@ namespace ym
 	void DissolveMaterial::Update()
 	{
 		if (isInit_ == false) return;
-		auto &input = KeyboardInput::GetInstance();
+		auto &input = KeyboardInput::Instance();
 		if (input.GetKeyDown("8"))
 		{
 			time_.time += 0.1f;

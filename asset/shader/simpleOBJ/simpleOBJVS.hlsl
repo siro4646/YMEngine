@@ -1,4 +1,6 @@
 #include "../Header/modelStruct.hlsli"
+#include "../Header/func.hlsli"
+
 struct PSInput
 {
     float4 pos : SV_POSITION;
@@ -28,9 +30,15 @@ PSInput main(VSInput Input)
     //output.pos = mul(output.pos, view); // ビュー行列適用
     //output.pos = mul(output.pos, proj); // プロジェクション行列適用
     
-    //Input.normal.
-    float3x3 normalMatrix = (float3x3) mat; // 上3x3を取り出す
-    output.normal = float4(normalize(mul(normalMatrix, Input.normal)), 1);
+    float4x4 worldInvTrans = transpose(MyInverse(mat)); // mat = Scale * Rotation * Translation
+    float3x3 normalMatrix = (float3x3) worldInvTrans; // 上3×3を抜き出す
+
+    float3 nWorld = mul(normalMatrix, Input.normal);
+    nWorld = normalize(nWorld);
+
+// 法線ベクトルなので w=0
+    output.normal = float4(nWorld, 0.0f);
+    
     output.color = Input.color;
     output.uv = Input.uv;
     output.ray = normalize(worldPos.xyz - eye); // カメラ位置からワールド座標への方向

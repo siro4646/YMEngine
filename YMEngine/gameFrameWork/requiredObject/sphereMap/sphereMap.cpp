@@ -18,7 +18,7 @@ namespace ym
 	{
 		localTransform.Position = { 0.0f,0.0f,0.0f };
 		localTransform.Scale = { 1.0f,1.0f,1.0f };
-		localTransform.Scale *= 100;
+		localTransform.Scale *= 50;
 
 		name = "SphereMap";
 

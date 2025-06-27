@@ -97,7 +97,7 @@ namespace ym
 	void TestObject3::Update()
 	{
 
-		auto &input = KeyboardInput::GetInstance();
+		auto &input = KeyboardInput::Instance();
 		if (input.GetKeyDown("7"))
 		{
 			auto sceneRenderRegistrar = SceneRenderRegistrar::Instance();

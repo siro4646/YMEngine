@@ -8,7 +8,6 @@ namespace ym
 	bool SwapChain::Init(Device *pDev, CommandQueue *pQueue, HWND hwnd, u32 width, u32 height)
 	{
 		bool enableHDR = pDev->GetColorSpaceType() != ColorSpaceType::Rec709;
-
 		{
 			DXGI_SWAP_CHAIN_DESC1 desc = {};
 			desc.BufferCount = kFrameCount;
@@ -169,6 +168,26 @@ namespace ym
 		height_ = height;
 
 	}
+	void SwapChain::Resize(HWND hwnd)
+	{
+		RECT rect;
+		GetClientRect(hwnd, &rect);
+
+		// DPI補正（必要なら）
+		HMONITOR hMonitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST);
+		UINT dpiX, dpiY;
+		GetDpiForMonitor(hMonitor, MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
+		float scale = dpiX / 96.0f;
+
+		UINT width = static_cast<UINT>((rect.right - rect.left) * scale);
+		UINT height = static_cast<UINT>((rect.bottom - rect.top) * scale);
+
+		pSwapChain_->ResizeBuffers(kFrameCount, width, height, pDevice_->GetSwapChain().GetCurrentRenderTargetView()->GetFormat(), 0);
+
+		width_ = width;
+		height_ = height;
+	}
+
 	D3D12_CPU_DESCRIPTOR_HANDLE SwapChain::GetDescHandle(int index)
 	{
 		return renderTargetViews_[index].GetDescInfo().cpuHandle;

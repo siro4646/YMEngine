@@ -128,7 +128,7 @@ namespace ym
 		}
 
 
-		static MouseInput &GetInstance()
+		static MouseInput &Instance()
 		{
 			static MouseInput instance;
 			return instance;

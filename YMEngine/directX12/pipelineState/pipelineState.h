@@ -103,6 +103,7 @@ namespace ym
 		}
 
 		bool Init(Device *pDev, const GraphicsPipelineStateDesc &desc);
+		void Update(Device *pDev);
 		void Destroy();
 
 		static GraphicsPipelineStateDesc GetDefaultDesc();
@@ -112,6 +113,9 @@ namespace ym
 
 	private:
 		ID3D12PipelineState *pPipelineState_{ nullptr };
+
+		GraphicsPipelineStateDesc desc_{};
+
 	};	// class GraphicsPipelineState
 
 	class ComputePipelineState
@@ -125,6 +129,7 @@ namespace ym
 		}
 
 		bool Init(Device *pDev, const ComputePipelineStateDesc &desc);
+		bool InitFromEntryPoint(Device *pDev, const ComputePipelineStateDesc &desc, const std::string &csEntryPoint);
 		void Destroy();
 
 		// getter

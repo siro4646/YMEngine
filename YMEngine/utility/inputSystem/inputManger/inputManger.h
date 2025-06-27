@@ -5,6 +5,8 @@
 #include "../gamePad/gamePadInput.h"
 #include "../mouse/mouseInput.h"
 
+#include "application/application.h"
+
 namespace ym {
 
 	class InputManager
@@ -61,30 +63,23 @@ namespace ym {
 			return false;
 		}
 
-		static InputManager &GetInstance() {
+		static InputManager &Instance() {
 			static InputManager instance;
 			return instance;
 		}
 
 		void Initialize(HWND hWnd) {
-			KeyboardInput::GetInstance().Initialize(hWnd);
-			MouseInput::GetInstance().Initialize(hWnd);
+			KeyboardInput::Instance().Initialize(hWnd);
+			MouseInput::Instance().Initialize(hWnd);
 		}
 
 		void Update() {
-			/*auto th1 = std::thread([]
-				{
-
-					KeyboardInput::GetInstance().Update();
-				});
-			auto th2 = std::thread([]
-				{
-					MouseInput::GetInstance().Update();
-				});
-			th1.join();
-			th2.join();*/
-			KeyboardInput::GetInstance().Update();
-			MouseInput::GetInstance().Update();
+			KeyboardInput::Instance().Update();
+			MouseInput::Instance().Update();
+		}
+		void Poll()
+		{
+			KeyboardInput::Instance().Poll();
 
 		}
 
